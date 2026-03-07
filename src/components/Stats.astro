@@ -1,0 +1,119 @@
+---
+---
+<section class="stats-section reveal">
+  <div class="stats-grid">
+    <div class="stat-card reveal reveal-delay-1">
+      <div class="stat-icon">⚽</div>
+      <div class="stat-number" data-target="47">0</div>
+      <div class="stat-label">Matches Analyzed</div>
+    </div>
+    <div class="stat-card reveal reveal-delay-2">
+      <div class="stat-icon">💻</div>
+      <div class="stat-number" data-target="12">0</div>
+      <div class="stat-label">Projects Built</div>
+    </div>
+    <div class="stat-card reveal reveal-delay-3">
+      <div class="stat-icon">✍️</div>
+      <div class="stat-number" data-target="24">0</div>
+      <div class="stat-label">Blog Posts</div>
+    </div>
+    <div class="stat-card reveal reveal-delay-4">
+      <div class="stat-icon">🏆</div>
+      <div class="stat-number" data-target="8">0</div>
+      <div class="stat-label">Achievements</div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .stats-section {
+    padding: 4rem 0;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .stat-card {
+    text-align: center;
+    padding: 2rem 1.5rem;
+    border-radius: 20px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.5s ease;
+  }
+  .stat-card:hover::before { transform: scaleX(1); }
+  .stat-card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--glass-shadow-hover);
+  }
+
+  .stat-number {
+    font-family: var(--font-display);
+    font-size: 3rem;
+    font-weight: 800;
+    background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+  .stat-label {
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted-text);
+    font-family: var(--font-mono);
+  }
+  .stat-icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  @media (max-width: 768px) {
+    .stats-section { padding: 1.5rem 0 !important; }
+    .stats-grid { gap: 1rem !important; }
+    .stat-card { padding: 1.25rem 1rem !important; }
+    .stat-number { font-size: 2.5rem !important; }
+  }
+</style>
+
+<script is:inline>
+  (() => {
+    // STATS COUNTER
+    const statsObserver = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const num = entry.target;
+          const target = +num.dataset.target;
+          let current = 0;
+          const increment = target / 60;
+          const timer = setInterval(() => {
+            current += increment;
+            if (current >= target) { num.textContent = target + '+'; clearInterval(timer); }
+            else { num.textContent = Math.floor(current); }
+          }, 30);
+          statsObserver.unobserve(num);
+        }
+      });
+    }, { threshold: 0.5 });
+    document.querySelectorAll('.stat-number[data-target]').forEach(el => statsObserver.observe(el));
+  })();
+</script>

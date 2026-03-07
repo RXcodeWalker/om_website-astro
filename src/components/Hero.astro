@@ -1,0 +1,208 @@
+---
+---
+<section class="hero-spectacular">
+  <canvas id="hero-canvas"></canvas>
+  <div class="container">
+    <div class="hero-eyebrow">Arsenal · Code · Growth</div>
+    <h1 class="hero-title">Beyond The Basics</h1>
+    <div class="hero-roles">
+      <span id="hero-static">Created by a 10th grader who </span>
+      <span class="typewriter-text" id="typewriter"></span><span class="cursor">|</span>
+    </div>
+    <div class="hero-cta-group">
+      <a href="/blog" class="btn-primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+        </svg>
+        Read the Blog
+      </a>
+      <a href="/about" class="btn-ghost">
+        About Me
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+          <polyline points="12 5 19 12 12 19"></polyline>
+        </svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* ---- Hero Canvas ---- */
+  #hero-canvas {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    opacity: 0.8;
+  }
+
+  /* ---- HERO SECTION ---- */
+  .hero-spectacular {
+    position: relative;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    text-align: center;
+  }
+
+  .hero-spectacular .container {
+    position: relative;
+    z-index: 2;
+  }
+
+  .hero-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--accent-1);
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: heroReveal 0.8s ease 0.2s forwards;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .hero-eyebrow::before, .hero-eyebrow::after {
+    content: '';
+    width: 40px;
+    height: 1px;
+    background: var(--accent-1);
+    opacity: 0.6;
+  }
+
+  .hero-title {
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 7vw, 6rem);
+    font-weight: 800;
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    background: linear-gradient(135deg, var(--accent-1) 0%, var(--accent-2) 50%, var(--accent-3) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    background-size: 200% auto;
+    animation: gradientShift 6s ease infinite, heroReveal 0.8s ease 0.4s both;
+    margin-bottom: 1.5rem;
+  }
+
+  .hero-roles {
+    font-family: var(--font-body);
+    font-size: clamp(1rem, 2.5vw, 1.3rem);
+    font-weight: 300;
+    color: var(--muted-text);
+    margin-bottom: 2.5rem;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: heroReveal 0.8s ease 0.6s forwards;
+    height: 2rem;
+  }
+
+  .hero-roles .typewriter-text {
+    color: var(--text-color);
+    font-weight: 500;
+  }
+
+  .hero-cta-group {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: heroReveal 0.8s ease 0.8s forwards;
+  }
+
+  @keyframes heroReveal {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 768px) {
+    .hero-spectacular { height: 80vh !important; min-height: 500px; }
+    .hero-title { font-size: 3rem !important; margin-bottom: 1rem !important; }
+    .hero-roles { margin-bottom: 1.5rem !important; }
+  }
+</style>
+
+<script is:inline>
+  (() => {
+    // HERO CANVAS
+    const heroCanvas = document.getElementById('hero-canvas');
+    if (heroCanvas) {
+      const hCtx = heroCanvas.getContext('2d');
+      function resizeHeroCanvas() {
+        heroCanvas.width = heroCanvas.offsetWidth;
+        heroCanvas.height = heroCanvas.offsetHeight;
+      }
+      resizeHeroCanvas();
+      window.addEventListener('resize', resizeHeroCanvas);
+
+      function drawPitch(ctx, w, h) {
+        ctx.clearRect(0, 0, w, h);
+        ctx.strokeStyle = 'rgba(76, 201, 240, 0.07)';
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.arc(w/2, h/2, Math.min(w,h)*0.18, 0, Math.PI*2); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(w/2, 0); ctx.lineTo(w/2, h); ctx.stroke();
+        const pad = 20; ctx.strokeRect(pad, pad, w-pad*2, h-pad*2);
+        const pw = w*0.18, ph = h*0.45;
+        ctx.strokeRect(pad, (h-ph)/2, pw, ph); ctx.strokeRect(w-pad-pw, (h-ph)/2, pw, ph);
+      }
+
+      const particles = Array.from({length: 60}, () => ({
+        x: Math.random() * 800, y: Math.random() * 500, r: Math.random() * 2 + 0.5,
+        vx: (Math.random() - 0.5) * 0.3, vy: (Math.random() - 0.5) * 0.3,
+        alpha: Math.random() * 0.3 + 0.05, color: Math.random() > 0.5 ? '76,201,240' : '138,79,255'
+      }));
+
+      let heroMouseX = 0, heroMouseY = 0;
+      document.addEventListener('mousemove', e => {
+        const rect = heroCanvas.getBoundingClientRect();
+        heroMouseX = e.clientX - rect.left;
+        heroMouseY = e.clientY - rect.top;
+      });
+
+      function animateHero() {
+        const w = heroCanvas.width, h = heroCanvas.height;
+        hCtx.clearRect(0, 0, w, h);
+        drawPitch(hCtx, w, h);
+        particles.forEach(p => {
+          const dx = p.x - heroMouseX, dy = p.y - heroMouseY;
+          const dist = Math.sqrt(dx*dx + dy*dy);
+          if (dist < 80) { p.vx += (dx / dist) * 0.1; p.vy += (dy / dist) * 0.1; }
+          p.x += p.vx; p.y += p.vy; p.vx *= 0.99; p.vy *= 0.99;
+          if (p.x < 0 || p.x > w) p.vx *= -1; if (p.y < 0 || p.y > h) p.vy *= -1;
+          hCtx.beginPath(); hCtx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+          hCtx.fillStyle = `rgba(${p.color}, ${p.alpha})`; hCtx.fill();
+        });
+        requestAnimationFrame(animateHero);
+      }
+      animateHero();
+    }
+
+    // TYPEWRITER
+    const phrases = ['analyzes Arsenal tactics', 'writes code for fun', 'loves learning new things', 'thinks in systems', 'builds cool websites', 'follows football obsessively'];
+    let phraseIdx = 0, charIdx = 0, isDeleting = false;
+    const tw = document.getElementById('typewriter');
+    function typeWriter() {
+      if (!tw) return;
+      const phrase = phrases[phraseIdx];
+      if (isDeleting) {
+        charIdx--;
+        tw.textContent = phrase.substring(0, charIdx);
+        if (charIdx === 0) { isDeleting = false; phraseIdx = (phraseIdx + 1) % phrases.length; setTimeout(typeWriter, 500); return; }
+        setTimeout(typeWriter, 50);
+      } else {
+        charIdx++;
+        tw.textContent = phrase.substring(0, charIdx);
+        if (charIdx === phrase.length) { isDeleting = true; setTimeout(typeWriter, 2000); return; }
+        setTimeout(typeWriter, 80);
+      }
+    }
+    setTimeout(typeWriter, 1800);
+  })();
+</script>

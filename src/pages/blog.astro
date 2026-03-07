@@ -1,0 +1,33 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/ui/PageHeader.astro';
+import BlogSearch from '../components/blog/BlogSearch.astro';
+import '../styles/blog.css';
+import '../styles/blog-spectacular.css';
+---
+
+<BaseLayout title="Om — Blog" description="In-depth Arsenal analysis, tactical breakdowns, and football insights by Om Jhamvar.">
+  <main class="container main-content">
+    
+    <PageHeader 
+      eyebrow="Words & Thoughts" 
+      title="My Blog" 
+      description="Football tactics, coding journeys, personal growth — unfiltered and straight from the source."
+      useTypewriter={true}
+    />
+
+    <BlogSearch />
+
+    <div class="blog-grid" id="blog-grid">
+      <article class="glass-card">
+        <h3>Loading posts...</h3>
+        <p class="text-muted">Please wait while content loads.</p>
+      </article>
+    </div>
+
+  </main>
+
+  <script is:inline src="/js/spectacular-shared.js"></script>
+  <script is:inline src="/js/blog.js"></script>
+  <script is:inline src="/js/utils/cursor.js"></script>
+</BaseLayout>

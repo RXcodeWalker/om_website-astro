@@ -1,0 +1,95 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/ui/PageHeader.astro';
+import Card from '../components/ui/Card.astro';
+
+const achievements = [
+  {
+    title: "Built First Personal Website",
+    date: "2025",
+    description: "Created a fully functional personal website with blog functionality using HTML, CSS, and JavaScript with liquid glass design aesthetics.",
+    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>',
+    gradient: "linear-gradient(135deg, var(--accent-1), var(--accent-2))"
+  },
+  {
+    title: "Guitar — LCM Grade 8, High Distinction",
+    date: "2025",
+    description: "Reached advanced-level musicianship and pre-diploma standard. Performed live at annual concerts playing 'Joker and the Thief', 'Slither', and 'It\'s My Life' solo. Currently pursuing Diploma level.",
+    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>',
+    gradient: "linear-gradient(135deg, var(--accent-2), var(--accent-3))"
+  },
+  {
+    title: "Learning & Growing",
+    date: "Ongoing",
+    description: "Continuously improving skills in web development, software engineering, and technical writing while balancing academics.",
+    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>',
+    gradient: "linear-gradient(135deg, var(--accent-3), var(--accent-1))"
+  }
+];
+---
+
+<BaseLayout title="Om — Achievements">
+  <main class="container main-content">
+    
+    <PageHeader 
+      eyebrow="Milestones" 
+      title="Achievements" 
+      description="Milestones and accomplishments on my journey as a student developer and musician."
+      useTypewriter={true}
+    />
+
+    <div class="achievements-grid">
+      {achievements.map((achievement, index) => (
+        <Card 
+          title={achievement.title}
+          date={achievement.date}
+          description={achievement.description}
+          icon={achievement.icon}
+          gradient={achievement.gradient}
+          delay={`${index * 0.1}s`}
+        />
+      ))}
+    </div>
+
+    <section class="glass-card glass-feature reveal" style="margin-top: 3rem;">
+      <div class="feature-content">
+        <div class="next-icon">🚀</div>
+        <h2>What's Next?</h2>
+        <p class="text-muted">Focused on building my skills in software development, contributing to open source, and creating projects that solve real problems. Stay tuned!</p>
+      </div>
+    </section>
+
+  </main>
+
+  <style>
+    .achievements-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+    .glass-feature {
+      text-align: center;
+      padding: 4rem 2rem;
+    }
+    .next-icon {
+      font-size: 2.5rem;
+      margin-bottom: 1.5rem;
+    }
+  </style>
+
+  <script is:inline>
+    // Universal 3D Tilt Script
+    document.querySelectorAll('.tilt-card').forEach(card => {
+      card.addEventListener('mousemove', e => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left, y = e.clientY - rect.top;
+        const centerX = rect.width / 2, centerY = rect.height / 2;
+        const rotateX = (y - centerY) / centerY * -8, rotateY = (x - centerX) / centerX * 8;
+        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(10px)`;
+        card.style.setProperty('--mouse-x', (x / rect.width * 100) + '%');
+        card.style.setProperty('--mouse-y', (y / rect.height * 100) + '%');
+      });
+      card.addEventListener('mouseleave', () => card.style.transform = '');
+    });
+  </script>
+</BaseLayout>

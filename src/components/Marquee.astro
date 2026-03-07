@@ -1,0 +1,65 @@
+---
+---
+<div class="marquee-section">
+  <div class="marquee-track" id="marquee-track">
+    <span class="marquee-item"><span class="marquee-dot"></span>Football Tactics</span>
+    <span class="marquee-item"><span class="marquee-dot"></span>Arsenal FC</span>
+    <span class="marquee-item"><span class="marquee-dot"></span>Web Development</span>
+    <span class="marquee-item"><span class="marquee-dot"></span>Python</span>
+    <span class="marquee-item"><span class="marquee-dot"></span>Creative Coding</span>
+    <span class="marquee-item"><span class="marquee-dot"></span>Strategic Analysis</span>
+    <span class="marquee-item"><span class="marquee-dot"></span>10th Grade Builder</span>
+    <span class="marquee-item"><span class="marquee-dot"></span>Learning in Public</span>
+    <!-- Duplicate for seamless loop -->
+    <span class="marquee-item"><span class="marquee-dot"></span>Football Tactics</span>
+    <span class="marquee-item"><span class="marquee-dot"></span>Arsenal FC</span>
+    <span class="marquee-item"><span class="marquee-dot"></span>Web Development</span>
+    <span class="marquee-item"><span class="marquee-dot"></span>Python</span>
+    <span class="marquee-item"><span class="marquee-dot"></span>Creative Coding</span>
+    <span class="marquee-item"><span class="marquee-dot"></span>Strategic Analysis</span>
+    <span class="marquee-item"><span class="marquee-dot"></span>10th Grade Builder</span>
+    <span class="marquee-item"><span class="marquee-dot"></span>Learning in Public</span>
+  </div>
+</div>
+
+<style>
+  .marquee-section {
+    padding: 2rem 0;
+    overflow: hidden;
+    border-top: 1px solid var(--glass-border);
+    border-bottom: 1px solid var(--glass-border);
+    margin: 4rem 0;
+  }
+  .marquee-track {
+    display: flex;
+    gap: 3rem;
+    animation: marqueeScroll 20s linear infinite;
+    white-space: nowrap;
+  }
+  .marquee-track:hover { animation-play-state: paused; }
+  .marquee-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--muted-text);
+    flex-shrink: 0;
+  }
+  .marquee-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent-1);
+  }
+  @keyframes marqueeScroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  @media (max-width: 768px) {
+    .marquee-section { margin: 2rem 0 !important; padding: 1rem 0 !important; }
+  }
+</style>

@@ -1,0 +1,86 @@
+---
+---
+<section class="glass-card contact-section reveal">
+  <div class="card-shine"></div>
+  <h2 class="section-title">Send a Message</h2>
+  <form class="contact-form" action="https://formspree.io/f/xzdajdnn" method="POST">
+    <input type="hidden" name="_subject" value="New message from Om's website">
+    <input type="hidden" name="_captcha" value="false">
+    
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="name">Name</label>
+        <input type="text" id="name" name="name" placeholder="Your name" required>
+      </div>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" placeholder="your.email@example.com" required>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="message">Message</label>
+      <textarea id="message" name="message" placeholder="What would you like to discuss?" rows="6" required></textarea>
+    </div>
+
+    <button type="submit" class="submit-btn btn-primary">
+      Send Message
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+    </button>
+  </form>
+</section>
+
+<style>
+  .contact-section {
+    padding: 3rem;
+    margin-top: 2rem;
+  }
+  .section-title {
+    font-size: 1.8rem;
+    margin-bottom: 2rem;
+  }
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  @media (max-width: 640px) {
+    .form-grid { grid-template-columns: 1fr; }
+  }
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    margin-bottom: 1.5rem;
+  }
+  .form-group label {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    color: var(--accent-1);
+    letter-spacing: 0.1em;
+  }
+  .form-group input, 
+  .form-group textarea {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 1rem;
+    color: var(--text-color);
+    font-family: inherit;
+    transition: all 0.3s ease;
+  }
+  .form-group input:focus, 
+  .form-group textarea:focus {
+    outline: none;
+    border-color: var(--accent-1);
+    background: rgba(255, 255, 255, 0.06);
+    box-shadow: 0 0 20px rgba(76, 201, 240, 0.1);
+  }
+  .submit-btn {
+    width: 100%;
+    justify-content: center;
+    padding: 1.2rem;
+  }
+</style>

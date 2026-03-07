@@ -1,0 +1,125 @@
+---
+---
+<section class="section about-strip reveal" style="margin-top: 1rem;">
+  <div class="about-text">
+    <div class="section-label">Who I Am</div>
+    <h2>A student building<br><span class="gradient-text">in public</span></h2>
+    <p>Hey! I'm Om Jhamvar — a 10th grader from India obsessed with two things: football (specifically the tactical brilliance of Arsenal) and the craft of building software.</p>
+    <p>This site is where I document everything I learn, analyze, and create. No polish required — just honest work in progress.</p>
+    <div class="about-tags">
+      <span class="about-tag">⚽ Arsenal FC</span>
+      <span class="about-tag">💻 Web Dev</span>
+      <span class="about-tag">🐍 Python</span>
+      <span class="about-tag">📊 Data Analysis</span>
+      <span class="about-tag">🧠 Tactics</span>
+      <span class="about-tag">🎨 Design</span>
+      <span class="about-tag">📖 Continuous Learner</span>
+    </div>
+    <div style="margin-top: 2rem;">
+      <a href="/about" class="btn-ghost">Full story →</a>
+    </div>
+  </div>
+
+  <div class="glass-card tilt-card" style="background: linear-gradient(135deg, rgba(76,201,240,0.08), rgba(138,79,255,0.08)); border-color: rgba(76,201,240,0.2);">
+    <div class="card-shine"></div>
+    <div style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--accent-1); letter-spacing: 0.15em; margin-bottom: 1.5rem;">QUICK FACTS</div>
+    <div id="quick-facts">
+      <div class="quick-fact">
+        <span class="qf-icon">🏫</span>
+        <div>
+          <div class="qf-label">Grade</div>
+          <div class="qf-value">10th Grade Student</div>
+        </div>
+      </div>
+      <div class="quick-fact">
+        <span class="qf-icon">❤️</span>
+        <div>
+          <div class="qf-label">Club</div>
+          <div class="qf-value">Arsenal FC</div>
+        </div>
+      </div>
+      <div class="quick-fact">
+        <span class="qf-icon">🔭</span>
+        <div>
+          <div class="qf-label">Currently</div>
+          <div class="qf-value">Learning & building daily</div>
+        </div>
+      </div>
+      <div class="quick-fact">
+        <span class="qf-icon">🎯</span>
+        <div>
+          <div class="qf-label">Goal</div>
+          <div class="qf-value">Build things that matter</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .about-strip {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: center;
+    padding: 3rem 0;
+  }
+  @media (max-width: 640px) {
+    .about-strip { grid-template-columns: 1fr; }
+  }
+  .about-text h2 {
+    font-family: var(--font-display);
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 1rem;
+  }
+  .about-text p {
+    color: var(--muted-text);
+    line-height: 1.8;
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+  }
+  .about-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+  }
+  .about-tag {
+    padding: 0.4rem 1rem;
+    border-radius: 50px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--muted-text);
+    letter-spacing: 0.05em;
+    transition: all 0.3s ease;
+  }
+  .about-tag:hover {
+    border-color: var(--accent-1);
+    color: var(--accent-1);
+    transform: translateY(-2px);
+  }
+  .gradient-text {
+    background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .quick-fact {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+    align-items: center;
+  }
+  .qf-icon { font-size: 1.2rem; }
+  .qf-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--muted-text); text-transform: uppercase; }
+  .qf-value { font-weight: 600; font-size: 0.95rem; }
+
+  @media (max-width: 768px) {
+    .about-strip { padding: 1.5rem 0 !important; gap: 1.5rem !important; }
+  }
+</style>

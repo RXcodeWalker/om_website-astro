@@ -1,0 +1,87 @@
+---
+---
+<section class="section reveal" style="margin-top: 2rem;">
+  <div class="section-label">Skills & Interests</div>
+  <h2 class="section-heading">My <span>Universe</span></h2>
+  <div class="glass-card" style="padding: 1.5rem; overflow: hidden;">
+    <canvas id="skills-canvas"></canvas>
+  </div>
+</section>
+
+<style>
+  #skills-canvas {
+    width: 100%;
+    height: 300px;
+    border-radius: 20px;
+    display: block;
+  }
+</style>
+
+<script is:inline>
+  (() => {
+    // SKILLS CONSTELLATION
+    const sc = document.getElementById('skills-canvas');
+    if (sc) {
+      const sctx = sc.getContext('2d');
+      function resizeSkills() { 
+        sc.width = sc.offsetWidth; 
+        sc.height = sc.offsetHeight; 
+      }
+      resizeSkills();
+      window.addEventListener('resize', resizeSkills);
+
+      const skills = [
+        { name: 'HTML/CSS', x: 0.15, y: 0.3, size: 8, color: '76,201,240' },
+        { name: 'JavaScript', x: 0.28, y: 0.65, size: 9, color: '255,209,102' },
+        { name: 'Python', x: 0.45, y: 0.4, size: 10, color: '138,79,255' },
+        { name: 'Web Dev', x: 0.38, y: 0.2, size: 11, color: '76,201,240' },
+        { name: 'Football Tactics', x: 0.7, y: 0.3, size: 12, color: '239,1,7' },
+        { name: 'Arsenal Fan', x: 0.85, y: 0.25, size: 14, color: '239,1,7' }
+      ];
+
+      function drawSkills() {
+        sctx.clearRect(0, 0, sc.width, sc.height);
+        
+        // Draw lines between nodes
+        sctx.strokeStyle = 'rgba(128, 128, 128, 0.15)';
+        sctx.lineWidth = 1;
+        for (let i = 0; i < skills.length; i++) {
+          for (let j = i + 1; j < skills.length; j++) {
+            sctx.beginPath();
+            sctx.moveTo(skills[i].x * sc.width, skills[i].y * sc.height);
+            sctx.lineTo(skills[j].x * sc.width, skills[j].y * sc.height);
+            sctx.stroke();
+          }
+        }
+
+        // Draw nodes
+        skills.forEach(s => {
+          const x = s.x * sc.width, y = s.y * sc.height;
+          
+          // Glow
+          const grad = sctx.createRadialGradient(x, y, 0, x, y, s.size * 3);
+          grad.addColorStop(0, `rgba(${s.color}, 0.3)`);
+          grad.addColorStop(1, 'transparent');
+          sctx.fillStyle = grad;
+          sctx.beginPath();
+          sctx.arc(x, y, s.size * 3, 0, Math.PI * 2);
+          sctx.fill();
+
+          // Core
+          sctx.beginPath();
+          sctx.arc(x, y, s.size, 0, Math.PI * 2);
+          sctx.fillStyle = `rgb(${s.color})`;
+          sctx.fill();
+
+          // Label
+          sctx.fillStyle = 'var(--text-color)';
+          sctx.font = '500 12px DM Sans';
+          sctx.textAlign = 'center';
+          sctx.fillText(s.name, x, y + s.size + 20);
+        });
+        requestAnimationFrame(drawSkills);
+      }
+      drawSkills();
+    }
+  })();
+</script>

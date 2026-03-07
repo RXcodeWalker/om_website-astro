@@ -1,0 +1,62 @@
+---
+interface Props {
+  eyebrow: string;
+  title: string;
+  description: string;
+  useTypewriter?: boolean;
+}
+
+const { eyebrow, title, description, useTypewriter = false } = Astro.props;
+---
+
+<div class="page-hero reveal">
+  <div class="page-eyebrow">{eyebrow}</div>
+  <h1>
+    <span>{title}</span>
+  </h1>
+  <p>{description}</p>
+</div>
+
+<style>
+  .page-hero {
+    padding: 3.5rem 0 2rem;
+    margin-bottom: 2.5rem;
+  }
+  .page-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--accent-1);
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .page-eyebrow::before {
+    content: '';
+    width: 32px; height: 1px;
+    background: var(--accent-1);
+  }
+  .page-hero h1 {
+    font-family: var(--font-display);
+    font-size: clamp(2.2rem, 5vw, 3.5rem);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    margin-bottom: 0.75rem;
+  }
+  .page-hero h1 span {
+    background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .page-hero p {
+    font-family: var(--font-body);
+    font-size: 1.05rem;
+    color: var(--muted-text);
+    max-width: 560px;
+    line-height: 1.7;
+  }
+</style>

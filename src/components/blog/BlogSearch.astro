@@ -1,0 +1,89 @@
+---
+---
+<div class="blog-controls reveal" style="margin-bottom:1.5rem;">
+  <div class="search-wrapper">
+    <svg class="search-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+    <input type="text" id="search-input" placeholder="Search posts..." class="search-bar">
+  </div>
+  <div class="blog-filters">
+    <button class="filter-btn active" data-filter="all">All</button>
+    <button class="filter-btn" data-filter="Football">Football</button>
+    <button class="filter-btn" data-filter="Growth">Growth</button>
+  </div>
+</div>
+
+<style>
+  .blog-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.25rem;
+    width: 100%;
+  }
+  .search-wrapper {
+    position: relative;
+    width: 100%;
+  }
+  .search-icon {
+    position: absolute;
+    left: 1.25rem;
+    top: 42%;
+    transform: translateY(-50%);
+    color: var(--muted-text);
+    pointer-events: none;
+    z-index: 10;
+  }
+  .search-bar {
+    width: 100%;
+    padding: 1rem 1.5rem 1rem 3.5rem;
+    border-radius: 16px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    color: var(--text-color);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 1rem;
+    box-shadow: var(--glass-shadow);
+  }
+  .search-bar:focus {
+    outline: none;
+    border-color: var(--accent-1);
+    background: var(--glass-bg-strong);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent-1) 15%, transparent);
+    transform: translateY(-1px);
+  }
+  .blog-filters {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    padding-left: 0.25rem;
+  }
+  .filter-btn {
+    padding: 0.6rem 1.4rem;
+    border-radius: 100px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    color: var(--muted-text);
+    cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    transition: all 0.25s ease;
+  }
+  .filter-btn:hover {
+    border-color: var(--accent-1);
+    color: var(--accent-1);
+    transform: translateY(-2px);
+    background: var(--glass-bg-strong);
+  }
+  .filter-btn.active {
+    background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 4px 15px color-mix(in srgb, var(--accent-1) 30%, transparent);
+  }
+  @media (max-width: 640px) {
+    .blog-filters { width: 100%; gap: 0.5rem; }
+    .filter-btn { padding: 0.5rem 1rem; font-size: 0.7rem; }
+  }
+</style>

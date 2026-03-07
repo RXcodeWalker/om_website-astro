@@ -1,0 +1,41 @@
+/* 
+  =============================================================
+  GLOBAL STYLE ENTRY POINT
+  Consolidating all CSS into a single optimized bundle.
+  =============================================================
+*/
+
+@import './style.css';
+@import './spectacular.css';
+@import './pages.css';
+
+/* 
+  Global variables used across the site
+*/
+:root {
+  --font-display: 'Syne', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+  --font-mono: 'DM Mono', monospace;
+  
+  /* Shared accent variables for easy branding changes */
+  --accent-1: #4cc9f0;
+  --accent-2: #4361ee;
+  --accent-3: #7209b7;
+}
+
+/* 
+  Core Layout Fixes 
+*/
+body {
+  font-family: var(--font-body);
+  overflow-x: hidden;
+}
+
+.main-content {
+  min-height: 80vh;
+}
+
+/* Ensure the loader doesn't flash on every page if not needed */
+#loader.hide {
+  display: none;
+}
