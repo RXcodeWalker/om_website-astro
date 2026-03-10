@@ -25,16 +25,21 @@
   --muted-text:      #5a6a84;
 
   /* ── Glass system ── */
-  --glass-bg:            rgba(255,255,255,0.52);
-  --glass-bg-strong:     rgba(241, 239, 239, 0.93);
-  --glass-border:        rgba(255,255,255,0.60);
-  --glass-border-inner:  rgba(255,255,255,0.85);
-  --glass-border-outer:  rgba(200,215,240,0.35);
-  --glass-shadow:        0 4px 24px rgba(30,50,100,0.09), 0 1px 4px rgba(30,50,100,0.06);
-  --glass-shadow-hover:  0 16px 48px rgba(30,50,100,0.16), 0 4px 16px rgba(30,50,100,0.08);
-  --glass-blur:          24px;
-  --glass-sat:           200%;
-  --glass-noise:         0.38;
+  --glass-bg:            rgba(255,255,255,0.58);
+  --glass-bg-strong:     rgba(248,252,255,0.88);
+  --glass-border:        rgba(255,255,255,0.64);
+  --glass-border-inner:  rgba(255,255,255,0.92);
+  --glass-border-outer:  rgba(170,194,232,0.34);
+  --glass-shadow:        0 10px 30px rgba(14,28,56,0.10), 0 2px 8px rgba(14,28,56,0.06);
+  --glass-shadow-hover:  0 24px 62px rgba(14,30,62,0.18), 0 8px 24px rgba(14,30,62,0.1);
+  --glass-blur:          26px;
+  --glass-sat:           185%;
+  --glass-noise:         0.3;
+  --glass-top-edge:      rgba(255,255,255,0.46);
+  --glass-inner-shadow:  rgba(12,20,42,0.08);
+  --glass-bleed:         color-mix(in srgb, var(--accent-1) 10%, transparent);
+  --glass-bleed-secondary: color-mix(in srgb, var(--accent-2) 8%, transparent);
+  --category-reflection: var(--accent-1);
 
   /* ── Accent colors (default: arctic) ── */
   --accent-1: #4cc9f0;
@@ -47,9 +52,27 @@
   --font-mono:    'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
 
   /* ── Spacing & radius ── */
-  --card-radius:  22px;
+  --card-radius:  20px;
   --input-bg:     rgba(255,255,255,0.6);
   --container:    1020px;
+
+  /* Haptic motion tokens */
+  --haptic-duration-in: 170ms;
+  --haptic-duration-out: 360ms;
+  --curve-haptic-compress: cubic-bezier(0.2, 0, 0.2, 1);
+  --curve-haptic-overshoot: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --curve-haptic-recover: cubic-bezier(0.22, 1, 0.36, 1);
+  --haptic-lift: -4px;
+  --haptic-lift-touch: -2px;
+  --haptic-hover-scale: 1.012;
+  --haptic-press-scale: 0.984;
+  --surface-contrast-hover: 1.06;
+  --surface-contrast-press: 0.99;
+
+  /* Nav motion + thread */
+  --nav-pad: 0.88rem;
+  --nav-scale: 1;
+  --nav-progress: 0;
 }
 
 /* =========================================================
@@ -63,13 +86,17 @@ html[data-theme="dark"] {
   --text-secondary:  #b8c8e0;
   --muted-text:      #7890b0;
 
-  --glass-bg:            rgba(18,24,44,0.65);
-  --glass-bg-strong:     rgba(22,30,54,0.78);
-  --glass-border:        rgba(255,255,255,0.095);
-  --glass-border-inner:  rgba(255,255,255,0.14);
-  --glass-border-outer:  rgba(60,80,120,0.25);
-  --glass-shadow:        0 4px 24px rgba(0,0,0,0.35), 0 1px 4px rgba(0,0,0,0.2);
-  --glass-shadow-hover:  0 16px 60px rgba(0,0,0,0.55), 0 4px 20px rgba(0,0,0,0.3);
+  --glass-bg:            rgba(16,23,44,0.68);
+  --glass-bg-strong:     rgba(24,33,60,0.84);
+  --glass-border:        rgba(255,255,255,0.13);
+  --glass-border-inner:  rgba(255,255,255,0.18);
+  --glass-border-outer:  rgba(66,90,138,0.28);
+  --glass-shadow:        0 12px 34px rgba(0,0,0,0.42), 0 2px 10px rgba(0,0,0,0.24);
+  --glass-shadow-hover:  0 26px 68px rgba(0,0,0,0.62), 0 8px 26px rgba(0,0,0,0.36);
+  --glass-top-edge:      rgba(214,228,255,0.26);
+  --glass-inner-shadow:  rgba(0,0,0,0.28);
+  --glass-bleed:         color-mix(in srgb, var(--accent-1) 14%, transparent);
+  --glass-bleed-secondary: color-mix(in srgb, var(--accent-2) 12%, transparent);
 
   --input-bg: rgba(18,24,44,0.6);
 }
@@ -150,74 +177,110 @@ a:hover { color: var(--accent-2); }
 
 .glass-card {
   position: relative;
-  padding: 2.25rem 2.5rem;
+  padding: 2rem 2.2rem;
   border-radius: var(--card-radius);
+  --card-tint: var(--category-reflection, var(--accent-1));
 
-  /* Surface tint */
-  background: var(--glass-bg);
+  /* Surface tint + ambient bleed */
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--glass-top-edge) 95%, transparent) 0%,
+      transparent 18%
+    ),
+    radial-gradient(
+      120% 84% at 12% -14%,
+      color-mix(in srgb, var(--card-tint) 16%, transparent),
+      transparent 58%
+    ),
+    radial-gradient(
+      92% 82% at 92% 116%,
+      var(--glass-bleed-secondary),
+      transparent 64%
+    ),
+    radial-gradient(
+      88% 72% at -12% 104%,
+      var(--glass-bleed),
+      transparent 62%
+    ),
+    var(--glass-bg);
   backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat)) brightness(1.02);
   -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat)) brightness(1.02);
 
-  /* Specular border: bright top-left edge, dim bottom-right */
+  /* Specular border */
   border: 1px solid var(--glass-border);
   outline: 1px solid var(--glass-border-outer);
   outline-offset: -1px;
 
-  /* Layered shadows */
+  /* Layered shadows + inner depth */
   box-shadow:
     var(--glass-shadow),
     inset 0  1px 0   var(--glass-border-inner),
+    inset 0 -16px 28px var(--glass-inner-shadow),
     inset 0 -1px 0   rgba(255,255,255,0.04),
     inset 1px 0 0    rgba(255,255,255,0.08),
     inset -1px 0 0   rgba(0,0,0,0.04);
 
   overflow: hidden;
-  transition: all 0.38s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translate3d(0, 0, 0);
+  transition:
+    transform var(--haptic-duration-out) var(--curve-haptic-recover),
+    box-shadow 300ms ease,
+    background 260ms ease,
+    border-color 240ms ease,
+    filter 240ms ease;
 }
 
-/* ── Prismatic specular sweep ── */
+/* Prism reflection sweep */
 .glass-card::before {
   content: '';
   position: absolute;
   inset: -60%;
   background: linear-gradient(
-    118deg,
-    transparent           28%,
-    rgba(255,255,255,0.04) 40%,
-    rgba(255,255,255,0.11) 48%,
-    rgba(255,255,255,0.18) 50%,
-    rgba(255,255,255,0.11) 52%,
-    rgba(255,255,255,0.04) 60%,
-    transparent           72%
+    114deg,
+    transparent 29%,
+    color-mix(in srgb, var(--card-tint) 10%, rgba(255,255,255,0.08)) 42%,
+    rgba(255,255,255,0.16) 49%,
+    rgba(255,255,255,0.21) 50%,
+    rgba(255,255,255,0.16) 51%,
+    color-mix(in srgb, var(--card-tint) 10%, rgba(255,255,255,0.08)) 58%,
+    transparent 71%
   );
-  transform: translateX(-100%) rotate(18deg);
+  transform: translateX(-108%) rotate(17deg);
   animation: glassPrism 10s ease-in-out infinite;
   pointer-events: none;
   z-index: 1;
 }
 
 @keyframes glassPrism {
-  0%, 100% { transform: translateX(-100%) rotate(18deg); }
-  40%, 60% { transform: translateX(100%)  rotate(18deg); }
+  0%, 100% { transform: translateX(-108%) rotate(17deg); }
+  42%, 58% { transform: translateX(102%) rotate(17deg); }
 }
 
-/* ── Iridescent top edge glow ── */
+/* Top-edge highlight + reflection grain */
 .glass-card::after {
   content: '';
   position: absolute;
   inset: 0;
   border-radius: inherit;
   background:
-    linear-gradient(180deg,
-      color-mix(in srgb, var(--accent-1) 6%, rgba(255,255,255,0.1)) 0%,
-      transparent 25%
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--glass-top-edge) 92%, transparent) 0%,
+      rgba(255,255,255,0.03) 22%,
+      transparent 34%
+    ),
+    radial-gradient(
+      78% 42% at 18% 0%,
+      color-mix(in srgb, var(--card-tint) 22%, transparent),
+      transparent 66%
     ),
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
-  background-size: auto, 200px 200px;
+  background-size: auto, auto, 180px 180px;
   opacity: var(--glass-noise);
   pointer-events: none;
   z-index: 2;
-  mix-blend-mode: overlay;
+  mix-blend-mode: screen;
 }
 
 .glass-card > * { position: relative; z-index: 3; }
@@ -226,18 +289,23 @@ a:hover { color: var(--accent-2); }
 .glass-card-hover { cursor: pointer; }
 
 .glass-card-hover:hover {
-  transform: translateY(-5px) scale(1.012);
+  transform: translate3d(0, var(--haptic-lift), 0) scale(var(--haptic-hover-scale));
+  transition-timing-function: var(--curve-haptic-overshoot);
   background: var(--glass-bg-strong);
   box-shadow:
     var(--glass-shadow-hover),
     inset 0  1px 0   rgba(255,255,255,0.35),
     inset 0 -1px 0   rgba(255,255,255,0.08),
     0 0 0 1px color-mix(in srgb, var(--accent-1) 18%, transparent),
-    0 0 40px color-mix(in srgb, var(--accent-1) 8%, transparent);
+    0 0 30px color-mix(in srgb, var(--accent-1) 9%, transparent);
+  filter: saturate(var(--surface-contrast-hover)) contrast(1.02);
 }
 
 .glass-card-hover:active {
-  transform: translateY(-2px) scale(0.995);
+  transform: translate3d(0, calc(var(--haptic-lift) * 0.35), 0) scale(var(--haptic-press-scale));
+  transition-duration: var(--haptic-duration-in);
+  transition-timing-function: var(--curve-haptic-compress);
+  filter: saturate(var(--surface-contrast-press)) contrast(0.99);
 }
 
 /* ── Feature variant ── */
@@ -314,28 +382,89 @@ html[data-theme="dark"] .glass-feature {
   position: sticky;
   top: 0;
   z-index: 250;
-  backdrop-filter: blur(20px) saturate(180%) brightness(1.02);
-  -webkit-backdrop-filter: blur(20px) saturate(180%) brightness(1.02);
-  background: var(--glass-bg);
+  backdrop-filter: blur(22px) saturate(180%) brightness(1.02);
+  -webkit-backdrop-filter: blur(22px) saturate(180%) brightness(1.02);
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--glass-top-edge) 76%, transparent) 0%,
+      transparent 34%
+    ),
+    var(--glass-bg);
   border-bottom: 1px solid var(--glass-border);
-  box-shadow: 0 2px 16px rgba(0,0,0,0.06), inset 0 -1px 0 var(--glass-border);
-  transition: box-shadow 0.3s ease, background 0.3s ease;
+  box-shadow:
+    0 4px 20px rgba(8, 16, 36, 0.08),
+    inset 0 -1px 0 var(--glass-border);
+  transition: box-shadow 260ms ease, background 260ms ease, border-color 260ms ease;
+}
+
+.site-header::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--glass-top-edge) 92%, transparent) 18%,
+    transparent 82%
+  );
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.site-header::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  width: 100%;
+  height: 1.5px;
+  background: linear-gradient(90deg, var(--accent-1), var(--accent-2), var(--accent-3));
+  box-shadow: 0 0 10px color-mix(in srgb, var(--accent-1) 36%, transparent);
+  transform-origin: left center;
+  transform: scaleX(var(--nav-progress));
+  transition: transform 110ms linear;
+  pointer-events: none;
 }
 
 .site-header.scrolled {
-  background: var(--glass-bg-strong);
-  box-shadow: 0 6px 28px rgba(0,0,0,0.1), inset 0 -1px 0 var(--glass-border);
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--glass-top-edge) 78%, transparent) 0%,
+      transparent 30%
+    ),
+    var(--glass-bg-strong);
+  box-shadow:
+    0 14px 32px rgba(8, 16, 36, 0.14),
+    inset 0 -1px 0 var(--glass-border);
 }
 
-/* =========================================================
-   NAV
-========================================================= */
+.site-header.nav-condensed {
+  --nav-pad: 0.62rem;
+  --nav-scale: 0.988;
+}
+
+.site-header .main-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--nav-pad) 0;
+  transform: scale(var(--nav-scale));
+  transform-origin: top center;
+  transition:
+    padding 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
 
 .main-nav {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.9rem 0;
+  padding: var(--nav-pad) 0;
 }
 
 .brand {
@@ -361,9 +490,12 @@ html[data-theme="dark"] .glass-feature {
   letter-spacing: 0.01em;
   color: var(--muted-text);
   text-decoration: none;
-  padding: 0.45rem 0.75rem;
+  padding: 0.43rem 0.72rem;
   border-radius: 8px;
-  transition: color 0.25s ease, background 0.25s ease;
+  transition:
+    color 220ms ease,
+    background 220ms ease,
+    padding 260ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .nav-links a:hover {
@@ -387,8 +519,25 @@ html[data-theme="dark"] .glass-feature {
   background: var(--accent-1);
 }
 
-.nav-right { display: flex; align-items: center; gap: 0.5rem; }
+.site-header.nav-condensed .nav-links a {
+  padding: 0.35rem 0.64rem;
+}
 
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  transition: gap 260ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.site-header.nav-condensed .nav-right {
+  gap: 0.38rem;
+}
+
+.site-header.nav-condensed :is(.theme-btn, .menu-toggle) {
+  width: 36px;
+  height: 36px;
+}
 /* =========================================================
    NAV BUTTONS (theme, ambient, cursor)
    All share this glass-pill base
@@ -405,14 +554,29 @@ html[data-theme="dark"] .glass-feature {
   box-shadow: 0 2px 8px rgba(0,0,0,0.08);
   cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  transition: all 0.28s cubic-bezier(0.4,0,0.2,1);
+  transform: translate3d(0, 0, 0);
+  transition:
+    transform var(--haptic-duration-out) var(--curve-haptic-recover),
+    box-shadow 240ms ease,
+    background 240ms ease,
+    border-color 240ms ease,
+    color 220ms ease,
+    width 240ms ease,
+    height 240ms ease;
   overflow: hidden;
 }
 
 .theme-btn:hover {
   background: var(--glass-bg-strong);
-  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
-  transform: scale(1.08);
+  box-shadow: 0 8px 22px rgba(0,0,0,0.14);
+  transform: translate3d(0, calc(var(--haptic-lift) * 0.75), 0) scale(1.04);
+  transition-timing-function: var(--curve-haptic-overshoot);
+}
+
+.theme-btn:active {
+  transform: translate3d(0, 0, 0) scale(0.96);
+  transition-duration: var(--haptic-duration-in);
+  transition-timing-function: var(--curve-haptic-compress);
 }
 
 .theme-btn svg {
@@ -508,9 +672,25 @@ html[data-theme="dark"] .moon-icon { opacity: 1; transform: rotate(0deg) scale(1
   backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
   box-shadow: 0 2px 8px rgba(0,0,0,0.08);
   cursor: pointer;
-  transition: all 0.28s ease;
+  transform: translate3d(0, 0, 0);
+  transition:
+    transform var(--haptic-duration-out) var(--curve-haptic-recover),
+    box-shadow 240ms ease,
+    background 240ms ease,
+    border-color 240ms ease,
+    width 240ms ease,
+    height 240ms ease;
 }
-.menu-toggle:hover { transform: scale(1.08); box-shadow: 0 4px 16px rgba(0,0,0,0.12); }
+.menu-toggle:hover {
+  transform: translate3d(0, calc(var(--haptic-lift) * 0.75), 0) scale(1.04);
+  transition-timing-function: var(--curve-haptic-overshoot);
+  box-shadow: 0 8px 22px rgba(0,0,0,0.14);
+}
+.menu-toggle:active {
+  transform: translate3d(0, 0, 0) scale(0.96);
+  transition-duration: var(--haptic-duration-in);
+  transition-timing-function: var(--curve-haptic-compress);
+}
 .menu-toggle span {
   display: block; width: 17px; height: 2px; border-radius: 2px;
   background: var(--text-color);
@@ -616,12 +796,13 @@ html[data-theme="dark"] .moon-icon { opacity: 1; transform: rotate(0deg) scale(1
 ========================================================= */
 
 #progress-bar {
-  position: fixed; top: 0; left: 0;
-  height: 2.5px; width: 0%;
-  background: linear-gradient(90deg, var(--accent-1), var(--accent-2), var(--accent-3));
-  z-index: 9999;
-  transition: width 0.1s ease-out;
-  box-shadow: 0 0 8px var(--accent-1), 0 0 20px color-mix(in srgb, var(--accent-1) 40%, transparent);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
 }
 
 /* =========================================================
@@ -636,11 +817,29 @@ html[data-theme="dark"] .moon-icon { opacity: 1; transform: rotate(0deg) scale(1
   border-radius: 100px; font-weight: 600; font-size: 0.9rem;
   letter-spacing: 0.01em;
   box-shadow: 0 4px 16px color-mix(in srgb, var(--accent-1) 30%, transparent);
-  transition: all 0.3s ease; margin-top: 1.25rem;
+  transform: translate3d(0, 0, 0);
+  transition:
+    transform var(--haptic-duration-out) var(--curve-haptic-recover),
+    box-shadow 240ms ease,
+    filter 240ms ease,
+    color 220ms ease;
+  margin-top: 1.25rem;
 }
-.btn-link:hover { color: white; transform: translateY(-2px); box-shadow: 0 8px 24px color-mix(in srgb,var(--accent-1) 38%,transparent); }
+.btn-link:hover {
+  color: white;
+  transform: translate3d(0, calc(var(--haptic-lift) * 0.65), 0) scale(1.012);
+  transition-timing-function: var(--curve-haptic-overshoot);
+  box-shadow: 0 10px 26px color-mix(in srgb,var(--accent-1) 36%,transparent);
+  filter: saturate(var(--surface-contrast-hover));
+}
+.btn-link:active {
+  transform: translate3d(0, 0, 0) scale(0.98);
+  transition-duration: var(--haptic-duration-in);
+  transition-timing-function: var(--curve-haptic-compress);
+  filter: saturate(var(--surface-contrast-press));
+}
 .btn-link svg   { transition: transform 0.28s ease; }
-.btn-link:hover svg { transform: translateX(3px); }
+.btn-link:hover svg { transform: translateX(2px); }
 
 /* =========================================================
    COLOR PALETTE SWITCHER
@@ -653,9 +852,23 @@ html[data-theme="dark"] .moon-icon { opacity: 1; transform: rotate(0deg) scale(1
   background: var(--glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
   box-shadow: 0 6px 24px rgba(0,0,0,0.12);
   cursor: pointer; display: flex; align-items: center; justify-content: center;
-  transition: all 0.3s ease;
+  transform: translate3d(0, 0, 0);
+  transition:
+    transform var(--haptic-duration-out) var(--curve-haptic-recover),
+    box-shadow 240ms ease,
+    border-color 220ms ease,
+    background 220ms ease;
 }
-.palette-toggle:hover { transform: scale(1.1) rotate(45deg); box-shadow: 0 10px 32px rgba(0,0,0,0.18); }
+.palette-toggle:hover {
+  transform: translate3d(0, calc(var(--haptic-lift) * 0.75), 0) scale(1.05) rotate(15deg);
+  transition-timing-function: var(--curve-haptic-overshoot);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.18);
+}
+.palette-toggle:active {
+  transform: translate3d(0, 0, 0) scale(0.96);
+  transition-duration: var(--haptic-duration-in);
+  transition-timing-function: var(--curve-haptic-compress);
+}
 .palette-toggle svg { color: var(--muted-text); transition: color 0.3s; }
 .palette-toggle:hover svg { color: var(--text-color); }
 
@@ -674,14 +887,29 @@ html[data-theme="dark"] .moon-icon { opacity: 1; transform: rotate(0deg) scale(1
 
 .palette-btn {
   width: 26px; height: 26px; border-radius: 50%; border: 2px solid transparent;
-  cursor: pointer; transition: all 0.28s ease; position: relative;
+  cursor: pointer;
+  transform: translate3d(0, 0, 0);
+  transition:
+    transform var(--haptic-duration-out) var(--curve-haptic-recover),
+    box-shadow 220ms ease,
+    opacity 220ms ease;
+  position: relative;
 }
 .palette-btn::before {
   content: ''; position: absolute; inset: -4px; border-radius: 50%;
   border: 2px solid white; opacity: 0; transition: opacity 0.28s ease;
 }
 .palette-btn.active::before { opacity: 1; }
-.palette-btn:hover { transform: scale(1.3); box-shadow: 0 0 16px currentColor; }
+.palette-btn:hover {
+  transform: translate3d(0, calc(var(--haptic-lift) * 0.6), 0) scale(1.18);
+  transition-timing-function: var(--curve-haptic-overshoot);
+  box-shadow: 0 0 14px currentColor;
+}
+.palette-btn:active {
+  transform: translate3d(0, 0, 0) scale(0.94);
+  transition-duration: var(--haptic-duration-in);
+  transition-timing-function: var(--curve-haptic-compress);
+}
 
 .palette-btn[data-palette="arctic"]   { background: linear-gradient(135deg,#4cc9f0,#4361ee); }
 .palette-btn[data-palette="neon"]     { background: linear-gradient(135deg,#00f5d4,#ff00c8); }
@@ -693,6 +921,168 @@ html[data-theme="dark"] .moon-icon { opacity: 1; transform: rotate(0deg) scale(1
 .palette-btn[data-palette="gold"]     { background: linear-gradient(135deg,#f59e0b,#d97706); }
 .palette-btn[data-palette="lavender"] { background: linear-gradient(135deg,#a78bfa,#c084fc); }
 .palette-btn[data-palette="crimson"]  { background: linear-gradient(135deg,#dc2626,#ef4444); }
+
+/* =========================================================
+   HAPTIC INTERACTIONS
+   Buttons and cards get a tiny compression + recovery curve
+========================================================= */
+
+body :is(
+  .btn-primary,
+  .btn-ghost,
+  .submit-btn,
+  .read-more-btn,
+  .featured-read-more,
+  .feature-card-arrow,
+  .skills-tab,
+  .filter-btn,
+  .command-clear,
+  .about-tag,
+  .sidebar-btn,
+  .tts-btn,
+  .asp-action-btn,
+  .asp-retry-btn,
+  .top-ctrl-btn,
+  .social-icon,
+  .feature-card,
+  .stat-card,
+  .blog-page .blog-card,
+  .project-card,
+  .achievement-card,
+  .contact-card,
+  .interest-card
+) {
+  transform: translate3d(0, 0, 0);
+  transition:
+    transform var(--haptic-duration-out) var(--curve-haptic-recover),
+    box-shadow 300ms ease,
+    filter 260ms ease,
+    border-color 260ms ease,
+    background 260ms ease,
+    color 220ms ease,
+    opacity 220ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  body :is(
+    .btn-primary,
+    .btn-ghost,
+    .submit-btn,
+    .read-more-btn,
+    .featured-read-more,
+    .feature-card-arrow,
+    .skills-tab,
+    .filter-btn,
+    .command-clear,
+    .about-tag,
+    .sidebar-btn,
+    .tts-btn,
+    .asp-action-btn,
+    .asp-retry-btn,
+    .top-ctrl-btn,
+    .social-icon,
+    .feature-card,
+    .stat-card,
+    .blog-page .blog-card,
+    .project-card,
+    .achievement-card,
+    .contact-card,
+    .interest-card
+  ):hover {
+    transform: translate3d(0, var(--haptic-lift), 0) scale(var(--haptic-hover-scale));
+    transition-timing-function: var(--curve-haptic-overshoot);
+    filter: saturate(var(--surface-contrast-hover));
+  }
+}
+
+body :is(
+  .btn-primary,
+  .btn-ghost,
+  .submit-btn,
+  .read-more-btn,
+  .featured-read-more,
+  .feature-card-arrow,
+  .skills-tab,
+  .filter-btn,
+  .command-clear,
+  .about-tag,
+  .sidebar-btn,
+  .tts-btn,
+  .asp-action-btn,
+  .asp-retry-btn,
+  .top-ctrl-btn,
+  .social-icon,
+  .feature-card,
+  .stat-card,
+  .blog-page .blog-card,
+  .project-card,
+  .achievement-card,
+  .contact-card,
+  .interest-card
+):active {
+  transform: translate3d(0, calc(var(--haptic-lift) * 0.35), 0) scale(var(--haptic-press-scale));
+  transition-duration: var(--haptic-duration-in);
+  transition-timing-function: var(--curve-haptic-compress);
+  filter: saturate(var(--surface-contrast-press));
+}
+
+@media (hover: none), (pointer: coarse) {
+  body :is(
+    .btn-primary,
+    .btn-ghost,
+    .submit-btn,
+    .read-more-btn,
+    .featured-read-more,
+    .feature-card-arrow,
+    .skills-tab,
+    .filter-btn,
+    .command-clear,
+    .about-tag,
+    .sidebar-btn,
+    .tts-btn,
+    .asp-action-btn,
+    .asp-retry-btn,
+    .top-ctrl-btn,
+    .social-icon,
+    .feature-card,
+    .stat-card,
+    .blog-page .blog-card,
+    .project-card,
+    .achievement-card,
+    .contact-card,
+    .interest-card
+  ):hover {
+    transform: none;
+  }
+
+  body :is(
+    .btn-primary,
+    .btn-ghost,
+    .submit-btn,
+    .read-more-btn,
+    .featured-read-more,
+    .feature-card-arrow,
+    .skills-tab,
+    .filter-btn,
+    .command-clear,
+    .about-tag,
+    .sidebar-btn,
+    .tts-btn,
+    .asp-action-btn,
+    .asp-retry-btn,
+    .top-ctrl-btn,
+    .social-icon,
+    .feature-card,
+    .stat-card,
+    .blog-page .blog-card,
+    .project-card,
+    .achievement-card,
+    .contact-card,
+    .interest-card
+  ):active {
+    transform: translate3d(0, var(--haptic-lift-touch), 0) scale(0.99);
+  }
+}
 
 /* =========================================================
    FOOTER
@@ -728,6 +1118,200 @@ html[data-theme="dark"] .moon-icon { opacity: 1; transform: rotate(0deg) scale(1
 }
 
 /* =========================================================
+   REDUCED MOTION (PREMIUM)
+   Keep intent via depth, opacity, contrast, and material
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --haptic-lift: 0px;
+    --haptic-hover-scale: 1;
+    --haptic-press-scale: 1;
+    --haptic-duration-in: 120ms;
+    --haptic-duration-out: 220ms;
+    --glass-noise: 0.24;
+  }
+
+  html { scroll-behavior: auto; }
+
+  body {
+    animation: none;
+    opacity: 1;
+  }
+
+  .site-header,
+  .site-header .main-nav,
+  .site-header::after {
+    transition-duration: 0.01ms !important;
+  }
+
+  .site-header.nav-condensed {
+    --nav-pad: 0.88rem;
+    --nav-scale: 1;
+  }
+
+  .site-header.nav-condensed .nav-links a {
+    padding: 0.43rem 0.72rem;
+  }
+
+  .reveal,
+  .fade-in {
+    transform: none;
+    transition: opacity 220ms ease, filter 220ms ease;
+  }
+
+  .fade-in {
+    animation-name: fadeInReduced !important;
+    animation-duration: 220ms !important;
+    animation-timing-function: ease !important;
+  }
+
+  @keyframes fadeInReduced {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .blob {
+    animation: none;
+    opacity: 0.18;
+    filter: blur(92px) saturate(112%);
+  }
+
+  .glass-card::before {
+    animation: none;
+    transform: translateX(-40%) rotate(17deg);
+    opacity: 0.28;
+  }
+
+  .ambient-btn.active,
+  .ambient-btn.active .eq-bar {
+    animation: none;
+  }
+
+  .ambient-btn.active .eq-bars { opacity: 0.85; }
+  .ambient-btn.active .eq-bar:nth-child(1) { height: 5px; }
+  .ambient-btn.active .eq-bar:nth-child(2) { height: 8px; }
+  .ambient-btn.active .eq-bar:nth-child(3) { height: 6px; }
+  .ambient-btn.active .headphone-icon { transform: none; }
+
+  body :is(
+    .glass-card-hover,
+    .btn-link,
+    .theme-btn,
+    .menu-toggle,
+    .palette-toggle,
+    .palette-btn,
+    .btn-primary,
+    .btn-ghost,
+    .submit-btn,
+    .read-more-btn,
+    .featured-read-more,
+    .feature-card,
+    .blog-page .blog-card,
+    .skills-tab,
+    .filter-btn,
+    .command-clear,
+    .about-tag,
+    .sidebar-btn,
+    .tts-btn,
+    .asp-action-btn,
+    .asp-retry-btn
+  ) {
+    transform: none !important;
+    transition:
+      opacity 180ms ease,
+      box-shadow 220ms ease,
+      background 220ms ease,
+      border-color 220ms ease,
+      color 180ms ease,
+      filter 220ms ease !important;
+  }
+
+  body :is(
+    .glass-card-hover,
+    .btn-link,
+    .theme-btn,
+    .menu-toggle,
+    .palette-toggle,
+    .palette-btn,
+    .btn-primary,
+    .btn-ghost,
+    .submit-btn,
+    .read-more-btn,
+    .featured-read-more,
+    .feature-card,
+    .blog-page .blog-card,
+    .skills-tab,
+    .filter-btn,
+    .command-clear,
+    .about-tag,
+    .sidebar-btn,
+    .tts-btn,
+    .asp-action-btn,
+    .asp-retry-btn
+  ):hover,
+  body :is(
+    .glass-card-hover,
+    .btn-link,
+    .theme-btn,
+    .menu-toggle,
+    .palette-toggle,
+    .palette-btn,
+    .btn-primary,
+    .btn-ghost,
+    .submit-btn,
+    .read-more-btn,
+    .featured-read-more,
+    .feature-card,
+    .blog-page .blog-card,
+    .skills-tab,
+    .filter-btn,
+    .command-clear,
+    .about-tag,
+    .sidebar-btn,
+    .tts-btn,
+    .asp-action-btn,
+    .asp-retry-btn
+  ):focus-visible {
+    opacity: 0.98;
+    filter: saturate(1.08) contrast(1.04);
+    box-shadow:
+      0 12px 30px rgba(8,14,34,0.2),
+      inset 0 1px 0 rgba(255,255,255,0.2);
+  }
+
+  body :is(
+    .glass-card-hover,
+    .btn-link,
+    .theme-btn,
+    .menu-toggle,
+    .palette-toggle,
+    .palette-btn,
+    .btn-primary,
+    .btn-ghost,
+    .submit-btn,
+    .read-more-btn,
+    .featured-read-more,
+    .feature-card,
+    .blog-page .blog-card,
+    .skills-tab,
+    .filter-btn,
+    .command-clear,
+    .about-tag,
+    .sidebar-btn,
+    .tts-btn,
+    .asp-action-btn,
+    .asp-retry-btn
+  ):active {
+    opacity: 0.9;
+    filter: saturate(0.98) contrast(0.98);
+    box-shadow:
+      0 4px 14px rgba(8,14,34,0.16),
+      inset 0 1px 0 rgba(255,255,255,0.12);
+  }
+}
+
+/* =========================================================
    RESPONSIVE — TABLET & MOBILE (≤ 768px)
 ========================================================= */
 
@@ -735,6 +1319,17 @@ html[data-theme="dark"] .moon-icon { opacity: 1; transform: rotate(0deg) scale(1
   :root { --container: 100%; }
   .container  { padding: 0 1.25rem; }
   .main-content { padding: 2.5rem 1.25rem 4rem; }
+
+  .site-header,
+  .site-header.nav-condensed {
+    --nav-pad: 0.74rem;
+    --nav-scale: 1;
+  }
+
+  .site-header.nav-condensed :is(.theme-btn, .menu-toggle) {
+    width: 38px;
+    height: 38px;
+  }
 
   .brand     { display: block; }
   .menu-toggle { display: flex; }

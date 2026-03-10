@@ -4,6 +4,8 @@
   /* ── CUSTOM CURSOR ──────────────────────────────────── */
   const dot  = document.getElementById('cursor-dot');
   const ring = document.getElementById('cursor-ring');
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
   let cursorEnabled = localStorage.getItem('cursorEnabled') !== 'false';
   let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
   let ringX  = mouseX, ringY = mouseY;
@@ -82,7 +84,12 @@
   }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
 
   function attachReveal() {
-    document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
+    const revealEls = document.querySelectorAll('.reveal');
+    if (prefersReducedMotion) {
+      revealEls.forEach(el => el.classList.add('visible'));
+      return;
+    }
+    revealEls.forEach(el => revealObs.observe(el));
   }
   
   if (document.readyState === 'loading') {
@@ -93,7 +100,12 @@
 
   /* ── 3D TILT CARDS ──────────────────────────────────── */
   function attachTilt() {
+    if (prefersReducedMotion || !canHover) return;
+
     document.querySelectorAll('.tilt-card').forEach(card => {
+      if (card.dataset.tiltBound === 'true') return;
+      card.dataset.tiltBound = 'true';
+
       card.addEventListener('mousemove', e => {
         const r = card.getBoundingClientRect();
         const x = e.clientX - r.left, y = e.clientY - r.top;

@@ -1,32 +1,136 @@
 ---
+import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHeader from '../components/ui/PageHeader.astro';
 import BlogSearch from '../components/blog/BlogSearch.astro';
+import { estimateReadingMinutes, extractKeyIdeas, extractStrikingLine, formatReadingTime } from '../utils/postInsights';
 import '../styles/blog.css';
 import '../styles/blog-spectacular.css';
+
+const dateValue = (value: string) => {
+  const parsed = Date.parse(value);
+  return Number.isNaN(parsed) ? 0 : parsed;
+};
+
+const blogEntries = await getCollection('blog');
+const allPosts = blogEntries
+  .map((entry) => {
+    const markdownBody = entry.body ?? '';
+    const readingMinutes = estimateReadingMinutes(markdownBody);
+
+    return {
+      title: entry.data.title,
+      date: entry.data.date,
+      category: entry.data.category,
+      excerpt: entry.data.excerpt,
+      id: entry.data.id ?? entry.slug,
+      slug: entry.slug,
+      featured: entry.data.featured ?? false,
+      readTime: formatReadingTime(readingMinutes),
+      keyIdeas: extractKeyIdeas(markdownBody, 3),
+      strikingLine: extractStrikingLine(markdownBody, entry.data.excerpt),
+    };
+  })
+  .sort((a, b) => dateValue(b.date) - dateValue(a.date));
+
+const featuredPost = allPosts.find((post) => post.featured) ?? allPosts[0];
+const gridPosts = allPosts.filter((post) => post.id !== featuredPost?.id);
+const categories = [...new Set(allPosts.map((post) => post.category))].sort((a, b) => a.localeCompare(b));
+const postHref = (slug: string) => `/blog/${encodeURIComponent(slug)}`;
 ---
 
-<BaseLayout title="Om — Blog" description="In-depth Arsenal analysis, tactical breakdowns, and football insights by Om Jhamvar.">
-  <main class="container main-content">
-    
-    <PageHeader 
-      eyebrow="Words & Thoughts" 
-      title="My Blog" 
-      description="Football tactics, coding journeys, personal growth — unfiltered and straight from the source."
+<BaseLayout title="Om â€” Blog" description="In-depth Arsenal analysis, tactical breakdowns, and football insights by Om Jhamvar.">
+  <main class="container main-content blog-page">
+    <PageHeader
+      eyebrow="Words & Thoughts"
+      title="My Blog"
+      description="Football tactics, coding journeys, personal growth â€” unfiltered and straight from the source."
       useTypewriter={true}
     />
 
-    <BlogSearch />
+    <BlogSearch categories={categories} />
 
-    <div class="blog-grid" id="blog-grid">
-      <article class="glass-card">
-        <h3>Loading posts...</h3>
-        <p class="text-muted">Please wait while content loads.</p>
-      </article>
-    </div>
+    <section class="blog-index-shell">
+      {
+        featuredPost && (
+          <article class="featured-story glass-card glass-card-hover reveal" id="featured-story" data-featured-id={featuredPost.id}>
+            <div class="featured-story-copy">
+              <p class="featured-kicker">Lead Story</p>
+              <div class="featured-story-meta">
+                <span class="category-badge">{featuredPost.category}</span>
+                <span class="featured-story-date">{featuredPost.date}</span>
+              </div>
+              <h2>{featuredPost.title}</h2>
+              <p class="featured-story-excerpt">{featuredPost.excerpt}</p>
 
+              <div class="featured-story-footer">
+                <a href={postHref(featuredPost.slug)} class="featured-read-more">
+                  Read the full piece
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                  </svg>
+                </a>
+                <p class="featured-story-note">A strong place to start if you want the tone of the archive fast.</p>
+              </div>
+            </div>
+
+            <div class="featured-story-side" aria-hidden="true">
+              <div class="featured-story-orb"></div>
+              <p class="featured-side-label">Editorial Pick</p>
+              <p class="featured-side-copy">
+                Selected as the lead read for this archive view. Expect a longer, sharper argument than the rest of the wall.
+              </p>
+              <div class="featured-side-stat">
+                <span>Archive</span>
+                <strong>{allPosts.length} stories</strong>
+              </div>
+            </div>
+          </article>
+        )
+      }
+
+      <div class="blog-grid-head reveal">
+        <div>
+          <p class="blog-grid-kicker">Archive Wall</p>
+          <h2>Recent writing, notes, and match breakdowns.</h2>
+        </div>
+        <p class="blog-results-summary" id="results-summary">
+          {gridPosts.length} supporting {gridPosts.length === 1 ? 'story' : 'stories'}
+        </p>
+      </div>
+
+      <div class="blog-grid" id="blog-grid">
+        {
+          gridPosts.map((post) => (
+            <article class="glass-card glass-card-hover blog-card" data-post-id={post.id}>
+              <p class="blog-card-kicker">From the notebook</p>
+              <h3>{post.title}</h3>
+
+              <div class="blog-meta">
+                <span class="category-badge">{post.category}</span>
+                <span class="blog-date">{post.date}</span>
+              </div>
+
+              <p class="blog-excerpt">{post.excerpt}</p>
+
+              <a href={postHref(post.slug)} class="read-more-btn">
+                Read More
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </a>
+            </article>
+          ))
+        }
+      </div>
+    </section>
   </main>
 
+  <script is:inline define:vars={{ allPosts }}>
+    window.allPosts = allPosts;
+  </script>
   <script is:inline src="/js/spectacular-shared.js"></script>
   <script is:inline src="/js/blog.js"></script>
   <script is:inline src="/js/utils/cursor.js"></script>

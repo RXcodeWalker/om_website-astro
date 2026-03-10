@@ -127,10 +127,37 @@
     .hero-title { font-size: 3rem !important; margin-bottom: 1rem !important; }
     .hero-roles { margin-bottom: 1.5rem !important; }
   }
+
+  @media (prefers-reduced-motion: reduce) {
+    #hero-canvas {
+      opacity: 0.55;
+      filter: saturate(108%) contrast(104%);
+    }
+
+    .hero-eyebrow,
+    .hero-title,
+    .hero-roles,
+    .hero-cta-group {
+      animation: none !important;
+      opacity: 1;
+      transform: none;
+    }
+
+    .hero-title {
+      background-size: 100% auto;
+    }
+
+    .cursor {
+      animation: none;
+      opacity: 0.75;
+    }
+  }
 </style>
 
 <script is:inline>
   (() => {
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
     // HERO CANVAS
     const heroCanvas = document.getElementById('hero-canvas');
     if (heroCanvas) {
@@ -181,13 +208,32 @@
         });
         requestAnimationFrame(animateHero);
       }
-      animateHero();
+      if (reducedMotion) {
+        const w = heroCanvas.width;
+        const h = heroCanvas.height;
+        hCtx.clearRect(0, 0, w, h);
+        drawPitch(hCtx, w, h);
+        particles.slice(0, 28).forEach(p => {
+          hCtx.beginPath();
+          hCtx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          hCtx.fillStyle = `rgba(${p.color}, ${Math.min(p.alpha + 0.08, 0.28)})`;
+          hCtx.fill();
+        });
+      } else {
+        animateHero();
+      }
     }
 
     // TYPEWRITER
     const phrases = ['analyzes Arsenal tactics', 'writes code for fun', 'loves learning new things', 'thinks in systems', 'builds cool websites', 'follows football obsessively'];
     let phraseIdx = 0, charIdx = 0, isDeleting = false;
     const tw = document.getElementById('typewriter');
+
+    if (reducedMotion) {
+      if (tw) tw.textContent = phrases[0];
+      return;
+    }
+
     function typeWriter() {
       if (!tw) return;
       const phrase = phrases[phraseIdx];

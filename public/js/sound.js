@@ -26,12 +26,12 @@ window.BTB = window.BTB || {};
 
 // ── 1. UI Sounds ─────────────────────────────────────────
 const sounds = {
-  click:     new Audio('sounds/click.mp3'),
-  toggle:    new Audio('sounds/toggle.mp3'),
-  page_turn: new Audio('sounds/page_turn.mp3'),
-  whoosh:    new Audio('sounds/whoosh.mp3'),
-  hover:     new Audio('sounds/hover.mp3'),
-  chime:     new Audio('sounds/chime.mp3'),
+  click:     new Audio('/sounds/click.mp3'),
+  toggle:    new Audio('/sounds/toggle.mp3'),
+  page_turn: new Audio('/sounds/page_turn.mp3'),
+  whoosh:    new Audio('/sounds/whooshmp3.mp3'),
+  hover:     new Audio('/sounds/hover.mp3'),
+  chime:     new Audio('/sounds/chime.mp3'),
 };
 
 Object.values(sounds).forEach(s => { s.volume = 0.3; });
@@ -53,11 +53,11 @@ window.playSound = function (name) {
 
   // 🎵 Playlist (update filenames if needed)
   const tracks = [
-    'audio/lofi1.mp3',
-    'audio/lofi2.mp3',
-    'audio/lofi3.mp3',
-    'audio/lofi4.mp3',
-    'audio/lofi5.mp3'
+    '/audio/lofi1.mp3',
+    '/audio/lofi2.mp3',
+    '/audio/lofi3.mp3',
+    '/audio/lofi4.mp3',
+    '/audio/lofi5.mp3'
   ];
 
   let currentTrack = Math.floor(Math.random() * tracks.length);
