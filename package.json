@@ -10,7 +10,7 @@
     "test": "vitest"
   },
   "dependencies": {
-    "astro": "^5.17.1",
-    "@supabase/supabase-js": "^2.97.0"
+    "@supabase/supabase-js": "^2.99.0",
+    "astro": "^5.17.1"
   }
 }

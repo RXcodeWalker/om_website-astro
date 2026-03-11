@@ -194,9 +194,9 @@ window.BTB = window.BTB || {};
 
   function _destroy() {
     if (_teardown) _teardown();
-    // Restore default cursor
+    // Remove the cursor override CSS entirely
     const css = document.getElementById('cursor-css');
-    if (css) css.textContent = '*, *::before, *::after { cursor: auto; }';
+    if (css) css.remove();
     // Clean up any remaining particles/orb
     document.getElementById('cursor-orb')?.remove();
     document.getElementById('cursor-dot')?.remove();
