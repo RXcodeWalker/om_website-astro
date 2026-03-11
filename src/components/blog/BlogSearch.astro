@@ -46,6 +46,11 @@ const { categories = [] } = Astro.props;
       <span class="filter-count" data-count-for="all">0</span>
     </button>
 
+    <button class="filter-btn" data-filter="bookmarks" id="filter-bookmarks" type="button" aria-pressed="false">
+      <span>Bookmarks</span>
+      <span class="filter-count" data-count-for="bookmarks">0</span>
+    </button>
+
     {
       categories.map((category) => (
         <button class="filter-btn" data-filter={category} type="button" aria-pressed="false">

@@ -71,15 +71,28 @@
 
   function render() {
     const filteredPosts = getFilteredPosts();
-    const leadPost = filteredPosts.find((post) => post.featured) || filteredPosts[0] || null;
-    const supportingPosts = leadPost
-      ? filteredPosts.filter((post) => post.id !== leadPost.id)
-      : [];
+    
+    // If we're in "Bookmarks" mode, don't use the lead story layout
+    if (currentFilter === 'bookmarks') {
+      renderFeatured(null);
+      renderGrid(filteredPosts);
+    } else {
+      const leadPost = filteredPosts.find((post) => post.featured) || filteredPosts[0] || null;
+      const supportingPosts = leadPost
+        ? filteredPosts.filter((post) => post.id !== leadPost.id)
+        : [];
 
-    renderFeatured(leadPost);
-    renderGrid(supportingPosts);
-    updateStatus(filteredPosts.length, supportingPosts.length);
+      renderFeatured(leadPost);
+      renderGrid(supportingPosts);
+    }
+    
+    updateStatus(filteredPosts.length, getSupportingCount(filteredPosts));
     syncFilterIndicator();
+  }
+
+  function getSupportingCount(filteredPosts) {
+    if (currentFilter === 'bookmarks' || !filteredPosts.length) return filteredPosts.length;
+    return filteredPosts.length - 1; // total minus lead
   }
 
   function renderFeatured(post) {
@@ -131,6 +144,30 @@
   }
 
   function renderGrid(posts) {
+    let emptyStateHtml = '';
+    
+    if (!posts.length) {
+      if (currentFilter === 'bookmarks' && !currentQuery) {
+        emptyStateHtml = `
+          <article class="glass-card empty-state-card">
+            <p class="empty-state-kicker">Your library is empty</p>
+            <h3>You haven't bookmarked any stories yet.</h3>
+            <p class="blog-excerpt">Browse the archive and use the bookmark icon on any post to save it here for later.</p>
+            <button class="read-more-btn empty-reset-btn" type="button">Browse archive</button>
+          </article>
+        `;
+      } else {
+        emptyStateHtml = `
+          <article class="glass-card empty-state-card">
+            <p class="empty-state-kicker">No exact matches</p>
+            <h3>Nothing landed for "${escapeHtml(currentQuery || currentFilter)}".</h3>
+            <p class="blog-excerpt">Try a broader phrase, switch categories, or clear the search to reopen the full archive wall.</p>
+            <button class="read-more-btn empty-reset-btn" type="button">Reset search</button>
+          </article>
+        `;
+      }
+    }
+
     grid.innerHTML = posts.length
       ? posts.map((post, index) => `
           <article class="glass-card glass-card-hover blog-card" data-post-id="${escapeAttribute(post.id)}" style="--card-delay:${index * 70}ms;">
@@ -151,14 +188,7 @@
             </a>
           </article>
         `).join('')
-      : `
-          <article class="glass-card empty-state-card">
-            <p class="empty-state-kicker">No exact matches</p>
-            <h3>Nothing landed for "${escapeHtml(currentQuery || currentFilter)}".</h3>
-            <p class="blog-excerpt">Try a broader phrase, switch categories, or clear the search to reopen the full archive wall.</p>
-            <button class="read-more-btn empty-reset-btn" type="button">Reset search</button>
-          </article>
-        `;
+      : emptyStateHtml;
 
     const resetButton = grid.querySelector('.empty-reset-btn');
     if (resetButton) {
@@ -226,9 +256,13 @@
 
   function getFilteredPosts() {
     const tokens = tokenize(currentQuery);
+    const bookmarks = JSON.parse(localStorage.getItem('post-bookmarks') || '{}');
 
     return allPosts.filter((post) => {
-      if (currentFilter !== 'all' && post.category !== currentFilter) {
+      // Handle "Bookmarks" filter
+      if (currentFilter === 'bookmarks') {
+        if (!bookmarks[post.id]) return false;
+      } else if (currentFilter !== 'all' && post.category !== currentFilter) {
         return false;
       }
 
@@ -242,11 +276,15 @@
   }
 
   function hydrateCounts() {
+    const bookmarks = JSON.parse(localStorage.getItem('post-bookmarks') || '{}');
     const counts = allPosts.reduce((accumulator, post) => {
       accumulator.all += 1;
       accumulator[post.category] = (accumulator[post.category] || 0) + 1;
+      if (bookmarks[post.id]) {
+        accumulator.bookmarks = (accumulator.bookmarks || 0) + 1;
+      }
       return accumulator;
-    }, { all: 0 });
+    }, { all: 0, bookmarks: 0 });
 
     document.querySelectorAll('.filter-count').forEach((badge) => {
       const filter = badge.dataset.countFor;
