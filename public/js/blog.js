@@ -25,6 +25,29 @@
   render();
 
   function bindEvents() {
+    // Event delegation for grid cards
+    grid.addEventListener('click', (event) => {
+      const card = event.target.closest('.blog-card');
+      if (card && !event.target.closest('a, button')) {
+        const link = card.querySelector('.read-more-btn');
+        if (link) {
+          if (typeof playSound === 'function') playSound('click');
+          link.click();
+        }
+      }
+    });
+
+    // Event delegation for featured story
+    featuredStory?.addEventListener('click', (event) => {
+      if (!event.target.closest('a, button')) {
+        const link = featuredStory.querySelector('.featured-read-more');
+        if (link) {
+          if (typeof playSound === 'function') playSound('click');
+          link.click();
+        }
+      }
+    });
+
     filterButtons.forEach((button) => {
       button.addEventListener('click', () => {
         currentFilter = button.dataset.filter || 'all';
