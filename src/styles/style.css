@@ -1,10 +1,11 @@
 /* =========================================================
    GOOGLE FONTS
    Playfair Display — headings (editorial, authoritative)
-   Inter          — body + UI (clean, highly legible)
+   Lora           — editorial body (highly legible, professional)
+   Inter          — UI + subheadings (clean, precise)
 ========================================================= */
 
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;1,500;1,700&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;1,500;1,700&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500;600;700&display=swap');
 
 /* =========================================================
    RESET
@@ -47,7 +48,7 @@
   --accent-3: #ffd166;
 
   /* ── Typography ── */
-  --font-body:    'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-body:    'Lora', Georgia, serif;
   --font-heading: 'Playfair Display', 'Georgia', serif;
   --font-mono:    'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
 
@@ -397,6 +398,26 @@ html[data-theme="dark"] .glass-feature {
     inset 0 -1px 0 var(--glass-border);
   transition: box-shadow 260ms ease, background 260ms ease, border-color 260ms ease;
 }
+
+body.focus-mode .site-header {
+  background: #f7f7f5 !important;
+  border-bottom-color: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+body.focus-mode .site-header::before,
+body.focus-mode .site-header::after {
+  display: none !important;
+}
+
+body.focus-mode .nav-links a { color: #555 !important; }
+body.focus-mode .nav-links a:hover { background: rgba(0,0,0,0.05) !important; color: #111 !important; }
+body.focus-mode .nav-links a.active { background: transparent !important; color: #111 !important; font-weight: 700; }
+body.focus-mode .nav-links a.active::after { background: #111 !important; }
+body.focus-mode .theme-btn { color: #555 !important; }
+body.focus-mode .theme-btn:hover { background: rgba(0,0,0,0.05) !important; color: #111 !important; border-color: transparent !important; }
 
 .site-header::before {
   content: '';

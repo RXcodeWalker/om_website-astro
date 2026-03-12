@@ -39,12 +39,12 @@ const categories = [...new Set(allPosts.map((post) => post.category))].sort((a, 
 const postHref = (slug: string) => `/blog/${encodeURIComponent(slug)}`;
 ---
 
-<BaseLayout title="Om â€” Blog" description="In-depth Arsenal analysis, tactical breakdowns, and football insights by Om Jhamvar.">
+<BaseLayout title="Om's Blog" description="In-depth Arsenal analysis, tactical breakdowns, and football insights by Om Jhamvar.">
   <main class="container main-content blog-page">
     <PageHeader
       eyebrow="Words & Thoughts"
       title="My Blog"
-      description="Football tactics, coding journeys, personal growth â€” unfiltered and straight from the source."
+      description="Tactical analysis of sports and posts about personal growth, unfiltered and straight from the source."
       useTypewriter={true}
     />
 

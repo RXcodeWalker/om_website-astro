@@ -10,11 +10,11 @@ link: ""
 
 Well... we've bottled it again. Arsenal have made history: the FIRST-EVER time a Premier League team at the top of the table has bottled a 2-0 lead to a team in the relegation zone. We were up 2-0 against statistically the WORST team in PL history... and we found a way to draw it.
 
-**Match Summary**
+## Match Summary
 
 Saka gets a header inside five minutes. Wolves are passive, reactive, easily second best. Martinelli misses a 1v1 again. Hincapié makes it 2–0 at the hour mark. But then Arsenal retreat, become nervy, give possession away cheaply. Wolves gain belief. Too much open space on the left allows Bueno to score a wonder strike. Really gruelling final 20 mins as Arsenal try running the clock down. 94th minute: Raya error leads to late equalizer. Final score: 2–2.
 
-**The Real Problem: It’s Not Just the Result**
+## The Real Problem: It’s Not Just the Result
 
 Arteta's approach is to play defensive and pragmatic football. He prefers high possession, slow buildup, territorial dominance, and risk minimisation. Maybe it's based on statistics: more possession theoretically means more shots, more xG, more goals, more control of the game, less risk of conceding goals, and a higher likelihood of winning games. The first problem with this style, apart from how boring it is, is that it makes us nervy and hesitant.
 
@@ -24,7 +24,7 @@ The second issue, whether Arteta likes it or not, is that the opposition love wh
 
 United enjoyed it. Wolves enjoyed it. Brentford enjoyed it. This cannot be accidental; it is a systemic problem.
 
-**The Bigger Context: From Excitement to Fossil Football**
+## The Bigger Context: From Excitement to Fossil Football
 
 22/23 – Naïve but Electric
 Arsenal had the youngest squad in the league and we hadn't played Champions League football since 2016. There were no real expectations on our squad; in fact, many people discounted us from making it to the top five. But that season, despite losing in the end due to injuries and a lack of experience, we attacking fearlessly and we played very exciting, entertaining and dynamic football. I absolutely loved watching us play!
@@ -51,7 +51,7 @@ But this is what has happened recently:
 
 So what are we sacrificing entertainment for? We're playing boring football but what are we getting out of it? We lose control of the game, we let teams have chances, we concede goals, and we drop points. Plus, we do not score enough goals ourselves, and it's extremely frustrating to watch.
 
-**The “It Was Just…” Excuse**
+## The “It Was Just…” Excuse
 
 I'm seeing a lot of people online making the argument that it was just one error by Zubimendi, just two wonder strikes by Dorgu and Cunha, just one banger by Bueno tonight, just one long throw-in by Brentford. These surface-level excuses about occasional bangers and defensive lapses make sense once in a while, but if this happens repeatedly, it isn't random anymore.
 
@@ -61,7 +61,7 @@ Absolutely NOT.
 
 In fact, Brentford deserved to beat us in the end and we were lucky to finish with a draw. The match prior, we looked very shaky against Sunderland before Gyokeres doubled our lead. And in the Carabao Cup, against Chelsea, we might have conceded a goal if not for Rosenier's defensive tactics.
 
-**What a Title Race Should Feel Like**
+## What a Title Race Should Feel Like
 
 In 22/23: We were dreamers. I truly enjoyed watching us play.
 In 23/24: We still believed. And we really were entertaining.
@@ -76,7 +76,7 @@ Even if we somehow win the league this season, if I had the chance to rewatch th
 
 That in itself should tell you all you need to know about Arsenal's season thus far.
 
-**Where We Stand Now In The Premier League**
+## Where We Stand Now In The Premier League
 
 Arsenal are still five points clear of Man City, albeit with a game in hand. However, we could have -- and should have -- easily been 13-16 points clear of them at this moment. City aren't the same team they were two years ago; they're more fragile which they showed in January when they dropped so many points. However, Arsenal didn't win their winnable fixtures either.
 
@@ -86,7 +86,7 @@ The momentum is definitely with them. And for the first time in this title race,
 
 Which is why, if we slip up any further (I think we've already slipped up enough), they will smell blood. They will come for the title. They will be the ones to emerge victorious. While we crumble under pressure, they will resist. Not perfectly, not elegantly, but they will get the results, and they will win the league.
 
-**My Final Take**
+## My Final Take
 
 I've been a massive Arteta supporter. I love how he's transformed our club from a mid-table mandem to a world-class side, one of the best in Europe, that consistently fights for the title. I am grateful to how significantly he has raised Arsenal's standards. However, the question now is whether he can get us over the line.
 

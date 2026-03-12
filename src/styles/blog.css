@@ -550,6 +550,41 @@
 }
 
 /* =========================================================
+   RELATED POSTS
+========================================================= */
+
+.related-posts-section {
+  position: relative;
+  z-index: 95;
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto 6rem;
+  padding: 0 1.5rem;
+  padding-right: 6rem;
+}
+
+.related-heading {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-color);
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.focus-mode .related-posts-section {
+  max-width: 860px;
+  padding-right: 2rem;
+}
+
+.focus-mode .related-heading {
+  font-family: 'NYT Cheltenham', 'Georgia', serif !important;
+  color: #111 !important;
+  border-bottom-color: #333 !important;
+}
+
+/* =========================================================
    ██████  SIDEBAR TOOLBAR
 ========================================================= */
 
@@ -581,11 +616,9 @@
 
 .focus-mode .post-sidebar {
   opacity: 0.15;
-  pointer-events: none;
 }
 .focus-mode .post-sidebar:hover {
   opacity: 1;
-  pointer-events: all;
 }
 
 /* ── Progress Ring ── */
@@ -871,13 +904,25 @@
   opacity: 1;
 }
 
+/* ── Remove all liquid glass globally in focus mode ── */
+.focus-mode .glass-card {
+  background: #f7f7f5 !important;
+  border: 1px solid #e0ddd1 !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-radius: 8px !important;
+}
+.focus-mode .glass-card::before,
+.focus-mode .glass-card::after {
+  display: none !important;
+}
+
 /* ── Sidebar goes B&W in focus mode ── */
 .focus-mode .post-sidebar {
-  background: rgba(230, 228, 224, 0.92) !important;
-  border-color: #bbb !important;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.12) !important;
-  backdrop-filter: blur(20px) saturate(0%) !important;
-  -webkit-backdrop-filter: blur(20px) saturate(0%) !important;
+  background: #f7f7f5 !important;
+  border-color: #e0ddd1 !important;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.06) !important;
 }
 .focus-mode .sidebar-btn {
   color: #666 !important;
@@ -908,10 +953,10 @@
 
 /* ── Top-right controls go B&W in focus mode ── */
 .focus-mode .top-right-controls {
-  background: rgba(230, 228, 224, 0.92) !important;
-  border-color: #bbb !important;
-  backdrop-filter: blur(20px) saturate(0%) !important;
-  -webkit-backdrop-filter: blur(20px) saturate(0%) !important;
+  background: #f7f7f5 !important;
+  border-color: #e0ddd1 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 .focus-mode .top-ctrl-btn {
   color: #666 !important;
@@ -929,12 +974,12 @@
 
 /* ── Back button goes B&W in focus mode ── */
 .focus-mode .back-btn {
-  background: rgba(230, 228, 224, 0.92) !important;
-  border-color: #bbb !important;
+  background: #f7f7f5 !important;
+  border-color: #e0ddd1 !important;
   color: #444 !important;
-  backdrop-filter: blur(20px) saturate(0%) !important;
-  -webkit-backdrop-filter: blur(20px) saturate(0%) !important;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.1) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.05) !important;
 }
 .focus-mode .back-btn:hover {
   color: #111 !important;
@@ -942,79 +987,111 @@
 
 /* ── The article itself goes full B&W newspaper ── */
 .focus-mode .post-backdrop {
-  background: rgba(0, 0, 0, 0.72);
-  backdrop-filter: blur(40px) saturate(0%);
-  -webkit-backdrop-filter: blur(40px) saturate(0%);
+  background: #f7f7f5 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  opacity: 1 !important;
+}
+
+.focus-mode .post-container {
+  padding-top: 6rem !important;
 }
 
 .focus-mode .post-modal {
-  background: #f9f8f5 !important;
-  border-color: #d8d4cc !important;
-  box-shadow: 0 2px 40px rgba(0,0,0,0.35) !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
   filter: none;
+  max-width: 860px !important;
+  padding: 0 2rem !important;
 }
 
 /* Override every accent-coloured element inside the article */
 .focus-mode .post-modal h1 {
   color: #111 !important;
-  font-family: Georgia, 'Times New Roman', 'Noto Serif', serif !important;
-  letter-spacing: -0.01em;
+  font-family: 'NYT Cheltenham', 'Georgia', serif !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.01em !important;
+  text-align: center !important;
+  margin-bottom: 0.5rem !important;
 }
 
 .focus-mode .post-modal .blog-meta {
-  border-bottom-color: #ccc !important;
+  border-bottom: 1px solid #333 !important;
+  border-top: 1px solid #333 !important;
+  padding: 0.8rem 0 !important;
+  justify-content: center !important;
+  margin-bottom: 2rem !important;
 }
 
 .focus-mode .post-dek {
-  color: #45433f !important;
+  color: #333 !important;
+  font-family: 'NYT Imperial', 'Georgia', serif !important;
+  font-size: 1.25rem !important;
+  font-style: italic !important;
+  text-align: center !important;
+  margin-bottom: 1.5rem !important;
 }
 
 .focus-mode .post-hero-media {
-  background: rgba(0, 0, 0, 0.05) !important;
-  border-color: #c4c0b8 !important;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.5),
-    0 8px 20px rgba(0, 0, 0, 0.08) !important;
+  background: none !important;
+  border: 1px solid #ddd !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
 }
 
 .focus-mode .post-hero-kicker {
-  color: #666 !important;
+  color: #111 !important;
+  font-family: 'NYT Franklin', 'Arial', sans-serif !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.05em !important;
 }
 
 .focus-mode .post-hero-line {
-  color: #1f1f1f !important;
+  color: #333 !important;
+  font-family: 'Georgia', serif !important;
+  font-style: normal !important;
 }
 
 .focus-mode .post-hero-ideas li {
-  background: rgba(0, 0, 0, 0.05) !important;
-  border-color: #c9c5bd !important;
-  color: #4c4944 !important;
+  background: none !important;
+  border: 1px solid #ccc !important;
+  color: #333 !important;
+  border-radius: 0 !important;
+  font-family: 'Georgia', serif !important;
 }
 
 .focus-mode .category-badge {
-  background: #111 !important;
-  color: #f9f8f5 !important;
-  letter-spacing: 0.06em;
+  background: transparent !important;
+  color: #111 !important;
+  font-family: 'NYT Franklin', 'Arial', sans-serif !important;
+  letter-spacing: 0.05em !important;
+  border: 1px solid #111 !important;
+  border-radius: 0 !important;
 }
 
 .focus-mode .blog-date,
 .focus-mode .reading-time,
 .focus-mode .time-remaining {
-  color: #666 !important;
+  color: #333 !important;
+  font-family: 'NYT Franklin', 'Arial', sans-serif !important;
 }
 
 /* Post content typography — serif newspaper body */
 .focus-mode .post-content {
-  font-family: Georgia, 'Times New Roman', 'Noto Serif', serif !important;
-  color: #1a1a1a !important;
-  line-height: 1.85 !important;
+  font-family: 'NYT Imperial', 'Georgia', serif !important;
+  color: #111 !important;
+  line-height: 1.6 !important;
+  font-size: 1.15rem !important;
 }
 
 .focus-mode .post-content p {
-  color: #1a1a1a !important;
+  color: #111 !important;
+  margin-bottom: 1.2rem !important;
 }
 
-/* Drop cap — plain black, no gradient */
+/* Drop cap — classic NYT style */
 .focus-mode .post-content > p:first-of-type::first-letter {
   background: none !important;
   -webkit-background-clip: unset !important;
@@ -1022,80 +1099,116 @@
   background-clip: unset !important;
   color: #111 !important;
   filter: none !important;
-  font-family: Georgia, serif !important;
+  font-family: 'NYT Cheltenham', 'Georgia', serif !important;
+  font-size: 5.5em !important;
+  font-weight: 400 !important;
+  line-height: 0.65 !important;
+  margin-right: 0.05em !important;
+  margin-top: 0.05em !important;
 }
 
-/* Section headings — plain left rule, no accent color */
+/* Section headings — classic serif */
 .focus-mode .post-content h2 {
-  font-family: Georgia, 'Times New Roman', serif !important;
+  font-family: 'NYT Cheltenham', 'Georgia', serif !important;
+  font-weight: 700 !important;
   color: #111 !important;
-  border-left-color: #333 !important;
+  border-left: none !important;
+  padding-left: 0 !important;
   letter-spacing: 0 !important;
+  margin-top: 2.5rem !important;
+  margin-bottom: 1rem !important;
+  text-align: center !important;
+  font-size: 1.75rem !important;
 }
 
 .focus-mode .post-content h3 {
-  font-family: Georgia, serif !important;
-  color: #222 !important;
+  font-family: 'NYT Cheltenham', 'Georgia', serif !important;
+  color: #111 !important;
+  font-weight: 600 !important;
+  font-size: 1.35rem !important;
 }
 
 .focus-mode .post-content strong {
   color: #111 !important;
+  font-weight: 600 !important;
 }
 
-/* Blockquote — grey tinted, no accent */
+/* Blockquote — newspaper inset */
 .focus-mode .post-content blockquote {
-  background: #eeece8 !important;
-  border-color: #bbb !important;
+  background: transparent !important;
+  border: none !important;
+  border-top: 1px solid #111 !important;
+  border-bottom: 1px solid #111 !important;
+  border-radius: 0 !important;
   box-shadow: none !important;
+  padding: 1.5rem 0 !important;
+  margin: 2rem 2rem !important;
+  text-align: center !important;
 }
 .focus-mode .post-content blockquote::before {
-  color: #999 !important;
+  display: none !important;
 }
 .focus-mode .post-content blockquote p {
-  color: #333 !important;
+  color: #111 !important;
+  font-family: 'NYT Cheltenham', 'Georgia', serif !important;
+  font-size: 1.35rem !important;
+  font-style: italic !important;
 }
 
-/* Lists — neutral diamond */
+/* Lists — standard bullets/numbers */
 .focus-mode .post-content ul > li::before {
-  background: #555 !important;
+  background: #111 !important;
+  border-radius: 50% !important;
+  width: 5px !important;
+  height: 5px !important;
+  top: 0.7em !important;
+  transform: none !important;
 }
 .focus-mode .post-content ol > li::before {
-  color: #555 !important;
+  color: #111 !important;
+  font-family: 'Georgia', serif !important;
 }
 .focus-mode .post-content li {
-  color: #2a2a2a !important;
+  color: #111 !important;
 }
 
-/* Inline code — neutral */
+/* Inline code — simple monospaced grey */
 .focus-mode .post-content code {
-  background: #e8e6e2 !important;
-  border-color: #ccc !important;
-  color: #333 !important;
+  background: #f4f4f4 !important;
+  border: 1px solid #e0e0e0 !important;
+  color: #111 !important;
+  border-radius: 2px !important;
+  font-family: monospace !important;
 }
 
-/* Links — classic blue newspaper link */
+/* Links — simple underline */
 .focus-mode .post-content a {
-  color: #1a1a8c !important;
-  text-decoration-color: rgba(26,26,140,0.4) !important;
+  color: #111 !important;
+  text-decoration: underline !important;
+  text-decoration-color: #999 !important;
 }
 .focus-mode .post-content a:hover {
-  color: #000080 !important;
+  color: #000 !important;
+  text-decoration-color: #000 !important;
 }
 
 /* Post footer / signoff */
-.focus-mode .post-footer { border-top-color: #ccc !important; }
-.focus-mode .post-signoff { color: #777 !important; border-top-color: #ccc !important; }
+.focus-mode .post-footer { border-top: 1px solid #333 !important; }
+.focus-mode .post-signoff { color: #111 !important; font-family: 'NYT Cheltenham', 'Georgia', serif !important; font-style: italic !important; }
 
 /* Footer like button */
 .focus-mode .read-more-btn {
-  border-color: #999 !important;
-  color: #333 !important;
+  border: 1px solid #111 !important;
+  color: #111 !important;
   background: transparent !important;
+  border-radius: 0 !important;
+  font-family: 'NYT Franklin', 'Arial', sans-serif !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
 }
 .focus-mode .read-more-btn:hover {
   background: #111 !important;
-  color: #f9f8f5 !important;
-  border-color: #111 !important;
+  color: #f7f7f5 !important;
   box-shadow: none !important;
 }
 
@@ -1563,10 +1676,11 @@ body:has(.post-sidebar) .palette-container {
 
 /* ── Focus mode — B&W the whole reader ── */
 .focus-mode .tts-player {
-  background: rgba(230, 228, 224, 0.95) !important;
-  border-color: #bbb !important;
-  backdrop-filter: blur(20px) saturate(0%) !important;
-  -webkit-backdrop-filter: blur(20px) saturate(0%) !important;
+  background: #f7f7f5 !important;
+  border-color: #e0ddd1 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.06) !important;
 }
 .focus-mode .tts-progress-fill {
   background: #555 !important;
@@ -1972,19 +2086,20 @@ body:has(.post-sidebar) .palette-container {
 
 /* ── Focus mode — full B&W ── */
 .focus-mode .ai-summary-backdrop {
-  background: rgba(0,0,0,0.45) !important;
-  backdrop-filter: blur(6px) saturate(0%) !important;
-  -webkit-backdrop-filter: blur(6px) saturate(0%) !important;
+  background: rgba(247,247,245,0.85) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 .focus-mode .ai-summary-panel {
-  background: rgba(230,228,224,0.96) !important;
-  border-color: #bbb !important;
-  backdrop-filter: blur(24px) saturate(0%) !important;
-  -webkit-backdrop-filter: blur(24px) saturate(0%) !important;
+  background: #f7f7f5 !important;
+  border-color: #e0ddd1 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.06) !important;
 }
 .focus-mode .asp-header {
-  background: rgba(230,228,224,0.96) !important;
-  border-bottom-color: #ccc !important;
+  background: #f7f7f5 !important;
+  border-bottom-color: #e0ddd1 !important;
 }
 .focus-mode .asp-title      { color: #111 !important; }
 .focus-mode .asp-sparkle    { color: #555 !important; }

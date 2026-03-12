@@ -19,7 +19,7 @@ html[data-theme="dark"] {
 .reading-canvas {
   max-width: var(--reading-width);
   margin: 0 auto 8rem;
-  padding: 5rem 5rem 8rem;
+  padding: 3rem 4rem 6rem;
   font-family: var(--font-body);
   color: var(--reading-text);
   position: relative;
@@ -54,8 +54,8 @@ html[data-theme="dark"] {
 
 @media (max-width: 800px) {
   .reading-canvas {
-    margin: 2rem 1rem;
-    padding: 3rem 1.5rem;
+    margin: 1rem 0.75rem;
+    padding: 2rem 1.25rem;
   }
 }
 
@@ -71,30 +71,30 @@ html[data-theme="dark"] {
 .post-kicker {
   display: block;
   font-family: var(--font-mono);
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.15em;
+  letter-spacing: 0.12em;
   color: var(--reading-accent);
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   opacity: 0.9;
 }
 
 .post-title-premium {
   font-family: var(--font-heading);
-  font-size: clamp(2.5rem, 6vw, 4rem);
+  font-size: clamp(2.2rem, 5vw, 3.5rem);
   font-weight: 800;
   line-height: 1.1;
   letter-spacing: -0.04em;
-  margin-bottom: 2rem;
+  margin-bottom: 1.25rem;
   color: var(--text-color);
 }
 
 .post-subtitle-premium {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   line-height: 1.4;
   color: var(--muted-text);
-  margin-bottom: 3rem;
+  margin-bottom: 2rem;
   font-weight: 400;
   max-width: 60ch;
 }
@@ -105,10 +105,10 @@ html[data-theme="dark"] {
 .editorial-body > p:first-of-type::first-letter {
   float: left;
   font-family: var(--font-heading);
-  font-size: 5.5rem;
+  font-size: 5rem;
   line-height: 0.75;
-  padding-top: 0.5rem;
-  padding-right: 0.75rem;
+  padding-top: 0.4rem;
+  padding-right: 0.6rem;
   padding-left: 0.1rem;
   color: var(--reading-accent);
   font-weight: 800;
@@ -117,29 +117,29 @@ html[data-theme="dark"] {
 /* Headings */
 .editorial-body h2 {
   font-family: var(--font-heading);
-  font-size: 2.25rem;
+  font-size: 2rem;
   font-weight: 700;
-  margin: 4rem 0 1.5rem;
+  margin: 3.5rem 0 1.25rem;
   letter-spacing: -0.03em;
   line-height: 1.2;
 }
 
 .editorial-body h3 {
   font-family: var(--font-body);
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   font-weight: 600;
-  margin: 3rem 0 1rem;
+  margin: 2.5rem 0 0.85rem;
   letter-spacing: -0.02em;
 }
 
 /* Paragraphs */
 .editorial-body p {
-  margin-bottom: 2rem;
+  margin-bottom: 1.75rem;
 }
 
 /* Pull Quotes */
 .pull-quote {
-  margin: 4rem -4rem;
+  margin: 3.5rem -3.5rem;
   padding: 0;
   border: none;
   background: transparent;
@@ -147,12 +147,12 @@ html[data-theme="dark"] {
 }
 
 @media (max-width: 900px) {
-  .pull-quote { margin: 3rem 0; }
+  .pull-quote { margin: 2.5rem 0; }
 }
 
 .pull-quote p {
   font-family: var(--font-heading);
-  font-size: 2.5rem;
+  font-size: 2.25rem;
   line-height: 1.2;
   font-style: italic;
   color: var(--text-color);
@@ -161,9 +161,9 @@ html[data-theme="dark"] {
 
 .pull-quote cite {
   display: block;
-  margin-top: 1.5rem;
+  margin-top: 1.25rem;
   font-family: var(--font-mono);
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--reading-accent);
@@ -178,8 +178,8 @@ html[data-theme="dark"] {
   right: 50%;
   margin-left: -50vw;
   margin-right: -50vw;
-  margin-top: 4rem;
-  margin-bottom: 4rem;
+  margin-top: 3.5rem;
+  margin-bottom: 3.5rem;
   max-width: 1200px;
 }
 
@@ -200,13 +200,25 @@ html[data-theme="dark"] {
 /* Sticky Side TOC */
 .sidebar-toc {
   position: fixed;
-  left: calc(50% - (var(--reading-width) / 2) - 300px);
-  top: 15rem;
-  width: 200px;
+  left: calc(50% - (var(--reading-width) / 2) - 280px);
+  top: 10rem;
+  width: 220px;
   display: none;
+  padding: 1.5rem;
+  background: 
+    linear-gradient(180deg, rgba(255,255,255,0.4) 0%, transparent 30%),
+    var(--glass-bg);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  box-shadow: 
+    0 10px 30px rgba(0,0,0,0.04),
+    inset 0 1px 0 var(--glass-border-inner);
+  z-index: 50;
 }
 
-@media (min-width: 1400px) {
+@media (min-width: 1300px) {
   .sidebar-toc { display: block; }
 }
 
@@ -217,47 +229,56 @@ html[data-theme="dark"] {
 }
 
 .sidebar-toc li {
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.5rem;
 }
 
 .sidebar-toc a {
   font-size: 0.85rem;
   color: var(--muted-text);
   text-decoration: none;
-  transition: all 0.2s ease;
+  transition: all 0.25s ease;
   display: block;
-  border-left: 2px solid transparent;
-  padding-left: 1rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 8px;
+  line-height: 1.4;
 }
 
-.sidebar-toc a:hover, .sidebar-toc a.active {
+.sidebar-toc a:hover {
+  background: color-mix(in srgb, var(--reading-accent) 8%, transparent);
   color: var(--reading-accent);
-  border-left-color: var(--reading-accent);
 }
+
+.sidebar-toc a.active {
+  color: var(--reading-accent);
+  background: color-mix(in srgb, var(--reading-accent) 12%, transparent);
+  font-weight: 600;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+}
+
 
 /* ── Premium Header & Meta ── */
 .post-header-premium {
-  margin-bottom: 5rem;
+  margin-bottom: 2rem;
   border-bottom: 1px solid var(--glass-border);
-  padding-bottom: 3rem;
+  padding-bottom: 1.25rem;
 }
 
 .blog-meta-premium {
   display: flex;
-  gap: 3rem;
-  margin-bottom: 3rem;
+  gap: 2.5rem;
+  margin-bottom: 2rem;
   flex-wrap: wrap;
 }
 
 .meta-item {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.15rem;
 }
 
 .meta-label {
   font-family: var(--font-mono);
-  font-size: 0.65rem;
+  font-size: 0.6rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--muted-text);
@@ -265,31 +286,31 @@ html[data-theme="dark"] {
 
 .meta-item span:not(.meta-label) {
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   color: var(--text-color);
 }
 
 /* ── Toc Label ── */
 .toc-label {
   font-family: var(--font-mono);
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   text-transform: uppercase;
   letter-spacing: 0.15em;
   color: var(--muted-text);
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.25rem;
   font-weight: 700;
 }
 
 /* ── Footer Premium ── */
 .post-footer-premium {
-  margin-top: 8rem;
-  padding-top: 4rem;
+  margin-top: 6rem;
+  padding-top: 3rem;
   border-top: 1px solid var(--glass-border);
 }
 
 .post-signoff {
   font-family: var(--font-heading);
-  font-size: 1.5rem;
+  font-size: 1.35rem;
   font-style: italic;
   color: var(--text-color);
   text-align: center;

@@ -39,7 +39,7 @@ const introLine = post ? extractStrikingLine(postBody, post.data.excerpt) : '';
   </a>
 
   <div class="post-container" id="post-container">
-    <article class="glass-card post-modal" id="post-content">
+    <article class="glass-card post-modal" id="post-content" data-post-id={post ? (post.data.id ?? post.slug) : ''} data-post-slug={post?.slug ?? ''}>
       {post && Content ? (
         <>
           <div class="post-header cinematic-intro" id="post-intro">

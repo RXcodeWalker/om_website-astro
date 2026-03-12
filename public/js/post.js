@@ -53,43 +53,97 @@
   updateViews(postId);
 
   // Build TOC and Scroll Tracking
-  setTimeout(() => {
-    buildTOC();
-    initScrollTracking();
-  }, 100);
+  function initTOC() {
+    let attempts = 0;
+    const interval = setInterval(() => {
+      const headings = document.getElementById('post-body')?.querySelectorAll('h2, h3');
+      if ((headings && headings.length > 0) || attempts > 10) {
+        clearInterval(interval);
+        buildTOC();
+        initScrollTracking();
+      }
+      attempts++;
+    }, 100);
+  }
+  initTOC();
 
   // ─── TOC Builder ─────────────────────────────────
   function buildTOC() {
     const tocNav = document.getElementById('toc-nav');
-    if (!tocNav) return;
+    const premiumTocNav = document.getElementById('premium-toc-nav');
+    if (!tocNav && !premiumTocNav) return;
 
-    const content = document.getElementById('post-content');
-    if (!content) { tocNav.innerHTML = '<p class="toc-empty">No sections found.</p>'; return; }
+    // Search specifically in the editorial body
+    const content = document.getElementById('post-body');
+    if (!content) return;
 
-    const headings = content.querySelectorAll('h2, h3');
-    if (headings.length === 0) { tocNav.innerHTML = '<p class="toc-empty">No sections found.</p>'; return; }
+    const headings = Array.from(content.querySelectorAll('h2, h3'));
+    if (headings.length === 0) {
+      if (tocNav) tocNav.innerHTML = '<p class="toc-empty">No sections found.</p>';
+      if (premiumTocNav) premiumTocNav.innerHTML = '<p class="toc-empty">No sections found.</p>';
+      return;
+    }
 
-    tocNav.innerHTML = '';
+    const list = document.createElement('ul');
     headings.forEach((h, i) => {
       if (!h.id) h.id = slugify(h.textContent) + '-' + i;
+      
+      const item = document.createElement('li');
       const link = document.createElement('a');
       link.href = '#' + h.id;
       link.className = 'toc-link ' + (h.tagName === 'H3' ? 'h3' : '');
       link.textContent = h.textContent;
       link.dataset.target = h.id;
+      
       link.addEventListener('click', e => {
         e.preventDefault();
-        h.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const target = document.getElementById(h.id);
+        if (target) {
+          const top = target.getBoundingClientRect().top + window.pageYOffset - 100;
+          window.scrollTo({ top, behavior: 'smooth' });
+        }
         if (window.innerWidth < 769) closeTOC();
       });
-      tocNav.appendChild(link);
+
+      item.appendChild(link);
+      list.appendChild(item);
     });
+
+    if (tocNav) {
+      tocNav.innerHTML = '';
+      tocNav.appendChild(list.cloneNode(true));
+      // Bind listeners for standard TOC
+      tocNav.querySelectorAll('a').forEach((link, idx) => {
+        link.addEventListener('click', e => {
+          e.preventDefault();
+          const target = headings[idx];
+          const top = target.getBoundingClientRect().top + window.pageYOffset - 100;
+          window.scrollTo({ top, behavior: 'smooth' });
+          if (window.innerWidth < 769) closeTOC();
+        });
+      });
+    }
+
+    if (premiumTocNav) {
+      premiumTocNav.innerHTML = '';
+      premiumTocNav.appendChild(list);
+      // Bind listeners for premium TOC
+      premiumTocNav.querySelectorAll('a').forEach((link, idx) => {
+        link.addEventListener('click', e => {
+          e.preventDefault();
+          const target = headings[idx];
+          const top = target.getBoundingClientRect().top + window.pageYOffset - 100;
+          window.scrollTo({ top, behavior: 'smooth' });
+        });
+      });
+    }
   }
 
   // ─── Scroll Tracking ─────────────────────────────
   function initScrollTracking() {
     const progressFill = document.getElementById('progress-ring-fill');
     const progressPercent = document.getElementById('progress-percent');
+    const premiumProgressBar = document.getElementById('reading-progress-bar');
     const tocProgressFill = document.getElementById('toc-progress-fill');
     const timeRemaining = document.getElementById('time-remaining');
     const circumference = 2 * Math.PI * 18; // r=18
@@ -103,8 +157,10 @@
         const offset = circumference - (pct / 100) * circumference;
         progressFill.style.strokeDashoffset = offset;
         progressFill.style.strokeDasharray = circumference;
+        progressFill.style.stroke = `color-mix(in srgb, var(--accent-1) ${100 - pct}%, var(--accent-2))`;
       }
       if (progressPercent) progressPercent.textContent = pct + '%';
+      if (premiumProgressBar) premiumProgressBar.style.width = pct + '%';
       if (tocProgressFill) tocProgressFill.style.width = pct + '%';
 
       if (timeRemaining && totalWords > 0) {
@@ -130,9 +186,12 @@
     const headings = document.querySelectorAll('h2, h3');
     let activeId = null;
 
-    headings.forEach(h => {
-      if (h.getBoundingClientRect().top <= 120) activeId = h.id;
-    });
+    for (let i = headings.length - 1; i >= 0; i--) {
+      if (headings[i].getBoundingClientRect().top <= 150) {
+        activeId = headings[i].id;
+        break;
+      }
+    }
 
     tocLinks.forEach(l => {
       l.classList.toggle('active', l.dataset.target === activeId);
@@ -143,20 +202,26 @@
   async function initLikes(id) {
     liked = localStorage.getItem('liked-' + id) === '1';
     updateLikeUI();
+    fetchLikes(id);
+  }
 
+  async function fetchLikes(id) {
     const client = window.supabaseClient;
     if (!client) return;
 
     try {
-      const { data } = await client
-        .from('post_views') // Using existing table name from incrementViews.js
-        .select('*', { count: 'exact', head: true })
-        .eq('post_id', id);
-        
-      // Note: The original post.js used blog_views for likes, 
-      // but let's stick to the likes logic if it exists.
-      // If no likes column, we skip.
-    } catch {}
+      const { data, error } = await client
+        .from('post_views')
+        .select('likes')
+        .eq('post_id', id)
+        .maybeSingle();
+      
+      if (data && typeof data.likes === 'number') {
+        updateLikesDisplay(data.likes);
+      }
+    } catch (err) {
+      console.error('Error fetching likes:', err);
+    }
   }
 
   async function handleLike() {
@@ -164,16 +229,46 @@
       showToast('Already liked! 💖');
       return;
     }
+
+    const client = window.supabaseClient;
+    if (!client) return;
+
     liked = true;
     localStorage.setItem('liked-' + postId, '1');
     updateLikeUI();
     showToast('Thanks for the love! ❤️');
-    // Logic to update likes in DB could go here
+
+    try {
+      // Optimistic update
+      const currentLikes = parseInt(document.querySelector('.blog-likes')?.textContent || '0');
+      updateLikesDisplay(currentLikes + 1);
+
+      // We'll reuse the logic from views or create a new incrementLikes if available.
+      // Since I don't see a dedicated incrementLikes netlify function, 
+      // I'll try to update directly via client if permissions allow, 
+      // but usually these require a secure function.
+      // For now, I'll update the Supabase record directly if it exists.
+      
+      const { data } = await client.rpc('increment_likes', { post_id_input: postId });
+      if (data) updateLikesDisplay(data);
+    } catch (err) {
+      console.error('Error updating likes:', err);
+    }
   }
 
   function updateLikeUI() {
     const btn = document.getElementById('like-btn');
     if (btn) btn.classList.toggle('liked', liked);
+  }
+
+  function updateLikesDisplay(count) {
+    const likesEl = document.querySelector('.blog-likes');
+    if (likesEl) likesEl.textContent = count.toLocaleString();
+    const sidebarCount = document.getElementById('like-count');
+    if (sidebarCount) {
+      sidebarCount.textContent = count > 0 ? count : '';
+      sidebarCount.classList.toggle('visible', count > 0);
+    }
   }
 
   // ─── Bookmark System ─────────────────────────────
@@ -281,7 +376,7 @@
   }
 
   // ─── Event Listeners ──────────────────────────────
-  document.addEventListener('DOMContentLoaded', () => {
+  function initEvents() {
     document.getElementById('toc-toggle-btn')?.addEventListener('click', () => tocOpen ? closeTOC() : openTOC());
     document.getElementById('toc-close')?.addEventListener('click', closeTOC);
     document.getElementById('like-btn')?.addEventListener('click', handleLike);
@@ -299,9 +394,18 @@
     });
 
     document.getElementById('focus-mode-btn')?.addEventListener('click', toggleFocusMode);
-    document.getElementById('copy-link-btn')?.addEventListener('click', () => {
+    
+    const copyLinkHandler = () => {
       navigator.clipboard.writeText(window.location.href);
       showToast('🔗 Link copied!');
-    });
-  });
+    };
+    document.getElementById('share-copy')?.addEventListener('click', copyLinkHandler);
+    document.getElementById('copy-link-btn')?.addEventListener('click', copyLinkHandler);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initEvents);
+  } else {
+    initEvents();
+  }
 })();

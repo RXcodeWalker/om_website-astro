@@ -138,7 +138,6 @@
         </div>
         <h2>${highlightText(post.title, currentQuery)}</h2>
         <p class="featured-story-excerpt">${highlightText(post.excerpt, currentQuery)}</p>
-        ${renderPreviewStrips(post, 'featured')}
 
         <div class="featured-story-footer">
           <a href="${postHref(post.slug)}" class="featured-read-more">
@@ -201,7 +200,6 @@
               <span class="blog-date">${escapeHtml(post.date)}</span>
             </div>
             <p class="blog-excerpt">${highlightText(post.excerpt, currentQuery)}</p>
-            ${renderPreviewStrips(post)}
             <a href="${postHref(post.slug)}" class="read-more-btn">
               Read More
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
