@@ -4,8 +4,6 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHeader from '../components/ui/PageHeader.astro';
 import BlogSearch from '../components/blog/BlogSearch.astro';
 import { estimateReadingMinutes, extractKeyIdeas, extractStrikingLine, formatReadingTime } from '../utils/postInsights';
-import '../styles/blog.css';
-import '../styles/blog-spectacular.css';
 
 const dateValue = (value: string) => {
   const parsed = Date.parse(value);
