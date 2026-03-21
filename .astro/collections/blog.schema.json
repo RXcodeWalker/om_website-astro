@@ -25,6 +25,19 @@
         "link": {
           "type": "string"
         },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "author": {
+          "type": "string",
+          "default": "Om Jhamvar"
+        },
+        "image": {
+          "type": "string"
+        },
         "$schema": {
           "type": "string"
         }

@@ -38,7 +38,7 @@ const latestPost = allPosts.sort((a, b) => new Date(b.data.date).getTime() - new
                   <span class="blog-date">{latestPost.data.date}</span>
                 </div>
                 <p class="text-muted" style="font-size:0.9rem;line-height:1.6;margin-bottom:1.5rem;">{latestPost.data.excerpt}</p>
-                <a href={`/blog-post?id=${latestPost.slug}`} class="feature-card-arrow">
+                <a href={`/blog/${latestPost.slug}`} class="feature-card-arrow">
                   Read post
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <line x1="5" y1="12" x2="19" y2="12"></line>

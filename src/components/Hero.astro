@@ -3,10 +3,10 @@
 <section class="hero-spectacular">
   <canvas id="hero-canvas"></canvas>
   <div class="container">
-    <div class="hero-eyebrow">Arsenal · Code · Growth</div>
+    <div class="hero-eyebrow">Learning · Music  · Code · Growth · Sports</div>
     <h1 class="hero-title">Beyond The Basics</h1>
     <div class="hero-roles">
-      <span id="hero-static">Created by a 10th grader who </span>
+      <span id="hero-static">Created by an 11th grader who </span>
       <span class="typewriter-text" id="typewriter"></span><span class="cursor">|</span>
     </div>
     <div class="hero-cta-group">
@@ -225,7 +225,14 @@
     }
 
     // TYPEWRITER
-    const phrases = ['analyzes Arsenal tactics', 'writes code for fun', 'loves learning new things', 'thinks in systems', 'builds cool websites', 'follows football obsessively'];
+    const phrases = [
+      'ships coding and robotics builds',
+      'writes project breakdowns every week',
+      'extracts and discusses key lessons from books',
+      'performs guitar, piano, and vocals live',
+      'studies tactics across F1, football and other sports',
+      'is building a serious newsletter brand'
+    ];
     let phraseIdx = 0, charIdx = 0, isDeleting = false;
     const tw = document.getElementById('typewriter');
 
@@ -240,15 +247,15 @@
       if (isDeleting) {
         charIdx--;
         tw.textContent = phrase.substring(0, charIdx);
-        if (charIdx === 0) { isDeleting = false; phraseIdx = (phraseIdx + 1) % phrases.length; setTimeout(typeWriter, 500); return; }
-        setTimeout(typeWriter, 50);
+        if (charIdx === 0) { isDeleting = false; phraseIdx = (phraseIdx + 1) % phrases.length; setTimeout(typeWriter, 180); return; }
+        setTimeout(typeWriter, 28);
       } else {
         charIdx++;
         tw.textContent = phrase.substring(0, charIdx);
-        if (charIdx === phrase.length) { isDeleting = true; setTimeout(typeWriter, 2000); return; }
-        setTimeout(typeWriter, 80);
+        if (charIdx === phrase.length) { isDeleting = true; setTimeout(typeWriter, 850); return; }
+        setTimeout(typeWriter, 42);
       }
     }
-    setTimeout(typeWriter, 1800);
+    setTimeout(typeWriter, 500);
   })();
 </script>
