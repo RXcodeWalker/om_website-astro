@@ -17,7 +17,7 @@ const latestPost = allPosts.sort((a, b) => new Date(b.data.date).getTime() - new
   <Hero />
   <Marquee />
 
-  <main class="container main-content" style="padding-top: 0rem;">
+  <main class="container main-content home-main">
     
     <!-- LATEST BLOG DROPS -->
     <section class="section reveal" style="margin:1rem; padding:1rem; align-content: center;">
@@ -80,6 +80,16 @@ const latestPost = allPosts.sort((a, b) => new Date(b.data.date).getTime() - new
 
   <style>
     /* Page specific layout */
+    .home-main {
+      padding-top: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+    }
+    :global(.home-main > *) {
+      margin-top: 0 !important;
+      margin-bottom: 0 !important;
+    }
     .featured-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -176,8 +186,8 @@ const latestPost = allPosts.sort((a, b) => new Date(b.data.date).getTime() - new
       filter: saturate(var(--surface-contrast-hover));
     }
     .newsletter-home-section {
-      margin: 1rem;
-      padding: 0 1rem;
+      margin: 0.15rem 0 0.35rem;
+      padding: 0;
     }
     .newsletter-home-card {
       display: flex;
@@ -208,13 +218,29 @@ const latestPost = allPosts.sort((a, b) => new Date(b.data.date).getTime() - new
       flex-wrap: wrap;
       flex-shrink: 0;
     }
+    :global(.home-main .stats-section) {
+      padding: 1rem 0 !important;
+    }
+    :global(.home-main .about-strip) {
+      padding: 1.1rem 0 !important;
+    }
+    :global(.home-main .section) {
+      margin-top: 0.2rem !important;
+      margin-bottom: 0.35rem !important;
+    }
 
     @media (max-width: 768px) {
-      .main-content { padding-top: 1rem !important; padding-bottom: 2rem !important; }
-      .section { margin-bottom: 2.5rem !important; margin-top: 1.5rem !important; }
+      .home-main {
+        padding-top: 0.5rem !important;
+        padding-bottom: 1.25rem !important;
+        gap: 0.4rem !important;
+      }
+      .section { margin-bottom: 0.45rem !important; margin-top: 0.35rem !important; }
       .section-heading { margin-bottom: 1.25rem !important; font-size: 2.2rem !important; }
       .featured-grid { gap: 1rem !important; }
-      .newsletter-home-section { margin: 0 !important; padding: 0 !important; }
+      .newsletter-home-section { margin: 0.1rem 0 0.3rem !important; padding: 0 !important; }
+      :global(.home-main .stats-section) { padding: 0.7rem 0 !important; }
+      :global(.home-main .about-strip) { padding: 0.8rem 0 !important; }
       .newsletter-home-card {
         flex-direction: column;
         align-items: flex-start;
