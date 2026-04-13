@@ -1,0 +1,400 @@
+/* Post focus/zen mode: NYT-style B&W reading overrides */
+
+/* =========================================================
+   ██████  FOCUS / ZEN MODE — NYT-style B&W reading
+========================================================= */
+
+/* Fade out palette in focus mode */
+.focus-mode .palette-container {
+  opacity: 0.1;
+  transition: opacity 0.5s ease;
+}
+.focus-mode .palette-container:hover {
+  opacity: 1;
+}
+
+/* Sidebar dims but stays fully interactive in focus mode.
+   NO pointer-events:none — that kills hover detection entirely,
+   making it impossible for the :hover rule to ever re-enable clicks. */
+.focus-mode .post-sidebar {
+  opacity: 0.2;
+  /* Lock the centering transform so it can't jump on style recalc */
+  transform: translateY(-50%) translateX(0);
+  transition: opacity 0.5s ease;
+}
+.focus-mode .post-sidebar:hover {
+  opacity: 1;
+}
+
+/* ── Remove all liquid glass globally in focus mode ── */
+.focus-mode .glass-card {
+  background: #f7f7f5 !important;
+  border: 1px solid #e0ddd1 !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-radius: 8px !important;
+}
+.focus-mode .glass-card::before,
+.focus-mode .glass-card::after {
+  display: none !important;
+}
+
+/* ── Sidebar goes B&W in focus mode ── */
+.focus-mode .post-sidebar {
+  background: #f7f7f5 !important;
+  border-color: #e0ddd1 !important;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06) !important;
+}
+.focus-mode .sidebar-btn {
+  color: #666 !important;
+  background: transparent !important;
+  border-color: transparent !important;
+}
+.focus-mode .sidebar-btn:hover {
+  background: rgba(0, 0, 0, 0.09) !important;
+  border-color: #999 !important;
+  color: #111 !important;
+  transform: scale(1.08);
+}
+.focus-mode .sidebar-btn.active {
+  background: rgba(0, 0, 0, 0.12) !important;
+  border-color: #888 !important;
+  color: #111 !important;
+  box-shadow: none !important;
+}
+.focus-mode .like-btn.liked {
+  color: #888 !important;
+}
+.focus-mode .like-btn.liked svg {
+  fill: #888 !important;
+  stroke: #888 !important;
+}
+.focus-mode .bookmark-btn.bookmarked {
+  color: #333 !important;
+}
+.focus-mode .bookmark-btn.bookmarked svg {
+  fill: #333 !important;
+}
+.focus-mode .like-count {
+  background: #666 !important;
+}
+.focus-mode .sidebar-divider {
+  background: #ccc !important;
+}
+.focus-mode .progress-ring-track {
+  stroke: #ddd !important;
+}
+.focus-mode .progress-ring-fill {
+  stroke: #555 !important;
+}
+.focus-mode .progress-percent {
+  color: #444 !important;
+}
+
+/* ── Top-right controls go B&W in focus mode ── */
+.focus-mode .top-right-controls {
+  background: #f7f7f5 !important;
+  border-color: #e0ddd1 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+.focus-mode .top-ctrl-btn {
+  color: #666 !important;
+}
+.focus-mode .top-ctrl-btn:hover {
+  background: rgba(0, 0, 0, 0.09) !important;
+  border-color: #999 !important;
+  color: #111 !important;
+}
+.focus-mode .top-ctrl-btn.active {
+  background: rgba(0, 0, 0, 0.12) !important;
+  border-color: #888 !important;
+  color: #111 !important;
+}
+
+/* ── Back button goes B&W in focus mode ── */
+.focus-mode .back-btn {
+  background: #f7f7f5 !important;
+  border-color: #e0ddd1 !important;
+  color: #444 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05) !important;
+}
+.focus-mode .back-btn:hover {
+  color: #111 !important;
+}
+
+/* ── The article itself goes full B&W newspaper ── */
+.focus-mode .post-backdrop {
+  background: #f7f7f5 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  opacity: 1 !important;
+}
+
+.focus-mode .post-container {
+  padding-top: 6rem !important;
+}
+
+.focus-mode .post-modal {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  filter: none;
+  max-width: 860px !important;
+  padding: 0 2rem !important;
+}
+
+/* Override every accent-coloured element inside the article */
+.focus-mode .post-modal h1 {
+  color: #111 !important;
+  font-family: "NYT Cheltenham", "Georgia", serif !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.01em !important;
+  text-align: center !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.focus-mode .post-modal .blog-meta {
+  border-bottom: 1px solid #333 !important;
+  border-top: 1px solid #333 !important;
+  padding: 0.8rem 0 !important;
+  justify-content: center !important;
+  margin-bottom: 2rem !important;
+}
+
+.focus-mode .post-dek {
+  color: #333 !important;
+  font-family: "NYT Imperial", "Georgia", serif !important;
+  font-size: 1.25rem !important;
+  font-style: italic !important;
+  text-align: center !important;
+  margin-bottom: 1.5rem !important;
+}
+
+.focus-mode .post-hero-media {
+  background: none !important;
+  border: 1px solid #ddd !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+}
+
+.focus-mode .post-hero-kicker {
+  color: #111 !important;
+  font-family: "NYT Franklin", "Arial", sans-serif !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.05em !important;
+}
+
+.focus-mode .post-hero-line {
+  color: #333 !important;
+  font-family: "Georgia", serif !important;
+  font-style: normal !important;
+}
+
+.focus-mode .post-hero-ideas li {
+  background: none !important;
+  border: 1px solid #ccc !important;
+  color: #333 !important;
+  border-radius: 0 !important;
+  font-family: "Georgia", serif !important;
+}
+
+.focus-mode .category-badge {
+  background: transparent !important;
+  color: #111 !important;
+  font-family: "NYT Franklin", "Arial", sans-serif !important;
+  letter-spacing: 0.05em !important;
+  border: 1px solid #111 !important;
+  border-radius: 0 !important;
+}
+
+.focus-mode .blog-date,
+.focus-mode .reading-time,
+.focus-mode .time-remaining {
+  color: #333 !important;
+  font-family: "NYT Franklin", "Arial", sans-serif !important;
+}
+
+/* Post content typography — serif newspaper body */
+.focus-mode .post-content {
+  font-family: "NYT Imperial", "Georgia", serif !important;
+  color: #111 !important;
+  line-height: 1.6 !important;
+  font-size: 1.15rem !important;
+}
+
+.focus-mode .post-content p {
+  color: #111 !important;
+  margin-bottom: 1.2rem !important;
+}
+
+/* Drop cap — classic NYT style */
+.focus-mode .post-content > p:first-of-type::first-letter {
+  background: none !important;
+  -webkit-background-clip: unset !important;
+  -webkit-text-fill-color: #111 !important;
+  background-clip: unset !important;
+  color: #111 !important;
+  filter: none !important;
+  font-family: "NYT Cheltenham", "Georgia", serif !important;
+  font-size: 5.5em !important;
+  font-weight: 400 !important;
+  line-height: 0.65 !important;
+  margin-right: 0.05em !important;
+  margin-top: 0.05em !important;
+}
+
+/* Section headings — classic serif */
+.focus-mode .post-content h2 {
+  font-family: "NYT Cheltenham", "Georgia", serif !important;
+  font-weight: 700 !important;
+  color: #111 !important;
+  border-left: none !important;
+  padding-left: 0 !important;
+  letter-spacing: 0 !important;
+  margin-top: 2.5rem !important;
+  margin-bottom: 1rem !important;
+  text-align: center !important;
+  font-size: 1.75rem !important;
+}
+
+.focus-mode .post-content h3 {
+  font-family: "NYT Cheltenham", "Georgia", serif !important;
+  color: #111 !important;
+  font-weight: 600 !important;
+  font-size: 1.35rem !important;
+}
+
+.focus-mode .post-content strong {
+  color: #111 !important;
+  font-weight: 600 !important;
+}
+
+/* Blockquote — newspaper inset */
+.focus-mode .post-content blockquote {
+  background: transparent !important;
+  border: none !important;
+  border-top: 1px solid #111 !important;
+  border-bottom: 1px solid #111 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 1.5rem 0 !important;
+  margin: 2rem 2rem !important;
+  text-align: center !important;
+}
+.focus-mode .post-content blockquote::before {
+  display: none !important;
+}
+.focus-mode .post-content blockquote p {
+  color: #111 !important;
+  font-family: "NYT Cheltenham", "Georgia", serif !important;
+  font-size: 1.35rem !important;
+  font-style: italic !important;
+}
+
+/* Lists — standard bullets/numbers */
+.focus-mode .post-content ul > li::before {
+  background: #111 !important;
+  border-radius: 50% !important;
+  width: 5px !important;
+  height: 5px !important;
+  top: 0.7em !important;
+  transform: none !important;
+}
+.focus-mode .post-content ol > li::before {
+  color: #111 !important;
+  font-family: "Georgia", serif !important;
+}
+.focus-mode .post-content li {
+  color: #111 !important;
+}
+
+/* Inline code — simple monospaced grey */
+.focus-mode .post-content code {
+  background: #f4f4f4 !important;
+  border: 1px solid #e0e0e0 !important;
+  color: #111 !important;
+  border-radius: 2px !important;
+  font-family: monospace !important;
+}
+
+/* Links — simple underline */
+.focus-mode .post-content a {
+  color: #111 !important;
+  text-decoration: underline !important;
+  text-decoration-color: #999 !important;
+}
+.focus-mode .post-content a:hover {
+  color: #000 !important;
+  text-decoration-color: #000 !important;
+}
+
+/* Post footer / signoff */
+.focus-mode .post-footer {
+  border-top: 1px solid #333 !important;
+}
+.focus-mode .post-signoff {
+  color: #111 !important;
+  font-family: "NYT Cheltenham", "Georgia", serif !important;
+  font-style: italic !important;
+}
+
+/* Footer like button */
+.focus-mode .read-more-btn {
+  border: 1px solid #111 !important;
+  color: #111 !important;
+  background: transparent !important;
+  border-radius: 0 !important;
+  font-family: "NYT Franklin", "Arial", sans-serif !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+}
+.focus-mode .read-more-btn:hover {
+  background: #111 !important;
+  color: #f7f7f5 !important;
+  box-shadow: none !important;
+}
+
+/* Focus mode label pill in top-right of article */
+.focus-mode-label {
+  display: none;
+  position: fixed;
+  top: 1.75rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 200;
+  padding: 0.4rem 1rem;
+  border-radius: 100px;
+  background: rgba(0, 0, 0, 0.75);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  pointer-events: none;
+  animation: fadeLabel 1.8s ease forwards;
+}
+.focus-mode .focus-mode-label {
+  display: block;
+}
+
+@keyframes fadeLabel {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-6px);
+  }
+  20% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  75% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}

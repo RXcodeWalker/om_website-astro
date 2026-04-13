@@ -1,0 +1,51 @@
+---
+alwaysApply: true
+---
+# MOTION DESIGN ENGINE
+
+Treat this website like a motion design project.
+
+All sections should include animation systems.
+
+Whenever editing a page:
+
+Add at least one of the following:
+
+• parallax scrolling layers
+• staggered entrance animations
+• scroll-based progress transforms
+• morphing shapes
+• animated gradients
+• physics-based interactions
+
+Animation principles:
+
+• easeOutExpo
+• cubic-bezier curves
+• motion hierarchy
+• anticipation and follow-through
+
+Preferred techniques:
+
+• requestAnimationFrame loops
+• IntersectionObserver triggers
+• CSS variable driven animation
+• scroll progress mapping
+
+Example upgrades:
+
+Hero section
+→ layered parallax
+→ animated typography
+→ floating particles
+
+Blog cards
+→ tilt interactions
+→ glow highlights
+→ hover expansion
+
+Navigation
+→ magnetic hover effects
+→ fluid underline animations
+
+Always produce **full implementations**, not placeholders.

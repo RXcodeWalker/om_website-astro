@@ -55,15 +55,17 @@
     
     btn.addEventListener('click', () => { 
       const palette = btn.dataset.palette;
+      const html = document.documentElement;
 
-      // Smooth transition
-      document.documentElement.style.transition = "all 0.4s ease";
-
-      document.documentElement.setAttribute('data-palette', palette);
+      html.dataset.tuning = 'true';
+      html.style.transition = "all 0.4s ease";
+      html.setAttribute('data-palette', palette);
       localStorage.setItem('palette', palette);
 
       paletteButtons.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
+
+      setTimeout(() => { delete html.dataset.tuning; }, 420);
     });
 
   });

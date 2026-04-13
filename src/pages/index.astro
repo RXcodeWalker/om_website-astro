@@ -20,9 +20,9 @@ const latestPost = allPosts.sort((a, b) => new Date(b.data.date).getTime() - new
   <main class="container main-content home-main">
     
     <!-- LATEST BLOG DROPS -->
-    <section class="section reveal" style="margin:1rem; padding:1rem; align-content: center;">
+    <section class="section" data-handshake style="margin:1rem; padding:1rem; align-content: center;">
       <div class="section-label">Fresh Off The Press</div>
-      <h2 class="section-heading"><span>Latest drops</span></h2>
+      <h2 class="section-heading hs-heading"><span>Latest drops</span></h2>
 
       <div class="featured-grid" >
         <div class="feature-card tilt-card" id="latest-post-card">
@@ -54,7 +54,7 @@ const latestPost = allPosts.sort((a, b) => new Date(b.data.date).getTime() - new
       </div>
     </section>
 
-    <section id="newsletter-signup" class="section reveal newsletter-home-section" aria-label="Newsletter signup">
+    <section id="newsletter-signup" class="section newsletter-home-section" data-handshake aria-label="Newsletter signup">
       <div class="feature-card newsletter-home-card">
         <div class="feature-card-accent newsletter-home-accent"></div>
         <div class="newsletter-home-copy">

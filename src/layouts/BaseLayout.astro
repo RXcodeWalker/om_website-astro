@@ -74,6 +74,14 @@ const { title = "Beyond The Basics", description = "Football analysis, coding pr
     </div>
   </div>
 
+  <!-- Reticle (positioned by signal.js, never created at runtime) -->
+  <div id="reticle" aria-hidden="true">
+    <span class="ret-corner ret-tl"></span>
+    <span class="ret-corner ret-tr"></span>
+    <span class="ret-corner ret-bl"></span>
+    <span class="ret-corner ret-br"></span>
+  </div>
+
   <!-- Global Scripts -->
   <script is:inline src="/js/theme.js"></script>
   <script is:inline src="/js/scroll.js"></script>
@@ -81,6 +89,7 @@ const { title = "Beyond The Basics", description = "Football analysis, coding pr
   <script is:inline src="/js/invincibles.js"></script>
   <script is:inline src="/js/konami.js"></script>
   <script is:inline src="/js/utils/cursor.js"></script>
+  <script is:inline src="/js/signal.js"></script>
 
   <script is:inline>
     /* Global Loader logic (Temporarily disabled)
