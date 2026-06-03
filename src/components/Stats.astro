@@ -106,6 +106,12 @@
     .stat-card { padding: 1.25rem 1rem !important; }
     .stat-number { font-size: 2.5rem !important; }
   }
+  /* improvement #5: force 2×2 grid on small screens */
+  @media (max-width: 640px) {
+    .stats-grid {
+      grid-template-columns: repeat(2, 1fr) !important;
+    }
+  }
 </style>
 
 <script is:inline>

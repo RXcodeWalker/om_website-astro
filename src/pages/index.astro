@@ -9,64 +9,67 @@ import WelcomeCTA from '../components/WelcomeCTA.astro';
 import { getCollection } from 'astro:content';
 
 const allPosts = await getCollection('blog');
-const latestPost = allPosts.sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime())[0];
+const recentPosts = allPosts
+  .sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime())
+  .slice(0, 3);
 ---
 
 <BaseLayout title="Om — Home">
-  
+
   <Hero />
   <Marquee />
 
   <main class="container main-content home-main">
-    
-    <!-- LATEST BLOG DROPS -->
-    <section class="section" data-handshake style="margin:1rem; padding:1rem; align-content: center;">
-      <div class="section-label">Fresh Off The Press</div>
-      <h2 class="section-heading hs-heading"><span>Latest drops</span></h2>
 
-      <div class="featured-grid" >
-        <div class="feature-card tilt-card" id="latest-post-card">
-          <div class="card-shine"></div>
-          <div class="feature-card-accent"></div>
-          <div class="feature-card-tag">Latest Post</div>
-          <div id="latest-post-inner">
-            {latestPost ? (
-              <>
-                <h3 style="font-family:var(--font-display);font-weight:700;font-size:1.3rem;margin-bottom:0.75rem;">{latestPost.data.title}</h3>
-                <div class="blog-meta">
-                  <span class="category-badge">{latestPost.data.category}</span>
-                  <span class="blog-date">{latestPost.data.date}</span>
-                </div>
-                <p class="text-muted" style="font-size:0.9rem;line-height:1.6;margin-bottom:1.5rem;">{latestPost.data.excerpt}</p>
-                <a href={`/blog/${latestPost.slug}`} class="feature-card-arrow">
-                  Read post
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                    <polyline points="12 5 19 12 12 19"></polyline>
-                  </svg>
-                </a>
-              </>
-            ) : (
-              <h3>No posts found.</h3>
-            )}
-          </div>
-        </div>
+    <!-- LATEST BLOG DROPS — improvement #1: show 3 posts, improvement #6: section title group -->
+    <section class="section" data-handshake>
+      <div class="section-title-group">
+        <div class="section-label">Fresh Off The Press</div>
+        <h2 class="section-heading"><span>Latest drops</span></h2>
+      </div>
+
+      <div class="recent-posts-grid">
+        {recentPosts.map((post, index) => (
+          <a
+            href={`/blog/${post.slug}`}
+            class={`recent-post-card${index === 0 ? ' tilt-card post-card-featured' : ''}`}
+            aria-label={`Read: ${post.data.title}`}
+          >
+            <div class="card-shine"></div>
+            <div class="rpc-accent"></div>
+            <div class="rpc-tag">{post.data.category}</div>
+            <h3 class="rpc-title">{post.data.title}</h3>
+            <div class="rpc-meta">
+              <span class="rpc-date">{post.data.date}</span>
+            </div>
+            <p class="rpc-excerpt">{post.data.excerpt}</p>
+            <span class="rpc-arrow">
+              Read post
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </span>
+          </a>
+        ))}
       </div>
     </section>
 
+    <!-- NEWSLETTER — improvement #4: inline email form -->
     <section id="newsletter-signup" class="section newsletter-home-section" data-handshake aria-label="Newsletter signup">
-      <div class="feature-card newsletter-home-card">
-        <div class="feature-card-accent newsletter-home-accent"></div>
+      <div class="newsletter-home-card glass-card">
+        <div class="newsletter-home-accent"></div>
         <div class="newsletter-home-copy">
-          <div class="feature-card-tag">Newsletter</div>
+          <div class="rpc-tag">Newsletter</div>
           <h3>Get new posts in your inbox</h3>
           <p class="text-muted">
-            Weekly notes on coding, robotics, books, music, and sports analysis. No spam, just sharp ideas and real progress.
+            Weekly notes on coding, robotics, books, music, and sports analysis. No spam, just sharp ideas.
           </p>
         </div>
-        <div class="newsletter-home-actions">
-          <a href="/blog" class="btn-primary">Read recent posts</a>
-          <a href="/contact" class="btn-ghost">Subscribe via email</a>
+        <div class="newsletter-home-form" id="home-newsletter-slot">
+          <noscript>
+            <a href="https://app.kit.com/forms/9290185" target="_blank" rel="noopener" class="btn-primary">Subscribe</a>
+          </noscript>
         </div>
       </div>
     </section>
@@ -79,7 +82,6 @@ const latestPost = allPosts.sort((a, b) => new Date(b.data.date).getTime() - new
   </main>
 
   <style>
-    /* Page specific layout */
     .home-main {
       padding-top: 0;
       display: flex;
@@ -90,18 +92,32 @@ const latestPost = allPosts.sort((a, b) => new Date(b.data.date).getTime() - new
       margin-top: 0 !important;
       margin-bottom: 0 !important;
     }
-    .featured-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.5rem;
+
+    /* ── Section title group — improvement #6 ── */
+    .section-title-group {
+      margin-bottom: 1.5rem;
+      padding-left: 0.85rem;
+      border-left: 3px solid var(--accent-1);
     }
-    @media (max-width: 640px) {
-      .featured-grid { grid-template-columns: 1fr; }
+    .section-title-group .section-heading {
+      margin-bottom: 0;
     }
 
-    .feature-card {
+    /* ── 3 Recent Posts Grid — improvement #1 ── */
+    .recent-posts-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+    @media (min-width: 768px) {
+      .recent-posts-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .recent-post-card {
       position: relative;
-      padding: 1.85rem;
+      padding: 1.6rem;
       border-radius: var(--card-radius);
       background: var(--glass-bg);
       backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
@@ -112,79 +128,100 @@ const latestPost = allPosts.sort((a, b) => new Date(b.data.date).getTime() - new
       transition:
         transform var(--haptic-duration-out) var(--curve-haptic-recover),
         box-shadow 320ms ease,
-        border-color 260ms ease,
-        filter 260ms ease,
-        background 260ms ease;
+        border-color 260ms ease;
       text-decoration: none;
       color: var(--text-color);
-      display: block;
+      display: flex;
+      flex-direction: column;
     }
-    .feature-card:hover {
+    .recent-post-card:hover {
       transform: translate3d(0, var(--haptic-lift), 0) scale(var(--haptic-hover-scale));
       transition-timing-function: var(--curve-haptic-overshoot);
       box-shadow: var(--glass-shadow-hover);
       border-color: var(--accent-1);
-      filter: saturate(var(--surface-contrast-hover));
     }
-    .feature-card:active {
+    .recent-post-card:active {
       transform: translate3d(0, calc(var(--haptic-lift) * 0.35), 0) scale(var(--haptic-press-scale));
       transition-duration: var(--haptic-duration-in);
-      transition-timing-function: var(--curve-haptic-compress);
-      filter: saturate(var(--surface-contrast-press));
     }
-    .feature-card-accent {
-      position: absolute;
-      top: 0; right: 0;
-      width: 120px; height: 120px;
-      border-radius: 50%;
-      filter: blur(50px);
-      opacity: 0.2;
-      background: var(--accent-1);
-      transition: all 0.4s ease;
-    }
-    .feature-card:hover .feature-card-accent {
-      opacity: 0.4;
+    .recent-post-card:hover .rpc-accent {
+      opacity: 0.38;
       transform: scale(1.3);
     }
-    .feature-card-tag {
+    .recent-post-card:hover .rpc-arrow {
+      gap: 0.72rem;
+    }
+
+    .rpc-accent {
+      position: absolute;
+      top: 0; right: 0;
+      width: 100px; height: 100px;
+      border-radius: 50%;
+      filter: blur(40px);
+      opacity: 0.18;
+      background: var(--accent-1);
+      transition: all 0.4s ease;
+      pointer-events: none;
+    }
+    .rpc-tag {
       font-family: var(--font-mono);
-      font-size: 0.65rem;
+      font-size: 0.63rem;
       letter-spacing: 0.2em;
       text-transform: uppercase;
       color: var(--accent-1);
-      margin-bottom: 0.75rem;
+      margin-bottom: 0.65rem;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.45rem;
     }
-    .feature-card-tag::before {
+    .rpc-tag::before {
       content: '';
-      width: 20px;
+      width: 14px;
       height: 1px;
       background: var(--accent-1);
     }
-    .feature-card h3 {
+    .rpc-title {
       font-family: var(--font-display);
-      font-size: 1.3rem;
+      font-size: 1.15rem;
       font-weight: 700;
-      margin-bottom: 0.75rem;
+      margin-bottom: 0.55rem;
       color: var(--text-color);
+      line-height: 1.28;
     }
-    .feature-card-arrow {
-      margin-top: 1.5rem;
+    .post-card-featured .rpc-title {
+      font-size: 1.35rem;
+    }
+    .rpc-meta {
+      margin-bottom: 0.65rem;
+    }
+    .rpc-date {
+      color: var(--muted-text);
+      font-size: 0.78rem;
+    }
+    .rpc-excerpt {
+      font-size: 0.88rem;
+      line-height: 1.62;
+      color: var(--muted-text);
+      margin-bottom: 1.25rem;
+      flex-grow: 1;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .rpc-arrow {
+      margin-top: auto;
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
       font-family: var(--font-display);
-      font-size: 0.85rem;
+      font-size: 0.84rem;
       font-weight: 600;
       color: var(--accent-1);
-      transition: gap 240ms var(--curve-haptic-recover), filter 240ms ease;
+      transition: gap 240ms var(--curve-haptic-recover);
     }
-    .feature-card:hover .feature-card-arrow {
-      gap: 0.72rem;
-      filter: saturate(var(--surface-contrast-hover));
-    }
+
+    /* ── Newsletter — improvement #4 ── */
     .newsletter-home-section {
       margin: 0.15rem 0 0.35rem;
       padding: 0;
@@ -193,31 +230,97 @@ const latestPost = allPosts.sort((a, b) => new Date(b.data.date).getTime() - new
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 1.5rem;
+      gap: 1.75rem;
       padding: 2rem;
+      position: relative;
+      overflow: hidden;
     }
     .newsletter-home-accent {
-      width: 180px;
-      height: 180px;
-      opacity: 0.16;
+      position: absolute;
+      top: 0; right: 0;
+      width: 180px; height: 180px;
+      border-radius: 50%;
+      filter: blur(50px);
+      opacity: 0.14;
+      background: var(--accent-1);
+      pointer-events: none;
     }
     .newsletter-home-copy h3 {
-      margin-bottom: 0.6rem;
-      font-size: 1.45rem;
+      margin-bottom: 0.55rem;
+      font-size: 1.35rem;
+      font-family: var(--font-display);
+      font-weight: 700;
     }
     .newsletter-home-copy p {
       margin: 0;
-      max-width: 760px;
+      max-width: 520px;
       line-height: 1.65;
-      font-size: 0.95rem;
+      font-size: 0.92rem;
     }
-    .newsletter-home-actions {
-      display: flex;
-      align-items: center;
-      gap: 0.7rem;
-      flex-wrap: wrap;
+    .newsletter-home-form {
       flex-shrink: 0;
+      width: 260px;
     }
+
+    /* Kit form overrides */
+    :global(.newsletter-home-form .seva-form),
+    :global(.newsletter-home-form .formkit-form) {
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      padding: 0 !important;
+    }
+    :global(.newsletter-home-form [data-element="fields"]) {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 0.6rem !important;
+    }
+    :global(.newsletter-home-form .formkit-field) {
+      margin: 0 !important;
+    }
+    :global(.newsletter-home-form .formkit-input) {
+      width: 100% !important;
+      padding: 0.78rem 1rem !important;
+      border-radius: 10px !important;
+      border: 1px solid var(--glass-border) !important;
+      background: var(--glass-bg) !important;
+      color: var(--text-color) !important;
+      font-family: var(--font-body) !important;
+      font-size: 0.9rem !important;
+      outline: none !important;
+      transition: border-color 0.25s ease !important;
+      box-shadow: none !important;
+    }
+    :global(.newsletter-home-form .formkit-input:focus) {
+      border-color: var(--accent-1) !important;
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-1) 14%, transparent) !important;
+    }
+    :global(.newsletter-home-form .formkit-submit) {
+      width: 100% !important;
+      padding: 0.8rem !important;
+      border: none !important;
+      border-radius: 10px !important;
+      background: linear-gradient(90deg, var(--accent-1), var(--accent-2)) !important;
+      color: white !important;
+      font-family: var(--font-display) !important;
+      font-weight: 600 !important;
+      font-size: 0.88rem !important;
+      cursor: pointer !important;
+      transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+      box-shadow: 0 4px 16px color-mix(in srgb, var(--accent-1) 28%, transparent) !important;
+    }
+    :global(.newsletter-home-form .formkit-submit:hover) {
+      transform: translateY(-2px) !important;
+      box-shadow: 0 8px 24px color-mix(in srgb, var(--accent-1) 42%, transparent) !important;
+    }
+    :global(.newsletter-home-form .formkit-alert-error) {
+      font-size: 0.78rem !important;
+      color: #ff4d6d !important;
+      list-style: none !important;
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+
     :global(.home-main .stats-section) {
       padding: 1rem 0 !important;
     }
@@ -236,24 +339,41 @@ const latestPost = allPosts.sort((a, b) => new Date(b.data.date).getTime() - new
         gap: 0.4rem !important;
       }
       .section { margin-bottom: 0.45rem !important; margin-top: 0.35rem !important; }
-      .section-heading { margin-bottom: 1.25rem !important; font-size: 2.2rem !important; }
-      .featured-grid { gap: 1rem !important; }
-      .newsletter-home-section { margin: 0.1rem 0 0.3rem !important; padding: 0 !important; }
-      :global(.home-main .stats-section) { padding: 0.7rem 0 !important; }
-      :global(.home-main .about-strip) { padding: 0.8rem 0 !important; }
+      .section-heading { font-size: 2.2rem !important; }
       .newsletter-home-card {
         flex-direction: column;
         align-items: flex-start;
-        padding: 1.5rem;
+        padding: 1.4rem;
+        gap: 1.25rem;
       }
+      .newsletter-home-form {
+        width: 100%;
+      }
+      :global(.home-main .stats-section) { padding: 0.7rem 0 !important; }
+      :global(.home-main .about-strip) { padding: 0.8rem 0 !important; }
     }
   </style>
 
   <script is:inline>
-    // 3D TILT CARDS
+    // Newsletter lazy-load (Kit / ConvertKit)
+    (() => {
+      const slot = document.getElementById('home-newsletter-slot');
+      if (!slot) return;
+      const obs = new IntersectionObserver(([entry]) => {
+        if (!entry.isIntersecting) return;
+        obs.disconnect();
+        slot.innerHTML = `<form action="https://app.kit.com/forms/9290185/subscriptions" class="seva-form formkit-form" method="post" data-sv-form="9290185" data-uid="7eae6c347c" data-format="inline" data-version="5"><div data-style="clean"><ul class="formkit-alert formkit-alert-error" data-element="errors" data-group="alert"></ul><div data-element="fields" data-stacked="false" class="seva-fields formkit-fields"><div class="formkit-field"><input class="formkit-input" name="email_address" aria-label="Email Address" placeholder="your@email.com" required type="email"></div><button data-element="submit" class="formkit-submit formkit-submit"><div class="formkit-spinner"><div></div><div></div><div></div></div><span>Subscribe</span></button></div></div></form>`;
+        const s = document.createElement('script');
+        s.src = 'https://f.convertkit.com/ckjs/ck.5.js';
+        s.async = true;
+        document.body.appendChild(s);
+      }, { rootMargin: '200px' });
+      obs.observe(slot);
+    })();
+
+    // 3D Tilt (desktop hover-capable only)
     (() => {
       'use strict';
-
       const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       const hoverCapable = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
       if (reducedMotion || !hoverCapable) return;
@@ -261,13 +381,12 @@ const latestPost = allPosts.sort((a, b) => new Date(b.data.date).getTime() - new
       document.querySelectorAll('.tilt-card').forEach(card => {
         if (card.dataset.tiltBound === 'true') return;
         card.dataset.tiltBound = 'true';
-
         card.addEventListener('mousemove', e => {
           const rect = card.getBoundingClientRect();
           const x = e.clientX - rect.left, y = e.clientY - rect.top;
-          const centerX = rect.width / 2, centerY = rect.height / 2;
-          const rotateX = (y - centerY) / centerY * -8, rotateY = (x - centerX) / centerX * 8;
-          card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(10px)`;
+          const cx = rect.width / 2, cy = rect.height / 2;
+          const rx = (y - cy) / cy * -8, ry = (x - cx) / cx * 8;
+          card.style.transform = `perspective(1000px) rotateX(${rx}deg) rotateY(${ry}deg) translateZ(10px)`;
           card.style.setProperty('--mouse-x', (x / rect.width * 100) + '%');
           card.style.setProperty('--mouse-y', (y / rect.height * 100) + '%');
         });

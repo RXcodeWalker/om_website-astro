@@ -42,27 +42,21 @@ const introLine = post ? extractStrikingLine(postBody, post.data.excerpt) : '';
     <article class="reading-canvas editorial-post glass-card" id="post-content" data-post-id={postId} data-post-slug={postSlug}>
       {post && Content ? (
         <>
+          {/* improvement #17: prominent meta — category badge first, inline on mobile */}
           <header class="post-header-premium">
-            <span class="post-kicker">{post.data.category}</span>
             <h1 class="post-title-premium">{post.data.title}</h1>
-            
-            <div class="blog-meta-premium">
-              <div class="meta-item">
-                <span class="meta-label">Published</span>
-                <span class="blog-date">{post.data.date}</span>
-              </div>
-              <div class="meta-item">
-                <span class="meta-label">Reading Time</span>
-                <span class="blog-reading-time">Calculating...</span>
-              </div>
-              <div class="meta-item">
-                <span class="meta-label">Views</span>
-                <span class="blog-views">Loading...</span>
-              </div>
-              <div class="meta-item">
-                <span class="meta-label">Likes</span>
-                <span class="blog-likes">0</span>
-              </div>
+
+            <div class="blog-meta-premium blog-meta-inline">
+              <span class="category-badge">{post.data.category}</span>
+              <span class="meta-sep" aria-hidden="true">·</span>
+              <span class="blog-date">{post.data.date}</span>
+              <span class="meta-sep" aria-hidden="true">·</span>
+              <span class="blog-reading-time post-meta-muted">Calculating...</span>
+              <span class="meta-sep" aria-hidden="true">·</span>
+              <span class="blog-views post-meta-muted">Loading...</span>
+              <span class="meta-sep" aria-hidden="true">·</span>
+              <span class="blog-likes post-meta-muted">0</span>
+              <span class="post-meta-muted"> likes</span>
             </div>
           </header>
 
@@ -86,24 +80,24 @@ const introLine = post ? extractStrikingLine(postBody, post.data.excerpt) : '';
     </article>
   </div>
 
+  {/* improvement #18: related posts — single column on mobile, no right padding, no kicker */}
   {post && (
     <div class="related-posts-section">
       <h2 class="related-heading">More like this</h2>
-      <div class="blog-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); margin-top: 1.5rem;">
+      <div class="blog-grid related-posts-grid" style="margin-top: 1.5rem;">
         {allPosts
           .filter(p => p.data.category === post.data.category && p.slug !== post.slug)
           .sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime())
           .slice(0, 3)
           .map(related => (
-            <article class="glass-card glass-card-hover blog-card">
-              <p class="blog-card-kicker">From the notebook</p>
-              <h3>{related.data.title}</h3>
+            <article class="glass-card glass-card-hover blog-card" data-category={related.data.category}>
+              <h3><a href={`/blog/${related.slug}`} class="blog-card-stretched-link">{related.data.title}</a></h3>
               <div class="blog-meta">
                 <span class="category-badge">{related.data.category}</span>
                 <span class="blog-date">{related.data.date}</span>
               </div>
               <p class="blog-excerpt">{related.data.excerpt}</p>
-              <a href={`/blog/${related.slug}`} class="read-more-btn">
+              <a href={`/blog/${related.slug}`} class="read-more-btn" tabindex="-1" aria-hidden="true">
                 Read More
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <line x1="5" y1="12" x2="19" y2="12"></line>
