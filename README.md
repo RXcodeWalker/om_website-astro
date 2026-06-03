@@ -111,10 +111,6 @@ This project is a personal site and writing archive focused on fast static deliv
 
 Please raise issues for bugs or proposals before large changes.
 
-## License
-
-No license file detected. Add a `LICENSE` if you want to make this project public under a chosen license.
-
 ---
 
-If you want, I can also add a short CONTRIBUTING.md or CI workflow. What would you like next?
+Credit: This README file was enhanced and properly formatted using ChatGPT.
