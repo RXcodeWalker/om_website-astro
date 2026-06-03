@@ -1,0 +1,316 @@
+/* =========================================================
+   SIGNAL INTERACTION SYSTEM
+   Loaded after spectacular.css via global.css
+========================================================= */
+
+/* ── 01 RETICLE ASSEMBLY ─────────────────────────────────
+   Pre-rendered corner brackets that lock onto interactive
+   targets after a 200ms dwell.  Pure CSS transitions —
+   JS only toggles .locked + positions the container.
+   ──────────────────────────────────────────────────────── */
+
+#reticle {
+  position: fixed;
+  pointer-events: none;
+  z-index: 99985;
+  top: 0; left: 0;
+  width: 0; height: 0;
+}
+
+.ret-corner {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  opacity: 0;
+  transition:
+    opacity 160ms var(--curve-haptic-compress),
+    transform 160ms var(--curve-haptic-compress);
+}
+
+.ret-tl {
+  top: -3px; left: -3px;
+  border-top: 1.5px solid var(--accent-1);
+  border-left: 1.5px solid var(--accent-1);
+  border-radius: 3px 0 0 0;
+  transform: translate(-6px, -6px);
+}
+.ret-tr {
+  top: -3px; right: -3px;
+  border-top: 1.5px solid var(--accent-1);
+  border-right: 1.5px solid var(--accent-1);
+  border-radius: 0 3px 0 0;
+  transform: translate(6px, -6px);
+}
+.ret-bl {
+  bottom: -3px; left: -3px;
+  border-bottom: 1.5px solid var(--accent-1);
+  border-left: 1.5px solid var(--accent-1);
+  border-radius: 0 0 0 3px;
+  transform: translate(-6px, 6px);
+}
+.ret-br {
+  bottom: -3px; right: -3px;
+  border-bottom: 1.5px solid var(--accent-1);
+  border-right: 1.5px solid var(--accent-1);
+  border-radius: 0 0 3px 0;
+  transform: translate(6px, 6px);
+}
+
+/* Locked: corners snap inward */
+#reticle.locked .ret-corner {
+  opacity: 0.75;
+  transform: translate(0, 0);
+}
+
+/* Dissolve out is slower than snap in */
+#reticle:not(.locked) .ret-corner {
+  transition-duration: 240ms;
+  transition-timing-function: var(--curve-haptic-recover);
+}
+
+/* Action targets (links, buttons) use accent-2 */
+#reticle[data-type="action"] .ret-corner {
+  border-color: var(--accent-2);
+}
+
+/* ── Reduced motion: hide the reticle entirely ─────────── */
+@media (prefers-reduced-motion: reduce) {
+  #reticle { display: none; }
+}
+
+/* ── Touch / no-hover: hide reticle ────────────────────── */
+@media (hover: none), (pointer: coarse) {
+  #reticle { display: none; }
+}
+
+/* ── 02 SECTION HANDSHAKE ────────────────────────────────
+   Three-phase entry that replaces .reveal on opted-in
+   sections.  Driven entirely by class toggles from JS
+   IntersectionObserver — no scroll listener, no RAF.
+   ──────────────────────────────────────────────────────── */
+
+/* Pre-entry: section hidden, similar to .reveal baseline */
+[data-handshake] {
+  position: relative;
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity 0.6s ease,
+    transform 0.6s var(--curve-haptic-recover);
+}
+
+/* Phase 1: section becomes visible, scan line sweeps */
+[data-handshake].hs-phase-1 {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Scan line — injected once by JS, animated by CSS */
+.hs-scan {
+  display: block;
+  position: absolute;
+  left: 0; right: 0; top: 0;
+  height: 1.5px;
+  background: linear-gradient(90deg, transparent 0%, var(--accent-1) 30%, var(--accent-2) 70%, transparent 100%);
+  opacity: 0;
+  transform: scaleX(0);
+  transform-origin: left;
+  pointer-events: none;
+  z-index: 5;
+}
+
+[data-handshake].hs-phase-1 .hs-scan {
+  opacity: 0.6;
+  transform: scaleX(1);
+  transition: transform 320ms var(--curve-haptic-recover), opacity 200ms ease;
+}
+
+/* Fade scan after sweep completes */
+[data-handshake].hs-phase-2 .hs-scan {
+  opacity: 0;
+  transition: opacity 400ms ease 100ms;
+}
+
+/* Phase 2: heading snaps into focus */
+[data-handshake] .hs-heading {
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity 260ms ease,
+    transform 260ms var(--curve-haptic-recover);
+}
+
+[data-handshake].hs-phase-2 .hs-heading {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Phase 3: card borders activate via --panel-energy */
+[data-handshake] .glass-card,
+[data-handshake] .feature-card,
+[data-handshake] .stat-card {
+  --panel-energy: 0;
+  border-color: color-mix(
+    in srgb,
+    var(--accent-1) calc(var(--panel-energy) * 22%),
+    var(--glass-border)
+  );
+  box-shadow:
+    var(--glass-shadow),
+    0 0 calc(var(--panel-energy) * 16px) color-mix(in srgb, var(--accent-1) calc(var(--panel-energy) * 8%), transparent);
+  transition:
+    border-color 300ms ease,
+    box-shadow 300ms ease,
+    transform var(--haptic-duration-out) var(--curve-haptic-recover),
+    filter 260ms ease,
+    background 260ms ease;
+}
+
+/* ── Reduced motion: skip scan + transform, keep opacity ─ */
+@media (prefers-reduced-motion: reduce) {
+  [data-handshake] {
+    transform: none;
+    transition: opacity 220ms ease;
+  }
+  [data-handshake] .hs-heading {
+    transform: none;
+    transition: opacity 200ms ease;
+  }
+  .hs-scan { display: none; }
+}
+
+/* ── 03 CONTACT SURFACE CHARGE ───────────────────────────
+   Pointer-down contracts the surface with an inward glow;
+   pointer-up releases with a brief outward pulse.  Extends
+   the existing :active haptic state without touching
+   backdrop-filter.  JS sets data-pressing / data-released.
+   ──────────────────────────────────────────────────────── */
+
+[data-pressing] {
+  box-shadow:
+    0 4px 12px rgba(8, 16, 36, 0.10),
+    inset 0 0 0 1px color-mix(in srgb, var(--accent-1) 35%, transparent),
+    inset 0 0 20px color-mix(in srgb, var(--accent-1) 12%, transparent) !important;
+  transition-duration: 80ms !important;
+  transition-timing-function: var(--curve-haptic-compress) !important;
+}
+
+[data-released] {
+  box-shadow:
+    var(--glass-shadow-hover),
+    0 0 0 1.5px color-mix(in srgb, var(--accent-1) 20%, transparent),
+    0 0 24px color-mix(in srgb, var(--accent-1) 10%, transparent) !important;
+  transition-duration: 140ms !important;
+  transition-timing-function: var(--curve-haptic-overshoot) !important;
+}
+
+/* ── Reduced motion: material-only feedback, no glow ───── */
+@media (prefers-reduced-motion: reduce) {
+  [data-pressing] {
+    box-shadow:
+      var(--glass-shadow),
+      inset 0 0 0 1px color-mix(in srgb, var(--accent-1) 25%, transparent) !important;
+  }
+  [data-released] {
+    box-shadow: var(--glass-shadow) !important;
+  }
+}
+
+/* ── 04 PALETTE FREQUENCY SHIFT ──────────────────────────
+   When data-tuning is set on <html>, a brief sweep runs
+   along the header accent line.  Pairs with the existing
+   html { transition: background 0.9s } for atmospheric
+   retint.  Handled in theme.js, CSS-only here.
+   ──────────────────────────────────────────────────────── */
+
+html[data-tuning] .site-header::after {
+  animation: paletteSweep 0.4s var(--curve-haptic-recover) forwards;
+}
+
+@keyframes paletteSweep {
+  0%   { transform: scaleX(0); transform-origin: left; opacity: 1; }
+  60%  { opacity: 1; }
+  100% { transform: scaleX(1); transform-origin: left; opacity: 0.5; }
+}
+
+html[data-tuning] .blob {
+  transition: background 0.6s ease, opacity 0.6s ease;
+}
+
+/* ── 05 READING DEPTH ECHO ───────────────────────────────
+   --read-depth (0..1) drives a subtle brightness/saturation
+   lift on the post container as the reader progresses.
+   No layout properties animated — filter only.
+   ──────────────────────────────────────────────────────── */
+
+.depth-track {
+  --read-depth: 0;
+}
+
+.depth-track::before {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+  transform: scaleX(var(--read-depth));
+  transform-origin: left;
+  transition: transform 0.8s var(--curve-haptic-recover);
+  opacity: 0.5;
+  pointer-events: none;
+  z-index: 5;
+  border-radius: 0 0 var(--card-radius) var(--card-radius);
+}
+
+/* Subtle environmental shift as depth increases */
+.depth-track {
+  position: relative;
+  filter:
+    brightness(calc(1 + var(--read-depth) * 0.03))
+    saturate(calc(1 + var(--read-depth) * 0.05));
+  transition: filter 1s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .depth-track {
+    filter: none;
+    transition: none;
+  }
+  .depth-track::before {
+    transition: transform 0.3s ease;
+  }
+}
+
+/* ── 06 STRUCTURAL SILENCE ───────────────────────────────
+   When scroll passes 90%, ambient motion pauses and blobs
+   dim.  Reversed instantly on scroll-up.  Uses
+   animation-play-state so blob CSS animations resume
+   from wherever they paused — no jarring reset.
+   ──────────────────────────────────────────────────────── */
+
+body.transmission-complete .blob {
+  animation-play-state: paused;
+  opacity: 0.14;
+  transition: opacity 3s ease;
+}
+
+body.transmission-complete .glass-card::before {
+  animation-play-state: paused;
+}
+
+body.transmission-complete .site-header::after {
+  opacity: 0.3;
+  transition: opacity 2s ease;
+}
+
+/* Reverse: when class is removed, restore smoothly */
+body:not(.transmission-complete) .blob {
+  transition: opacity 0.8s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.transmission-complete .blob {
+    opacity: 0.08;
+    transition: opacity 0.5s ease;
+  }
+}

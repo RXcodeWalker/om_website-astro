@@ -1477,12 +1477,25 @@ body:has(.post-sidebar) .palette-container {
   .post-hero-ideas li {
     font-size: 0.78rem;
   }
+
+  /* improvement #14: back button mobile repositioning — icon-only, compact */
   .back-btn {
-    top: 1rem;
-    left: 1rem;
-    padding: 0.6rem 1.1rem;
-    font-size: 0.85rem;
+    top: 0.6rem;
+    left: 0.6rem;
+    padding: 0.55rem 0.65rem;
+    font-size: 0;
+    gap: 0;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    justify-content: center;
   }
+  .back-btn svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+
   .post-content {
     font-size: 1rem;
   }
@@ -1520,13 +1533,14 @@ body:has(.post-sidebar) .palette-container {
     height: 24px;
     margin: 0 0.15rem;
   }
+  /* improvement #15: 44px minimum touch targets on mobile sidebar */
   .sidebar-progress-wrap {
-    width: 36px;
-    height: 36px;
+    width: 44px;
+    height: 44px;
   }
   .sidebar-btn {
-    width: 36px;
-    height: 36px;
+    width: 44px;
+    height: 44px;
   }
   .toc-panel {
     right: 1rem;
@@ -1545,6 +1559,81 @@ body:has(.post-sidebar) .palette-container {
     width: auto;
     bottom: 5.5rem;
   }
+
+  /* improvement #18: related posts — no right padding offset on mobile */
+  .related-posts-section {
+    padding-right: 1.5rem !important;
+  }
+}
+
+/* improvement #16: better mobile typography */
+@media (max-width: 640px) {
+  .post-content {
+    font-size: 1.06rem !important;
+    line-height: 1.85 !important;
+  }
+  .post-content p {
+    margin-bottom: 1.4rem !important;
+  }
+  .post-content h2 {
+    font-size: 1.35rem !important;
+    margin-top: 2.5rem !important;
+  }
+  .post-content h3 {
+    font-size: 1.15rem !important;
+  }
+
+  /* improvement #18: single column related posts on small screens */
+  .related-posts-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* improvement #17: inline meta row for post header */
+.post-meta-muted {
+  color: var(--muted-text);
+  font-size: 0.82rem;
+}
+/* Override the column grid layout from .blog-meta-premium with a simple flex row */
+.blog-meta-inline {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  gap: 0.45rem !important;
+  margin-bottom: 0 !important;
+}
+.meta-sep {
+  color: var(--muted-text);
+  opacity: 0.4;
+  font-size: 0.75rem;
+  line-height: 1;
+}
+
+/* stretched link for related post cards (mirrors blog-list) */
+.related-posts-section .blog-card {
+  position: relative;
+  cursor: pointer;
+}
+.related-posts-section .blog-card-stretched-link {
+  color: inherit;
+  text-decoration: none;
+}
+.related-posts-section .blog-card-stretched-link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: var(--card-radius, 20px);
+}
+.related-posts-section .blog-card h3,
+.related-posts-section .blog-card .blog-meta,
+.related-posts-section .blog-card .blog-excerpt {
+  position: relative;
+  z-index: 1;
+}
+.related-posts-section .blog-card .read-more-btn {
+  position: relative;
+  z-index: 2;
 }
 
 @media (max-width: 640px) {

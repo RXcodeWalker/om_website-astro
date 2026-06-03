@@ -1,0 +1,582 @@
+/* Post layout: backdrop, shell, header, cinematic intro, responsive, compact, print */
+/* =========================================================
+   BLOG POST — READING EXPERIENCE
+========================================================= */
+
+.post-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(6, 10, 20, 0.48);
+  backdrop-filter: blur(28px) saturate(160%);
+  -webkit-backdrop-filter: blur(28px) saturate(160%);
+  z-index: 90;
+  animation: backdropIn 0.5s ease forwards;
+  transition: opacity 0.4s ease;
+}
+.focus-mode .post-backdrop {
+  opacity: 0.85;
+}
+
+@keyframes backdropIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+#reading-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 0%;
+  z-index: 10000;
+  background: linear-gradient(
+    90deg,
+    var(--accent-1),
+    var(--accent-2),
+    var(--accent-3)
+  );
+  box-shadow: 0 0 10px var(--accent-1);
+  transition: width 0.1s ease-out;
+}
+
+/* ── Back button ── */
+.back-btn {
+  position: fixed;
+  top: 5.5rem;
+  left: 1.75rem;
+  z-index: 150;
+  padding: 0.7rem 1.35rem;
+  border-radius: 100px;
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  color: var(--text-color);
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  text-decoration: none;
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  animation: slideInLeft 0.45s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  transition: all 0.28s ease;
+}
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+.back-btn:hover {
+  color: var(--accent-1);
+  background: var(--glass-bg-strong);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  transform: translateX(-3px);
+}
+.back-btn svg {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.25s ease;
+}
+.back-btn:hover svg {
+  transform: translateX(-2px);
+}
+
+/* ── Post container ── */
+.post-container {
+  position: relative;
+  z-index: 95;
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 3.5rem 1.5rem 6rem;
+  /* leave room for sidebar on right */
+  padding-right: 6rem;
+  transition: padding 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.post-container.wide-mode {
+  padding-right: 6rem;
+}
+
+/* ── Post modal card ── */
+.post-modal {
+  max-width: 720px;
+  width: 100%;
+  padding: 3.2rem 3.7rem;
+  animation: modalIn 0.56s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  transform-origin: center top;
+  transition:
+    max-width 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    padding 0.4s ease;
+}
+.post-modal.wide {
+  max-width: 960px;
+}
+
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: translateY(34px) scale(0.975);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.post-header {
+  display: grid;
+  gap: 0.95rem;
+  margin-bottom: 2.25rem;
+}
+
+.post-modal h1 {
+  font-family: var(--font-heading);
+  font-size: clamp(1.75rem, 3.5vw, 2.75rem);
+  font-weight: 700;
+  line-height: 1.16;
+  letter-spacing: -0.025em;
+  margin: 0;
+  color: var(--text-color);
+}
+
+.post-modal .blog-meta {
+  margin: 0;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--glass-border);
+  gap: 0.75rem;
+}
+
+.post-dek {
+  margin: 0;
+  max-width: 62ch;
+  color: color-mix(in srgb, var(--muted-text) 90%, white 10%);
+  font-size: clamp(1rem, 1.3vw, 1.13rem);
+  line-height: 1.75;
+}
+
+.post-hero-media {
+  position: relative;
+  margin: 0;
+  padding: 1rem 1.05rem;
+  border-radius: 18px;
+  border: 1px solid color-mix(in srgb, var(--accent-1) 18%, var(--glass-border));
+  background:
+    radial-gradient(
+      circle at 10% 15%,
+      color-mix(in srgb, var(--accent-1) 17%, transparent),
+      transparent 45%
+    ),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent 68%),
+    color-mix(in srgb, var(--glass-bg) 92%, black 8%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    0 18px 34px rgba(7, 11, 24, 0.18);
+  overflow: hidden;
+}
+
+.post-hero-glow {
+  position: absolute;
+  width: 13rem;
+  height: 13rem;
+  border-radius: 50%;
+  right: -4rem;
+  top: -5.5rem;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--accent-2) 30%, transparent),
+    transparent 70%
+  );
+  filter: blur(2px);
+  opacity: 0.88;
+  pointer-events: none;
+}
+
+.post-hero-content {
+  position: relative;
+  z-index: 1;
+}
+
+.post-hero-kicker {
+  margin: 0 0 0.52rem;
+  color: color-mix(in srgb, var(--accent-1) 74%, white 26%);
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  font-weight: 600;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.post-hero-line {
+  margin: 0;
+  color: color-mix(in srgb, var(--text-color) 90%, white 10%);
+  font-size: clamp(0.96rem, 1.4vw, 1.06rem);
+  font-style: italic;
+  line-height: 1.6;
+}
+
+.post-hero-ideas {
+  margin: 0.72rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.34rem;
+}
+
+.post-hero-ideas li {
+  padding: 0.36rem 0.52rem;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, white 12%, var(--glass-border));
+  background: color-mix(in srgb, white 8%, transparent);
+  color: color-mix(in srgb, var(--muted-text) 92%, white 8%);
+  font-size: 0.81rem;
+  line-height: 1.45;
+}
+
+.cinematic-intro .intro-chip,
+.cinematic-intro .intro-title,
+.cinematic-intro [data-intro-stage="dek"],
+.cinematic-intro [data-intro-stage="meta"],
+.cinematic-intro [data-intro-stage="hero"] {
+  will-change: transform, opacity, filter;
+}
+
+.has-intro-motion .cinematic-intro [data-intro-stage="dek"],
+.has-intro-motion .cinematic-intro [data-intro-stage="meta"],
+.has-intro-motion .cinematic-intro [data-intro-stage="hero"] {
+  opacity: 0;
+  transform: translateY(14px);
+  filter: blur(4px);
+}
+
+.has-intro-motion .cinematic-intro.intro-live .intro-title {
+  animation: introTitleLock 860ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.has-intro-motion .cinematic-intro.intro-live [data-intro-stage="dek"] {
+  animation: introCascade 560ms cubic-bezier(0.22, 1, 0.36, 1) 360ms both;
+}
+
+.has-intro-motion .cinematic-intro.intro-live [data-intro-stage="meta"] {
+  animation: introCascade 560ms cubic-bezier(0.22, 1, 0.36, 1) 500ms both;
+}
+
+.has-intro-motion .cinematic-intro.intro-live [data-intro-stage="hero"] {
+  animation: introCascade 620ms cubic-bezier(0.22, 1, 0.36, 1) 640ms both;
+}
+
+@keyframes introTitleLock {
+  0% {
+    opacity: 0;
+    transform: translateY(18px);
+    filter: blur(5px);
+  }
+  22% {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+  68% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes introCascade {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .post-backdrop,
+  .back-btn,
+  .post-modal,
+  .post-sidebar,
+  .toc-panel,
+  .share-panel,
+  .cinematic-intro .intro-title,
+  .cinematic-intro [data-intro-stage="dek"],
+  .cinematic-intro [data-intro-stage="meta"],
+  .cinematic-intro [data-intro-stage="hero"] {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  .post-modal,
+  .post-hero-media,
+  .post-sidebar,
+  .toc-panel,
+  .share-panel {
+    transition:
+      opacity 180ms ease,
+      box-shadow 220ms ease,
+      border-color 220ms ease,
+      background 220ms ease !important;
+  }
+
+  .has-intro-motion .cinematic-intro [data-intro-stage="dek"],
+  .has-intro-motion .cinematic-intro [data-intro-stage="meta"],
+  .has-intro-motion .cinematic-intro [data-intro-stage="hero"] {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+}
+
+.post-divider {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 2.75rem 0;
+  color: var(--muted-text);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+.post-divider::before,
+.post-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--glass-border),
+    transparent
+  );
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1024px) {
+  .post-container {
+    padding-right: 5rem;
+  }
+  .post-sidebar {
+    right: 0.75rem;
+  }
+  .toc-panel {
+    right: 4.75rem;
+    width: 210px;
+  }
+  .share-panel {
+    right: 4.75rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .blog-grid {
+    grid-template-columns: 1fr;
+  }
+  .post-container {
+    padding: 4.5rem 1rem 4rem;
+    padding-right: 1rem;
+  }
+  .post-modal {
+    padding: 2.25rem 1.5rem;
+  }
+  .post-modal h1 {
+    font-size: 1.65rem;
+  }
+  .post-header {
+    gap: 0.8rem;
+    margin-bottom: 1.65rem;
+  }
+  .post-dek {
+    font-size: 0.97rem;
+    line-height: 1.66;
+  }
+  .post-hero-media {
+    padding: 0.85rem 0.88rem;
+    border-radius: 15px;
+  }
+  .post-hero-ideas li {
+    font-size: 0.78rem;
+  }
+  .back-btn {
+    top: 1rem;
+    left: 1rem;
+    padding: 0.6rem 1.1rem;
+    font-size: 0.85rem;
+  }
+  .post-content {
+    font-size: 1rem;
+  }
+  .post-content > p:first-of-type::first-letter {
+    font-size: 3.6em;
+  }
+  .post-content h2 {
+    font-size: 1.3rem;
+  }
+
+  /* On mobile, sidebar moves to bottom */
+  .post-sidebar {
+    bottom: 1rem;
+    right: 50%;
+    top: auto;
+    transform: translateX(50%);
+    flex-direction: row;
+    width: auto;
+    padding: 0.6rem 0.9rem;
+    border-radius: 100px;
+    gap: 0.2rem;
+  }
+  @keyframes sidebarIn {
+    from {
+      opacity: 0;
+      transform: translateX(50%) translateY(24px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(50%) translateY(0);
+    }
+  }
+  .sidebar-divider {
+    width: 1px;
+    height: 24px;
+    margin: 0 0.15rem;
+  }
+  .sidebar-progress-wrap {
+    width: 36px;
+    height: 36px;
+  }
+  .sidebar-btn {
+    width: 36px;
+    height: 36px;
+  }
+  .toc-panel {
+    right: 1rem;
+    left: 1rem;
+    width: auto;
+    top: auto;
+    bottom: 5.5rem;
+    transform: translateY(16px);
+  }
+  .toc-panel.open {
+    transform: translateY(0);
+  }
+  .share-panel {
+    right: 1rem;
+    left: 1rem;
+    width: auto;
+    bottom: 5.5rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .post-modal {
+    padding: 1.75rem 1.25rem;
+  }
+  .post-hero-kicker {
+    margin-bottom: 0.45rem;
+  }
+  .post-hero-line {
+    font-size: 0.93rem;
+  }
+  .post-content p {
+    font-size: 1rem;
+  }
+}
+
+/* =========================================================
+   COMPACT LAYOUT OVERRIDES
+========================================================= */
+
+.page-hero {
+  padding: 1.5rem 0 0.5rem !important;
+  margin-bottom: 1.5rem !important;
+}
+.blog-controls {
+  margin-bottom: 1.5rem !important;
+  gap: 0.75rem !important;
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    padding-top: 1.5rem !important;
+  }
+  .page-hero h1 {
+    font-size: 2.4rem !important;
+    margin-bottom: 0.5rem !important;
+  }
+  .blog-grid {
+    gap: 1rem !important;
+  }
+  .glass-card {
+    padding: 1.25rem 1.25rem !important;
+  }
+  .blog-card h3 {
+    font-size: 1.15rem !important;
+    margin-bottom: 0.4rem !important;
+  }
+  .blog-excerpt {
+    font-size: 0.88rem !important;
+    margin-bottom: 1rem !important;
+  }
+  .blog-meta {
+    margin-bottom: 0.6rem !important;
+  }
+}
+
+/* =========================================================
+   PRINT STYLES
+========================================================= */
+
+@media print {
+  .post-backdrop,
+  .post-sidebar,
+  .toc-panel,
+  .share-panel,
+  .back-btn,
+  .palette-container,
+  .toast,
+  #progress-bar,
+  #cursor-dot,
+  #cursor-ring {
+    display: none !important;
+  }
+  .post-container {
+    padding: 0 !important;
+  }
+  .post-modal {
+    box-shadow: none !important;
+    border: none !important;
+    max-width: 100% !important;
+  }
+  .post-content {
+    font-size: 12pt !important;
+    line-height: 1.6 !important;
+  }
+}

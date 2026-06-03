@@ -1,0 +1,144 @@
+---
+interface Props {
+  tag?: string;
+  href?: string;
+  arrowLabel?: string;
+  large?: boolean;
+  class?: string;
+}
+
+const {
+  tag,
+  href,
+  arrowLabel,
+  large = false,
+  class: className = "",
+} = Astro.props;
+---
+
+<div
+  class:list={[
+    "feature-card",
+    "glass-card",
+    "glass-card-hover",
+    "tilt-card",
+    { "feature-card-large": large },
+    className,
+  ]}
+>
+  <div class="card-shine"></div>
+  <div class="feature-card-accent"></div>
+  {tag && <div class="feature-card-tag">{tag}</div>}
+  <slot />
+  {href && arrowLabel && (
+    <a href={href} class="feature-card-arrow">
+      {arrowLabel}
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+        <polyline points="12 5 19 12 12 19"></polyline>
+      </svg>
+    </a>
+  )}
+</div>
+
+<style>
+  .feature-card {
+    position: relative;
+    padding: var(--space-6);
+    border-radius: var(--card-radius);
+    text-decoration: none;
+    color: var(--text-color);
+    display: block;
+  }
+
+  .feature-card-accent {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    filter: blur(50px);
+    opacity: 0.12;
+    background: var(--accent-1);
+    pointer-events: none;
+    transition: opacity 0.35s ease;
+  }
+
+  .feature-card:hover .feature-card-accent {
+    opacity: 0.24;
+  }
+
+  .feature-card-tag {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent-1);
+    margin-bottom: var(--space-3);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .feature-card-tag::before {
+    content: "";
+    width: 20px;
+    height: 1px;
+    background: var(--accent-1);
+  }
+
+  .feature-card :global(h3) {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    margin-bottom: var(--space-3);
+    color: var(--text-color);
+  }
+
+  .feature-card :global(p) {
+    color: var(--muted-text);
+    font-size: var(--text-sm);
+    line-height: 1.65;
+  }
+
+  .feature-card-arrow {
+    margin-top: var(--space-5);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-display);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--accent-1);
+    transition: gap 240ms var(--curve-haptic-recover), filter 240ms ease;
+  }
+
+  .feature-card:hover .feature-card-arrow {
+    gap: 0.72rem;
+    filter: saturate(var(--surface-contrast-hover));
+  }
+
+  .feature-card-large {
+    grid-column: 1 / -1;
+    padding: var(--space-8);
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--accent-1) 8%, var(--glass-bg)),
+      color-mix(in srgb, var(--accent-2) 5%, var(--glass-bg))
+    );
+  }
+
+  .feature-card-large :global(h3) {
+    font-size: var(--text-2xl);
+  }
+
+  @media (max-width: 768px) {
+    .feature-card {
+      padding: var(--space-5);
+    }
+
+    .feature-card-large {
+      padding: var(--space-6);
+    }
+  }
+</style>

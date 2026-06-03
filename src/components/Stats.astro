@@ -1,6 +1,6 @@
 ---
 ---
-<section class="stats-section reveal">
+<section class="stats-section" data-handshake>
   <div class="stats-grid">
     <div class="stat-card reveal reveal-delay-1">
       <div class="stat-icon">⚽</div>
@@ -105,6 +105,12 @@
     .stats-grid { gap: 1rem !important; }
     .stat-card { padding: 1.25rem 1rem !important; }
     .stat-number { font-size: 2.5rem !important; }
+  }
+  /* improvement #5: force 2×2 grid on small screens */
+  @media (max-width: 640px) {
+    .stats-grid {
+      grid-template-columns: repeat(2, 1fr) !important;
+    }
   }
 </style>
 

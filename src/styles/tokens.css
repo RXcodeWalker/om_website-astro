@@ -1,0 +1,378 @@
+/* =========================================================
+   DESIGN TOKENS — SINGLE SOURCE OF TRUTH
+   Foundation + semantic tokens for the entire visual system.
+   Theme overrides live in final-themes.css.
+========================================================= */
+
+/* ── Texture Maps ── */
+:root {
+  --grain-map: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='0.25'/%3E%3C/svg%3E");
+  --paper-map: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.55' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='260' height='260' filter='url(%23p)' opacity='0.2'/%3E%3C/svg%3E");
+  --scanline-map: repeating-linear-gradient(180deg, rgba(0, 255, 156, 0.08) 0 1px, transparent 1px 4px);
+}
+
+/* =========================================================
+   SPACING SCALE
+   Strict 4px base. Use ONLY these tokens for all spacing.
+   Aliases map the old names to the new unified scale.
+========================================================= */
+:root {
+  --space-1:  0.25rem;  /*  4px */
+  --space-2:  0.5rem;   /*  8px */
+  --space-3:  0.75rem;  /* 12px */
+  --space-4:  1rem;     /* 16px */
+  --space-5:  1.5rem;   /* 24px */
+  --space-6:  2rem;     /* 32px */
+  --space-7:  3rem;     /* 48px */
+  --space-8:  4rem;     /* 64px */
+  --space-9:  6rem;     /* 96px */
+  --space-10: 8rem;     /* 128px */
+
+  /* Semantic aliases (old names → new scale) */
+  --space-2xs: var(--space-1);
+  --space-xs:  var(--space-2);
+  --space-sm:  var(--space-3);
+  --space-md:  var(--space-4);
+  --space-lg:  var(--space-5);
+  --space-xl:  var(--space-6);
+  --space-2xl: var(--space-7);
+  --space-3xl: var(--space-8);
+  --space-4xl: var(--space-9);
+}
+
+/* =========================================================
+   TYPOGRAPHY SCALE
+   Fluid sizes using clamp(); themes swap font-family,
+   but the scale, line-height, and tracking stay constant.
+========================================================= */
+:root {
+  --font-body:    "DM Sans", sans-serif;
+  --font-heading: "Syne", sans-serif;
+  --font-display: "Syne", sans-serif;
+  --font-mono:    "JetBrains Mono", "Fira Code", "Cascadia Code", monospace;
+
+  /* Type scale — tighter, more confident */
+  --text-xs:      0.75rem;
+  --text-sm:      0.875rem;
+  --text-base:    1rem;
+  --text-md:      1.125rem;
+  --text-lg:      1.375rem;
+  --text-xl:      clamp(1.5rem, 3vw, 2rem);
+  --text-2xl:     clamp(2rem, 4vw, 3rem);
+  --text-3xl:     clamp(2.5rem, 5vw, 3.75rem);
+  --text-display: clamp(3.5rem, 7vw, 6rem);
+
+  /* Tracking */
+  --tracking-tight:  -0.04em;
+  --tracking-normal: -0.015em;
+  --tracking-wide:   0.12em;
+  --tracking-mono:   0.08em;
+
+  /* Leading */
+  --leading-none:    1;
+  --leading-tight:   1.05;
+  --leading-snug:    1.2;
+  --leading-normal:  1.7;
+  --leading-relaxed: 1.85;
+
+  /* Prose max-widths */
+  --measure-narrow: 52ch;
+  --measure:        65ch;
+  --measure-wide:   80ch;
+}
+
+/* =========================================================
+   LAYOUT TOKENS
+========================================================= */
+:root {
+  --container:       1120px;
+  --container-wide:  1280px;
+  --container-narrow: 720px;
+  --content-inset:   2rem;
+
+  --card-radius:     20px;
+  --radius-sm:       8px;
+  --radius-md:       14px;
+  --radius-lg:       20px;
+  --radius-pill:     100px;
+
+  /* Section rhythm — generous whitespace is premium */
+  --section-gap:     var(--space-9);
+  --section-gap-sm:  var(--space-8);
+}
+
+/* =========================================================
+   COLOR & SURFACE — LIGHT MODE (aurora defaults)
+========================================================= */
+:root {
+  --accent-1: #4cc9f0;
+  --accent-2: #7b61ff;
+  --accent-3: #ffd166;
+
+  --bg-color:       #f0f4ff;
+  --bg-surface:     rgba(255, 255, 255, 0.58);
+  --text-color:     #0a1628;
+  --text-secondary: #2d3f62;
+  --muted-text:     #5c7099;
+  --input-bg:       rgba(255, 255, 255, 0.66);
+
+  --page-atmosphere:
+    radial-gradient(110% 95% at 4% 6%, color-mix(in srgb, #4cc9f0 18%, transparent), transparent 60%),
+    radial-gradient(100% 85% at 100% 2%, color-mix(in srgb, #7b61ff 14%, transparent), transparent 66%),
+    radial-gradient(95% 100% at 52% 102%, color-mix(in srgb, #ffd166 12%, transparent), transparent 72%),
+    linear-gradient(145deg, #edf2ff 0%, #f0f4ff 43%, #f8f6ff 100%);
+  --page-texture:       var(--grain-map);
+  --page-texture-size:  220px 220px;
+  --page-texture-blend: soft-light;
+}
+
+/* =========================================================
+   GLASS SYSTEM — restrained for premium feel
+========================================================= */
+:root {
+  --glass-bg:            rgba(255, 255, 255, 0.52);
+  --glass-bg-strong:     rgba(248, 252, 255, 0.88);
+  --glass-border:        rgba(255, 255, 255, 0.5);
+  --glass-border-inner:  rgba(255, 255, 255, 0.92);
+  --glass-border-outer:  rgba(170, 194, 232, 0.2);
+  --glass-shadow:        0 4px 24px rgba(14, 28, 56, 0.06), 0 1px 4px rgba(14, 28, 56, 0.04);
+  --glass-shadow-hover:  0 16px 48px rgba(12, 28, 58, 0.12), 0 4px 16px rgba(12, 28, 58, 0.08);
+  --glass-blur:          24px;
+  --glass-sat:           180%;
+  --glass-brightness:    1.02;
+  --glass-noise:         0.22;
+  --glass-top-edge:      rgba(255, 255, 255, 0.36);
+  --glass-inner-shadow:  rgba(12, 20, 42, 0.05);
+  --glass-bleed:         color-mix(in srgb, var(--accent-1) 8%, transparent);
+  --glass-bleed-secondary: color-mix(in srgb, var(--accent-2) 6%, transparent);
+  --category-reflection: var(--accent-1);
+  --glass-border-width:  1px;
+  --glass-outline-width: 1px;
+  --glass-prism-opacity: 1;
+  --glass-prism-duration: 12s;
+}
+
+/* =========================================================
+   CARD HOVER SYSTEM — subtler, more refined
+========================================================= */
+:root {
+  --card-hover-bg:           var(--glass-bg-strong);
+  --card-hover-ring:         0 0 0 1px color-mix(in srgb, var(--accent-1) 18%, transparent);
+  --card-hover-glow:         0 0 24px color-mix(in srgb, var(--accent-1) 8%, transparent);
+  --card-hover-inset-top:    rgba(255, 255, 255, 0.24);
+  --card-hover-inset-bottom: rgba(255, 255, 255, 0.06);
+  --card-hover-filter:       saturate(var(--surface-contrast-hover)) contrast(1.01);
+}
+
+/* =========================================================
+   MOTION TOKENS — one unified system
+   Restrained, tactile, high-confidence.
+========================================================= */
+:root {
+  --duration-instant: 100ms;
+  --duration-fast:    160ms;
+  --duration-normal:  240ms;
+  --duration-slow:    400ms;
+  --duration-scene:   700ms;
+
+  --ease-out-expo:   cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring:     cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-in-back:    cubic-bezier(0.36, 0, 0.66, -0.56);
+  --ease-standard:   cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Haptic motion — restrained lifts */
+  --haptic-duration-in:      140ms;
+  --haptic-duration-out:     300ms;
+  --curve-haptic-compress:   cubic-bezier(0.2, 0, 0.2, 1);
+  --curve-haptic-overshoot:  cubic-bezier(0.34, 1.56, 0.64, 1);
+  --curve-haptic-recover:    cubic-bezier(0.22, 1, 0.36, 1);
+  --haptic-lift:             -3px;
+  --haptic-lift-touch:       -1px;
+  --haptic-hover-scale:      1.008;
+  --haptic-press-scale:      0.988;
+  --surface-contrast-hover:  1.04;
+  --surface-contrast-press:  0.99;
+
+  /* Theme motion */
+  --motion-hover-y:           -4px;
+  --motion-scale:             1.01;
+  --motion-duration:          300ms;
+  --motion-easing:            cubic-bezier(.22, 1, .36, 1);
+  --motion-shadow:            0 0 28px color-mix(in srgb, var(--accent-1) 12%, transparent);
+  --motion-border-flash:      transparent;
+  --motion-pulse-animation:   none;
+  --motion-flicker-animation: none;
+}
+
+/* =========================================================
+   LINK SYSTEM
+========================================================= */
+:root {
+  --link-decoration-line:      none;
+  --link-decoration-thickness: 2px;
+  --link-underline-offset:     0.16em;
+  --link-underline-color-hover: transparent;
+  --link-hover-color:          var(--accent-2);
+}
+
+/* =========================================================
+   SECTION / HEADER / NAV
+========================================================= */
+:root {
+  --section-rule: linear-gradient(to right, color-mix(in srgb, var(--accent-1) 60%, transparent), transparent);
+
+  --header-blur:           24px;
+  --header-sat:            180%;
+  --header-brightness:     1.03;
+  --header-shadow:         0 4px 20px rgba(8, 16, 36, 0.08), inset 0 -1px 0 var(--glass-border);
+  --header-shadow-scrolled: 0 12px 32px rgba(8, 16, 36, 0.14), inset 0 -1px 0 var(--glass-border);
+  --nav-link-hover-bg:     color-mix(in srgb, var(--accent-1) 8%, transparent);
+  --nav-link-active-bg:    color-mix(in srgb, var(--accent-1) 12%, transparent);
+  --nav-backdrop-bg:       rgba(8, 12, 24, 0.22);
+
+  --nav-pad:      0.88rem;
+  --nav-scale:    1;
+  --nav-progress: 0;
+}
+
+/* =========================================================
+   ICON BUTTONS
+========================================================= */
+:root {
+  --icon-btn-bg:           var(--glass-bg);
+  --icon-btn-bg-hover:     var(--glass-bg-strong);
+  --icon-btn-shadow:       0 2px 8px rgba(0, 0, 0, 0.06);
+  --icon-btn-shadow-hover: 0 8px 20px rgba(0, 0, 0, 0.1);
+  --icon-btn-border-hover: color-mix(in srgb, var(--accent-1) 32%, var(--glass-border));
+}
+
+/* =========================================================
+   BUTTON TOKENS
+========================================================= */
+:root {
+  --btn-primary-text:         #f8fdff;
+  --btn-primary-shadow:       0 8px 20px color-mix(in srgb, var(--accent-1) 22%, transparent);
+  --btn-primary-shadow-hover: 0 12px 28px color-mix(in srgb, var(--accent-1) 30%, transparent);
+  --btn-ghost-bg:             transparent;
+  --btn-ghost-border:         var(--glass-border);
+  --btn-ghost-hover-bg:       color-mix(in srgb, var(--accent-1) 8%, transparent);
+  --btn-ghost-hover-border:   color-mix(in srgb, var(--accent-1) 30%, transparent);
+  --btn-ghost-hover-shadow:   0 0 16px color-mix(in srgb, var(--accent-1) 10%, transparent);
+}
+
+/* =========================================================
+   BLOBS — subtler
+========================================================= */
+:root {
+  --blob-opacity: 0.22;
+  --blob-blur:    100px;
+  --blob-shape:   50%;
+  --blob-1-size:  520px;
+  --blob-2-size:  560px;
+  --blob-3-size:  440px;
+}
+
+/* =========================================================
+   READING EXPERIENCE
+========================================================= */
+:root {
+  --reading-width:       700px;
+  --reading-width-wide:  1000px;
+  --reading-font-size:   1.15rem;
+  --reading-line-height: 1.85;
+  --reading-bg:          #ffffff;
+  --reading-text:        #111111;
+  --reading-accent:      var(--accent-1);
+}
+
+/* =========================================================
+   DARK MODE — AURORA DEFAULTS
+========================================================= */
+html[data-theme="dark"] {
+  --bg-color:       #060c1c;
+  --text-color:     #e4ecf8;
+  --text-secondary: #b3c4de;
+  --muted-text:     #7a92b8;
+  --input-bg:       rgba(17, 24, 46, 0.68);
+
+  --page-atmosphere:
+    radial-gradient(120% 95% at 6% 8%, color-mix(in srgb, #4cc9f0 22%, transparent), transparent 64%),
+    radial-gradient(110% 90% at 94% 4%, color-mix(in srgb, #7b61ff 18%, transparent), transparent 70%),
+    radial-gradient(120% 110% at 50% 110%, color-mix(in srgb, #ffd166 12%, transparent), transparent 78%),
+    linear-gradient(160deg, #020713 0%, #060c1c 45%, #0a1228 100%);
+  --page-texture:       var(--grain-map);
+  --page-texture-size:  240px 240px;
+  --page-texture-blend: screen;
+
+  --glass-bg:            rgba(16, 23, 45, 0.62);
+  --glass-bg-strong:     rgba(24, 33, 60, 0.84);
+  --glass-border:        rgba(255, 255, 255, 0.1);
+  --glass-border-inner:  rgba(255, 255, 255, 0.16);
+  --glass-border-outer:  rgba(78, 102, 152, 0.22);
+  --glass-shadow:        0 8px 28px rgba(0, 0, 0, 0.36), 0 2px 8px rgba(0, 0, 0, 0.2);
+  --glass-shadow-hover:  0 20px 56px rgba(0, 0, 0, 0.48), 0 6px 20px rgba(0, 0, 0, 0.3);
+  --glass-noise:         0.2;
+  --glass-top-edge:      rgba(214, 228, 255, 0.16);
+  --glass-inner-shadow:  rgba(0, 0, 0, 0.24);
+  --glass-bleed:         color-mix(in srgb, var(--accent-1) 10%, transparent);
+  --glass-bleed-secondary: color-mix(in srgb, var(--accent-2) 8%, transparent);
+
+  --card-hover-ring:         0 0 0 1px color-mix(in srgb, var(--accent-1) 28%, transparent);
+  --card-hover-glow:         0 0 32px color-mix(in srgb, var(--accent-1) 12%, transparent);
+  --card-hover-inset-top:    rgba(255, 255, 255, 0.12);
+  --card-hover-inset-bottom: rgba(0, 0, 0, 0.16);
+  --card-hover-filter:       saturate(var(--surface-contrast-hover)) contrast(1.04);
+
+  --header-shadow:         0 6px 22px rgba(0, 0, 0, 0.3), inset 0 -1px 0 var(--glass-border);
+  --header-shadow-scrolled: 0 16px 40px rgba(0, 0, 0, 0.44), inset 0 -1px 0 var(--glass-border);
+  --nav-link-hover-bg:     color-mix(in srgb, var(--accent-1) 10%, transparent);
+  --nav-link-active-bg:    color-mix(in srgb, var(--accent-1) 14%, transparent);
+  --nav-backdrop-bg:       rgba(2, 7, 15, 0.45);
+
+  --icon-btn-shadow:       0 2px 8px rgba(0, 0, 0, 0.24);
+  --icon-btn-shadow-hover: 0 10px 24px rgba(0, 0, 0, 0.36);
+  --btn-primary-shadow:       0 10px 24px color-mix(in srgb, var(--accent-1) 26%, transparent);
+  --btn-primary-shadow-hover: 0 14px 36px color-mix(in srgb, var(--accent-1) 34%, transparent);
+  --btn-ghost-bg:          color-mix(in srgb, var(--glass-bg) 74%, transparent);
+
+  --blob-opacity: 0.3;
+  --blob-blur:    100px;
+
+  --reading-bg:   #0b0e14;
+  --reading-text: #e2e8f0;
+}
+
+/* =========================================================
+   RESPONSIVE OVERRIDES
+========================================================= */
+@media (max-width: 768px) {
+  :root {
+    --container:     100%;
+    --content-inset: 1.25rem;
+    --section-gap:   var(--space-8);
+    --section-gap-sm: var(--space-7);
+  }
+}
+
+@media (max-width: 640px) {
+  :root {
+    --content-inset: 1rem;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION — kill all decorative animation
+========================================================= */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0ms;
+    --duration-normal: 0ms;
+    --duration-slow: 0ms;
+    --duration-scene: 0ms;
+    --haptic-lift: 0px;
+    --haptic-hover-scale: 1;
+    --haptic-press-scale: 1;
+    --haptic-duration-in: 100ms;
+    --haptic-duration-out: 180ms;
+  }
+}

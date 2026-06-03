@@ -1,0 +1,46 @@
+---
+alwaysApply: true
+---
+# CREATIVE INTERACTION SYSTEM
+
+Your mission is to add unexpected interactive experiences.
+
+Every page should contain interactive elements that reward exploration.
+
+Possible interactions:
+
+Hidden triggers
+• keyboard easter eggs
+• hover secrets
+• hidden buttons
+• timed animations
+
+Playful UI
+• magnetic buttons
+• cursor physics
+• draggable objects
+• interactive grids
+
+Experimental elements
+• generative backgrounds
+• particle systems
+• physics simulations
+• procedural animations
+
+Examples to implement:
+
+Interactive skill constellation
+Users move cursor → skills orbit around it
+
+Dynamic blog exploration
+Posts rearrange in a flowing layout
+
+Music visualization
+Audio waveform reacts to ambient sound
+
+3D card stack
+Projects appear as floating layered cards
+
+When possible:
+
+Create **entire new JS systems**, not just tweaks.

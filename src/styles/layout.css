@@ -1,0 +1,42 @@
+/* =========================================================
+   LAYOUT PRIMITIVES
+   Reusable layout utilities consuming spacing tokens.
+========================================================= */
+
+/* ── Stack: vertical rhythm ── */
+.stack {
+  display: flex;
+  flex-direction: column;
+}
+
+.stack > * + * {
+  margin-top: var(--stack-gap, var(--space-6));
+}
+
+/* ── Cluster: wrapping horizontal group ── */
+.cluster {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cluster-gap, var(--space-4));
+  align-items: center;
+}
+
+/* ── Auto-grid: responsive fill grid ── */
+.auto-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--grid-min, 300px), 1fr));
+  gap: var(--grid-gap, var(--space-6));
+}
+
+/* ── Section: consistent vertical rhythm ── */
+.section-flow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--section-gap);
+}
+
+@media (max-width: 768px) {
+  .section-flow {
+    gap: var(--section-gap-sm);
+  }
+}

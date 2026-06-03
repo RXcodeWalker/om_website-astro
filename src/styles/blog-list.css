@@ -160,6 +160,19 @@ meta
   gap: 0.3rem;
 }
 
+/* improvement #7: reading time on every card */
+.blog-page .reading-time {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+  color: var(--muted-text);
+  font-size: 0.78rem;
+}
+.blog-page .reading-time svg {
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
 .blog-page .blog-excerpt {
   color: var(--muted-text);
   flex-grow: 1;
@@ -202,4 +215,42 @@ meta
 }
 .blog-page .read-more-btn:hover svg {
   transform: translateX(3px);
+}
+
+/* =========================================================
+   MOBILE IMPROVEMENTS (#8, #9, #13)
+========================================================= */
+
+/* improvement #9: sticky search + filter bar on mobile */
+@media (max-width: 768px) {
+  .blog-page .blog-controls {
+    position: sticky;
+    top: 3.8rem;
+    z-index: 40;
+    background: var(--bg-color);
+    padding-top: 0.6rem;
+    padding-bottom: 0.4rem;
+    margin-left: -1rem;
+    margin-right: -1rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+/* improvement #8: filter rail full-width on mobile (already scrollable, just needs full width) */
+@media (max-width: 640px) {
+  .blog-page .filter-rail {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+/* improvement #13: tighter mobile card gap */
+@media (max-width: 640px) {
+  .blog-page .blog-grid {
+    gap: 0.85rem !important;
+  }
+  .blog-page .glass-card.blog-card {
+    padding: 1.1rem 1.15rem !important;
+  }
 }
