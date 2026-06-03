@@ -485,6 +485,60 @@ h3 {
   box-shadow: 0 0 24px rgba(76, 201, 240, 0.18);
 }
 
+/* ── SCROLL-TO-TOP BUTTON — improvement #19 ─────────────── */
+#scroll-top-btn {
+  position: fixed;
+  bottom: 5.5rem; /* above palette switcher */
+  right: 1.35rem;
+  z-index: 200;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  color: var(--muted-text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.14);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(10px);
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.22s ease,
+    color 0.22s ease,
+    background 0.22s ease;
+}
+#scroll-top-btn.visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+#scroll-top-btn:hover {
+  border-color: var(--accent-1);
+  color: var(--accent-1);
+  background: var(--glass-bg-strong, var(--glass-bg));
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px);
+}
+#scroll-top-btn:active {
+  transform: scale(0.94);
+}
+/* On blog post pages, shift left of the sidebar */
+body:has(.post-sidebar) #scroll-top-btn {
+  right: 5.5rem;
+}
+@media (max-width: 768px) {
+  body:has(.post-sidebar) #scroll-top-btn {
+    display: none; /* hidden on mobile post pages — sidebar already handles nav */
+  }
+}
+
 /* ── RESPONSIVE ────────────────────────────────────────── */
 /* ── RESPONSIVE ────────────────────────────────────────── */
 @media (max-width: 768px) {

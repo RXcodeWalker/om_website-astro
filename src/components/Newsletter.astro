@@ -1,0 +1,131 @@
+---
+interface Props {
+  class?: string;
+}
+
+const { class: className = '' } = Astro.props;
+---
+
+<section
+  id="newsletter-signup"
+  class:list={['section reveal newsletter-home-section', className]}
+  aria-label="Newsletter signup"
+>
+  <div class="feature-card newsletter-home-card">
+    <div class="feature-card-accent newsletter-home-accent"></div>
+    <div class="newsletter-home-copy">
+      <div class="feature-card-tag">Newsletter</div>
+      <h3>Get new posts in your inbox</h3>
+      <p class="text-muted">
+        Weekly notes on coding, robotics, books, music, and sports analysis. No spam, just sharp ideas and real progress.
+      </p>
+    </div>
+    <div class="newsletter-form-slot" id="newsletter-form-slot">
+      <noscript>
+        <a href="https://app.kit.com/forms/9290185" target="_blank" rel="noopener" class="btn-primary">
+          Subscribe via Kit
+        </a>
+      </noscript>
+    </div>
+    <div class="newsletter-home-actions">
+      <a href="/blog" class="btn-primary">Read recent posts</a>
+    </div>
+  </div>
+</section>
+
+<script>
+  const slot = document.getElementById('newsletter-form-slot');
+  if (slot) {
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          obs.disconnect();
+
+          slot.innerHTML = `<form action="https://app.kit.com/forms/9290185/subscriptions" class="seva-form formkit-form" method="post" data-sv-form="9290185" data-uid="7eae6c347c" data-format="inline" data-version="5" min-width="400 500 600 700 800"><div data-style="clean"><ul class="formkit-alert formkit-alert-error" data-element="errors" data-group="alert"></ul><div data-element="fields" data-stacked="false" class="seva-fields formkit-fields"><div class="formkit-field"><input class="formkit-input" name="email_address" aria-label="Email Address" placeholder="Email Address" required type="email"></div><button data-element="submit" class="formkit-submit"><span>Subscribe</span></button></div></div></form>`;
+
+          const script = document.createElement('script');
+          script.src = 'https://f.convertkit.com/ckjs/ck.5.js';
+          script.async = true;
+          document.body.appendChild(script);
+        }
+      },
+      { rootMargin: '200px' }
+    );
+    obs.observe(slot);
+  }
+</script>
+
+<style>
+  .newsletter-home-section {
+    margin: 0;
+    padding: 0;
+  }
+  .newsletter-home-card {
+    position: relative;
+    padding: var(--space-6);
+    border-radius: var(--card-radius);
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-5);
+  }
+  .newsletter-home-accent {
+    position: absolute;
+    top: 0; right: 0;
+    width: 180px; height: 180px;
+    border-radius: 50%;
+    filter: blur(50px);
+    opacity: 0.16;
+    background: var(--accent-1);
+  }
+  .newsletter-home-copy h3 {
+    margin-bottom: var(--space-2);
+    font-size: var(--text-xl);
+  }
+  .newsletter-home-copy p {
+    margin: 0;
+    max-width: 760px;
+    line-height: 1.65;
+    font-size: var(--text-base);
+  }
+  .newsletter-home-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    flex-wrap: wrap;
+    flex-shrink: 0;
+  }
+  .newsletter-form-slot :global(.formkit-input) {
+    background: var(--input-bg);
+    color: var(--text-color);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+  }
+  .newsletter-form-slot :global(.formkit-submit) {
+    background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+    color: var(--btn-primary-text);
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: var(--text-sm);
+    cursor: pointer;
+  }
+
+  @media (max-width: 768px) {
+    .newsletter-home-card {
+      flex-direction: column;
+      align-items: flex-start;
+      padding: var(--space-5);
+    }
+  }
+</style>

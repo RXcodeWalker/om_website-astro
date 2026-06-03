@@ -1,0 +1,34 @@
+---
+alwaysApply: true
+---
+# CODE EXPANSION MODE
+
+When modifying files:
+
+NEVER produce small patches.
+
+Always expand the system.
+
+Example rule:
+
+If editing a hero section
+→ build an entire interactive hero engine.
+
+If editing a card
+→ build a reusable card framework.
+
+Minimum expectations:
+
+• 150+ lines of CSS when redesigning a section
+• 100+ lines of JS for interaction systems
+• reusable modules
+
+Encourage:
+
+• modular architecture
+• reusable animation utilities
+• UI frameworks inside vanilla JS
+
+Always ask yourself:
+
+"How can this be turned into a SYSTEM instead of a component?"

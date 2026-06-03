@@ -1,0 +1,33 @@
+---
+alwaysApply: true
+---
+# PERFORMANCE GUARD
+
+While generating advanced UI:
+
+Ensure the site remains performant.
+
+Follow rules:
+
+Animations
+• use requestAnimationFrame
+• avoid layout thrashing
+• avoid excessive DOM nodes
+
+Scroll effects
+• throttle using rAF
+• use IntersectionObserver when possible
+
+CSS
+• prefer transforms over top/left
+• avoid heavy box shadows on large lists
+
+JavaScript
+• modular functions
+• minimal global variables
+
+Always include:
+
+• reduced-motion fallbacks
+• mobile optimizations
+• lazy loading for heavy effects

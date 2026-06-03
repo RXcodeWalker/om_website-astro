@@ -1,0 +1,34 @@
+---
+interface Props {
+  label: string;
+  heading: string;
+  accentWord?: string;
+  align?: 'left' | 'center';
+  class?: string;
+}
+
+const {
+  label,
+  heading,
+  accentWord,
+  align = 'left',
+  class: className = '',
+} = Astro.props;
+
+const headingParts = accentWord && heading.includes(accentWord)
+  ? heading.split(accentWord)
+  : null;
+---
+
+<header class:list={['section-header', `section-header--${align}`, className]}>
+  <div class="section-label">{label}</div>
+  <h2 class="section-heading">
+    {headingParts ? (
+      <>
+        {headingParts[0]}<span>{accentWord}</span>{headingParts[1]}
+      </>
+    ) : (
+      heading
+    )}
+  </h2>
+</header>

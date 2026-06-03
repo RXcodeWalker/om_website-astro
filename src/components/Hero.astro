@@ -5,19 +5,23 @@
   <div class="container">
     <div class="hero-eyebrow">Learning · Music  · Code · Growth · Sports</div>
     <h1 class="hero-title">Beyond The Basics</h1>
+    <!-- improvement #3: cleaner two-line subtitle -->
     <div class="hero-roles">
-      <span id="hero-static">Created by an 11th grader who </span>
-      <span class="typewriter-text" id="typewriter"></span><span class="cursor">|</span>
+      <div class="hero-roles-static">11th grader · Builder · Writer</div>
+      <div class="hero-roles-typewriter">
+        <span class="typewriter-text" id="typewriter"></span><span class="cursor">|</span>
+      </div>
     </div>
+    <!-- improvement #2: mobile-first CTA buttons (48px min-height, full-width on small screens) -->
     <div class="hero-cta-group">
-      <a href="/blog" class="btn-primary">
+      <a href="/blog" class="btn-primary hero-btn">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
           <polyline points="14 2 14 8 20 8"></polyline>
         </svg>
         Read the Blog
       </a>
-      <a href="/about" class="btn-ghost">
+      <a href="/about" class="btn-ghost hero-btn">
         About Me
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -94,21 +98,41 @@
     margin-bottom: 1.5rem;
   }
 
+  /* improvement #3: two-line roles layout */
   .hero-roles {
-    font-family: var(--font-body);
-    font-size: clamp(1rem, 2.5vw, 1.3rem);
-    font-weight: 300;
-    color: var(--muted-text);
     margin-bottom: 2.5rem;
     opacity: 0;
     transform: translateY(20px);
     animation: heroReveal 0.8s ease 0.6s forwards;
-    height: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
   }
-
+  .hero-roles-static {
+    font-family: var(--font-mono);
+    font-size: clamp(0.72rem, 1.5vw, 0.88rem);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted-text);
+    opacity: 0.8;
+  }
+  .hero-roles-typewriter {
+    font-family: var(--font-body);
+    font-size: clamp(0.95rem, 2.2vw, 1.2rem);
+    font-weight: 400;
+    color: var(--muted-text);
+    min-height: 1.6rem;
+  }
   .hero-roles .typewriter-text {
     color: var(--text-color);
     font-weight: 500;
+  }
+
+  /* improvement #2: 48px min-height CTAs, full-width on small screens */
+  .hero-btn {
+    min-height: 48px;
+    padding: 0.9rem 1.8rem !important;
   }
 
   .hero-cta-group {
@@ -135,6 +159,20 @@
     .hero-roles { margin-bottom: 1.5rem !important; }
   }
 
+  /* improvement #2: full-width stacked CTAs on very small screens */
+  @media (max-width: 480px) {
+    .hero-cta-group {
+      flex-direction: column;
+      width: 100%;
+      padding: 0 1.5rem;
+      gap: 0.75rem;
+    }
+    .hero-btn {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     #hero-canvas {
       opacity: 0.55;
@@ -158,6 +196,15 @@
       animation: none;
       opacity: 0.75;
     }
+  }
+
+  /* cursor blink */
+  .cursor {
+    animation: blink 1s step-end infinite;
+    color: var(--accent-1);
+  }
+  @keyframes blink {
+    50% { opacity: 0; }
   }
 </style>
 

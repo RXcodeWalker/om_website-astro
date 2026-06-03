@@ -1,0 +1,40 @@
+/* =========================================================
+   MOTION SYSTEM
+   Duration and easing tokens live in tokens.css.
+   This file holds shared keyframes and the global
+   reduced-motion safety net for animations.
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ── improvement #20: page fade-in on load ── */
+@keyframes pageIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+body.loaded slot,
+.page-enter {
+  animation: pageIn 0.38s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Apply fade-in to the main slot content via body.loaded */
+body.loaded > .main-content,
+body.loaded > main {
+  animation: pageIn 0.38s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
