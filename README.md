@@ -8,28 +8,9 @@ A fast, content-driven personal website and blog built with Astro. It includes a
 - Content managed via `astro:content` collection (`src/content/config.ts`).
 - Client-side blog index with search, category filters, and bookmarks (`public/js/blog.js`).
 - In-browser audio reader using the Web Speech API with paragraph-level highlighting and controls (`public/js/reader.js`).
-- AI-powered post summarizer: client UI calls a Netlify serverless function which proxies Anthropic (Claude) (`public/js/summarizer.js`, `netlify/functions/summarize.js`).
+- AI-powered post summarizer: client UI calls a Netlify serverless function which proxies Anthropic (Claude) (`public/js/summarizer.js`, `netlify/functions/summarize.js`). NOTE: THIS DOESN'T WORK RIGHT NOW AS I DON'T HAVE ACCESS TO THE API KEY.
 - View counter backed by Supabase via a Netlify function (`netlify/functions/incrementViews.js`).
 - Utilities for estimating read time and extracting key ideas from Markdown (`src/utils/postInsights.ts`).
-
-## Demo / Example
-
-Example: visiting a blog post and generating an AI summary
-
-1. Open a post at `/blog/<slug>` in the built site.
-2. Click the `Listen` button to play audio (browser TTS).
-3. Click the `Summarize` button to open the AI summary panel — it calls `/.netlify/functions/summarize` and shows TL;DR, key points, and tone.
-
-Expected summarizer response shape (JSON returned by the Netlify function):
-
-```
-{
-  "tldr": "One punchy sentence",
-  "keyPoints": ["point 1", "point 2", "point 3"],
-  "tone": "Reflective",
-  "wordCount": 820
-}
-```
 
 ## Installation
 
