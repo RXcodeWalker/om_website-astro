@@ -1,0 +1,23 @@
+<a class="skip-link" href="#main">Skip to main content</a>
+
+<style>
+  .skip-link {
+    position: absolute;
+    top: var(--space-2);
+    left: var(--space-2);
+    z-index: calc(var(--z-overlay) + 1);
+    padding: var(--space-2) var(--space-4);
+    background: var(--surface-raised);
+    color: var(--text-primary);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    font-size: var(--step--1);
+    text-decoration: none;
+    transform: translateY(calc(-100% - var(--space-4)));
+    transition: transform var(--dur-fast) var(--ease-out);
+  }
+
+  .skip-link:focus {
+    transform: translateY(0);
+  }
+</style>

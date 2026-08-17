@@ -1,32 +1,33 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { getCollection } from 'astro:content';
+import { getCollection, render } from 'astro:content';
 import { extractKeyIdeas, extractStrikingLine } from '../../utils/postInsights';
 
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog');
   return posts.map((post) => ({
-    params: { slug: post.slug },
+    params: { slug: post.id },
   }));
 }
 
 const { slug } = Astro.params;
 const allPosts = await getCollection('blog');
 const post = allPosts.find(
-  (p) => p.slug === slug || p.data.id === slug || p.data.id?.toString() === slug?.toString(),
+  (p) => p.id === slug || p.data.id === slug || p.data.id?.toString() === slug?.toString(),
 );
 
-const renderResult = post ? await post.render() : null;
+const renderResult = post ? await render(post) : null;
 const Content = renderResult ? renderResult.Content : null;
-const postId = post ? post.data.id ?? post.slug : slug ?? '';
-const postSlug = post?.slug ?? slug ?? '';
+const postId = post ? post.data.id ?? post.id : slug ?? '';
+const postSlug = post?.id ?? slug ?? '';
 const postBody = post?.body ?? '';
 const introIdeas = post ? extractKeyIdeas(postBody, 3) : [];
 const introLine = post ? extractStrikingLine(postBody, post.data.excerpt) : '';
 ---
 
 <BaseLayout title={post ? post.data.title : "Post Not Found"}>
+  <main id="main">
   <div class="reading-progress-bar" id="reading-progress-bar"></div>
   <div class="post-backdrop"></div>
 
@@ -86,18 +87,18 @@ const introLine = post ? extractStrikingLine(postBody, post.data.excerpt) : '';
       <h2 class="related-heading">More like this</h2>
       <div class="blog-grid related-posts-grid" style="margin-top: 1.5rem;">
         {allPosts
-          .filter(p => p.data.category === post.data.category && p.slug !== post.slug)
+          .filter(p => p.data.category === post.data.category && p.id !== post.id)
           .sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime())
           .slice(0, 3)
           .map(related => (
             <article class="glass-card glass-card-hover blog-card" data-category={related.data.category}>
-              <h3><a href={`/blog/${related.slug}`} class="blog-card-stretched-link">{related.data.title}</a></h3>
+              <h3><a href={`/blog/${related.id}`} class="blog-card-stretched-link">{related.data.title}</a></h3>
               <div class="blog-meta">
                 <span class="category-badge">{related.data.category}</span>
                 <span class="blog-date">{related.data.date}</span>
               </div>
               <p class="blog-excerpt">{related.data.excerpt}</p>
-              <a href={`/blog/${related.slug}`} class="read-more-btn" tabindex="-1" aria-hidden="true">
+              <a href={`/blog/${related.id}`} class="read-more-btn" tabindex="-1" aria-hidden="true">
                 Read More
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -160,6 +161,7 @@ const introLine = post ? extractStrikingLine(postBody, post.data.excerpt) : '';
   </div>
 
   <div class="toast" id="toast"></div>
+  </main>
 
   <script is:inline src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script is:inline>

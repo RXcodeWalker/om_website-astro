@@ -8,14 +8,14 @@ if (urlId) {
   const allPosts = await getCollection('blog');
   const post = allPosts.find(
     (p) =>
-      p.slug === urlId ||
+      p.id === urlId ||
       p.data.id === urlId ||
-      p.slug.toLowerCase() === urlId.toLowerCase() ||
+      p.id.toLowerCase() === urlId.toLowerCase() ||
       p.data.id?.toString() === urlId.toString(),
   );
 
   if (post) {
-    return Astro.redirect(`/blog/${post.slug}`);
+    return Astro.redirect(`/blog/${post.id}`);
   }
 }
 ---

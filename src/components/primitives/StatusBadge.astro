@@ -1,0 +1,57 @@
+---
+type Status = 'shipped' | 'in-progress' | 'experiment' | 'archived';
+
+interface Props {
+  status: Status;
+  class?: string;
+}
+
+const { status, class: className = '' } = Astro.props;
+
+const labels: Record<Status, string> = {
+  shipped: 'Shipped',
+  'in-progress': 'In progress',
+  experiment: 'Experiment',
+  archived: 'Archived',
+};
+
+const dotClass: Record<Status, string> = {
+  shipped: 'status-badge__dot--shipped',
+  'in-progress': 'status-badge__dot--progress',
+  experiment: 'status-badge__dot--quiet',
+  archived: 'status-badge__dot--quiet',
+};
+---
+
+<span class:list={['status-badge', className]}>
+  <span class:list={['status-badge__dot', dotClass[status]]} aria-hidden="true"></span>
+  <span class="status-badge__label">{labels[status]}</span>
+</span>
+
+<style>
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+    color: var(--text-secondary);
+  }
+
+  .status-badge__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: var(--radius-full);
+    background: var(--status-quiet);
+  }
+
+  .status-badge__dot--shipped {
+    background: var(--status-shipped);
+  }
+
+  .status-badge__dot--progress {
+    background: var(--status-progress);
+  }
+</style>

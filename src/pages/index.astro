@@ -19,7 +19,7 @@ const recentPosts = allPosts
   <Hero />
   <Marquee />
 
-  <main class="container main-content home-main">
+  <main id="main" class="container main-content home-main">
 
     <!-- LATEST BLOG DROPS — improvement #1: show 3 posts, improvement #6: section title group -->
     <section class="section" data-handshake>
@@ -31,7 +31,7 @@ const recentPosts = allPosts
       <div class="recent-posts-grid">
         {recentPosts.map((post, index) => (
           <a
-            href={`/blog/${post.slug}`}
+            href={`/blog/${post.id}`}
             class={`recent-post-card${index === 0 ? ' tilt-card post-card-featured' : ''}`}
             aria-label={`Read: ${post.data.title}`}
           >

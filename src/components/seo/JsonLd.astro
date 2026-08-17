@@ -1,0 +1,63 @@
+---
+import { site } from '../../config/site';
+
+type SchemaType = 'Person' | 'BreadcrumbList' | 'CreativeWork';
+
+interface BreadcrumbItem {
+  name: string;
+  item: string;
+}
+
+interface Props {
+  type?: SchemaType;
+  breadcrumbs?: BreadcrumbItem[];
+  creativeWork?: {
+    name: string;
+    description: string;
+    url: string;
+    datePublished?: string;
+  };
+}
+
+const { type = 'Person', breadcrumbs = [], creativeWork } = Astro.props;
+
+let schema: Record<string, unknown>;
+
+if (type === 'BreadcrumbList') {
+  schema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: breadcrumbs.map((crumb, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: crumb.name,
+      item: crumb.item,
+    })),
+  };
+} else if (type === 'CreativeWork' && creativeWork) {
+  schema = {
+    '@context': 'https://schema.org',
+    '@type': 'CreativeWork',
+    name: creativeWork.name,
+    description: creativeWork.description,
+    url: creativeWork.url,
+    author: {
+      '@type': 'Person',
+      name: site.author,
+      url: site.url,
+    },
+    ...(creativeWork.datePublished ? { datePublished: creativeWork.datePublished } : {}),
+  };
+} else {
+  schema = {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    name: site.author,
+    url: site.url,
+    email: site.email,
+    sameAs: site.socials.map((social) => social.href),
+  };
+}
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(schema)} />

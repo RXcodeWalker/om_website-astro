@@ -1,0 +1,134 @@
+---
+import { site } from '../../config/site';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="container site-footer__grid">
+    <section aria-labelledby="footer-identity">
+      <h2 id="footer-identity" class="site-footer__heading">Identity</h2>
+      <p class="site-footer__name">{site.name}</p>
+      <p class="site-footer__tagline">{site.tagline}</p>
+      <p class="site-footer__meta">
+        <a href={`mailto:${site.email}`}>{site.email}</a>
+      </p>
+    </section>
+
+    <section aria-labelledby="footer-site">
+      <h2 id="footer-site" class="site-footer__heading">Site</h2>
+      <ul class="site-footer__list">
+        {site.nav.filter((item) => !item.external).map((item) => (
+          <li>
+            <a href={item.href} class="site-footer__link">{item.label}</a>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <section aria-labelledby="footer-elsewhere">
+      <h2 id="footer-elsewhere" class="site-footer__heading">Elsewhere</h2>
+      <ul class="site-footer__list">
+        {
+          site.socials.map((social) => (
+            <li>
+              <a href={social.href} class="site-footer__link link-external" rel="noopener noreferrer">
+                {social.label}
+              </a>
+            </li>
+          ))
+        }
+        <li>
+          <a href={site.blogUrl} class="site-footer__link link-external" rel="noopener noreferrer">
+            Writing
+          </a>
+        </li>
+      </ul>
+    </section>
+  </div>
+
+  <div class="site-footer__bar">
+    <div class="container site-footer__bar-inner">
+      <p>© {year} {site.author}. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    margin-top: var(--section-gap);
+    border-top: 1px solid var(--border-subtle);
+    background: var(--surface-page);
+  }
+
+  .site-footer__grid {
+    display: grid;
+    gap: var(--space-7);
+    padding-block: var(--space-8);
+  }
+
+  @media (min-width: 768px) {
+    .site-footer__grid {
+      grid-template-columns: 2fr 1fr 1fr;
+    }
+  }
+
+  .site-footer__heading {
+    margin: 0 0 var(--space-3);
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+    color: var(--text-muted);
+    font-weight: 400;
+  }
+
+  .site-footer__name {
+    margin: 0 0 var(--space-2);
+    font-family: var(--font-display);
+    font-size: var(--step-2);
+  }
+
+  .site-footer__tagline,
+  .site-footer__meta {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: var(--step--1);
+  }
+
+  .site-footer__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .site-footer__link {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: var(--step--1);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .site-footer__link:hover,
+    .site-footer__link:focus-visible,
+    .site-footer__meta a:hover,
+    .site-footer__meta a:focus-visible {
+      color: var(--accent);
+      text-decoration: underline;
+    }
+  }
+
+  .site-footer__bar {
+    border-top: 1px solid var(--border-subtle);
+    padding-block: var(--space-4);
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+  }
+
+  .site-footer__bar-inner p {
+    margin: 0;
+  }
+</style>

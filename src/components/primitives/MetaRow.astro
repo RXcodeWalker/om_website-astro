@@ -1,0 +1,72 @@
+---
+interface Item {
+  label: string;
+  value: string;
+  datetime?: string;
+}
+
+interface Props {
+  items: Item[];
+  class?: string;
+}
+
+const { items, class: className = '' } = Astro.props;
+---
+
+<dl class:list={['meta-row', 'tabular-nums', className]}>
+  {
+    items.map((item, index) => (
+      <>
+        <div class="meta-row__item">
+          <dt class="meta-row__label">{item.label}</dt>
+          <dd class="meta-row__value">
+            {item.datetime ? (
+              <time datetime={item.datetime}>{item.value}</time>
+            ) : (
+              item.value
+            )}
+          </dd>
+        </div>
+        {index < items.length - 1 && (
+          <span class="meta-row__sep" aria-hidden="true">
+            ·
+          </span>
+        )}
+      </>
+    ))
+  }
+</dl>
+
+<style>
+  .meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    color: var(--text-muted);
+  }
+
+  .meta-row__item {
+    display: inline-flex;
+    gap: var(--space-2);
+    margin: 0;
+  }
+
+  .meta-row__label {
+    margin: 0;
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+  }
+
+  .meta-row__value {
+    margin: 0;
+    color: var(--text-secondary);
+  }
+
+  .meta-row__sep {
+    color: var(--text-muted);
+  }
+</style>

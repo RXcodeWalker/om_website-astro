@@ -1,0 +1,46 @@
+---
+interface Props {
+  caption?: string;
+  class?: string;
+}
+
+const { caption, class: className = '' } = Astro.props;
+---
+
+<figure class:list={['gallery', className]}>
+  <div class="gallery__grid">
+    <slot />
+  </div>
+  {caption && <figcaption class="gallery__caption">{caption}</figcaption>}
+</figure>
+
+<style>
+  .gallery {
+    margin: var(--space-6) 0;
+  }
+
+  .gallery__grid {
+    display: grid;
+    gap: 1px;
+    background: var(--border-subtle);
+    border: 1px solid var(--border-subtle);
+  }
+
+  @media (min-width: 768px) {
+    .gallery__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .gallery__grid :global(figure),
+  .gallery__grid :global(img) {
+    margin: 0;
+  }
+
+  .gallery__caption {
+    margin-top: var(--space-2);
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    color: var(--text-muted);
+  }
+</style>

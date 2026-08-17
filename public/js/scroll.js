@@ -6,9 +6,6 @@
   const progressBar = document.getElementById('progress-bar');
   const header = document.querySelector('.site-header');
   const brandHero = document.getElementById('brand-hero');
-  const menuToggle = document.getElementById('menu-toggle');
-  const mobileMenu = document.getElementById('mobile-menu');
-  const navBackdrop = document.getElementById('nav-backdrop');
   const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
 
   let prefersReducedMotion = reducedMotionQuery.matches;
@@ -84,7 +81,7 @@
     entries.forEach((entry) => {
       if (!entry.isIntersecting) return;
       if (entry.target.classList.contains('reveal')) {
-        entry.target.classList.add('visible');
+        entry.target.classList.add('is-visible');
       } else {
         entry.target.style.animation = 'fadeIn 0.6s ease forwards';
       }
@@ -98,47 +95,6 @@
     if (event.target.closest('.glass-card-hover') && typeof playSound === 'function') {
       playSound('click');
     }
-  });
-
-  function openMenu() {
-    if (!mobileMenu || !menuToggle) return;
-    mobileMenu.classList.add('active');
-    menuToggle.classList.add('active');
-    if (navBackdrop) navBackdrop.classList.add('active');
-    menuToggle.setAttribute('aria-expanded', 'true');
-  }
-
-  function closeMenu() {
-    if (!mobileMenu || !menuToggle) return;
-    mobileMenu.classList.remove('active');
-    menuToggle.classList.remove('active');
-    if (navBackdrop) navBackdrop.classList.remove('active');
-    menuToggle.setAttribute('aria-expanded', 'false');
-  }
-
-  if (menuToggle && mobileMenu) {
-    menuToggle.addEventListener('click', () => {
-      const isOpen = mobileMenu.classList.contains('active');
-      if (isOpen) {
-        closeMenu();
-      } else {
-        openMenu();
-      }
-    });
-  }
-
-  if (navBackdrop) {
-    navBackdrop.addEventListener('click', closeMenu);
-  }
-
-  if (mobileMenu) {
-    mobileMenu.querySelectorAll('a').forEach((link) => {
-      link.addEventListener('click', closeMenu);
-    });
-  }
-
-  document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape') closeMenu();
   });
 
   const categoryColorMap = [

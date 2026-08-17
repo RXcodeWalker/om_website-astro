@@ -1,0 +1,162 @@
+---
+import Icon from '../primitives/Icon.astro';
+---
+
+<div class="theme-controls">
+  <button
+    type="button"
+    class="theme-controls__btn"
+    id="theme-toggle"
+    aria-label="Toggle dark mode"
+  >
+    <Icon name="sun" class="theme-controls__icon theme-controls__icon--light" />
+    <Icon name="moon" class="theme-controls__icon theme-controls__icon--dark" />
+  </button>
+
+  <details class="accent-picker">
+    <summary class="accent-picker__summary">Accent</summary>
+    <div class="accent-picker__options" role="group" aria-label="Accent colour">
+      <button type="button" class="accent-picker__btn" data-accent="ink">Ink</button>
+      <button type="button" class="accent-picker__btn" data-accent="oxblood">Oxblood</button>
+      <button type="button" class="accent-picker__btn" data-accent="ivy">Ivy</button>
+    </div>
+  </details>
+</div>
+
+<style>
+  .theme-controls {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .theme-controls__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    background: transparent;
+    border: 1px solid var(--border-interactive);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    cursor: pointer;
+  }
+
+  .theme-controls__icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  html[data-theme='dark'] .theme-controls__icon--light {
+    display: none;
+  }
+
+  html:not([data-theme='dark']) .theme-controls__icon--dark {
+    display: none;
+  }
+
+  .accent-picker {
+    position: relative;
+  }
+
+  .accent-picker__summary {
+    list-style: none;
+    cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+  }
+
+  .accent-picker__summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .accent-picker__options {
+    position: absolute;
+    right: 0;
+    top: calc(100% + var(--space-2));
+    display: grid;
+    gap: var(--space-1);
+    min-width: 8rem;
+    padding: var(--space-2);
+    background: var(--surface-raised);
+    border: 1px solid var(--border-strong);
+    box-shadow: var(--shadow-overlay);
+    z-index: var(--z-menu);
+  }
+
+  .accent-picker__btn {
+    padding: var(--space-2) var(--space-3);
+    text-align: left;
+    font-size: var(--step--1);
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    cursor: pointer;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .accent-picker__btn:hover,
+    .accent-picker__btn:focus-visible,
+    .theme-controls__btn:hover,
+    .theme-controls__btn:focus-visible {
+      background: var(--surface-sunken);
+    }
+  }
+
+  .accent-picker__btn[aria-pressed='true'] {
+    color: var(--accent);
+    outline: 1px solid var(--accent);
+  }
+</style>
+
+<script>
+  const themeToggle = document.getElementById('theme-toggle');
+  const accentButtons = document.querySelectorAll<HTMLButtonElement>('[data-accent]');
+
+  themeToggle?.addEventListener('click', () => {
+    const root = document.documentElement;
+    const isDark = root.getAttribute('data-theme') === 'dark';
+    if (isDark) {
+      root.removeAttribute('data-theme');
+      localStorage.setItem('theme', 'light');
+    } else {
+      root.setAttribute('data-theme', 'dark');
+      localStorage.setItem('theme', 'dark');
+    }
+    updateThemeColor();
+  });
+
+  accentButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+      const accent = button.dataset.accent;
+      if (!accent) return;
+      document.documentElement.setAttribute('data-accent', accent);
+      localStorage.setItem('accent', accent);
+      syncAccentButtons(accent);
+    });
+  });
+
+  function syncAccentButtons(active: string) {
+    accentButtons.forEach((button) => {
+      button.setAttribute('aria-pressed', String(button.dataset.accent === active));
+    });
+  }
+
+  function updateThemeColor() {
+    const meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
+    if (!meta) return;
+    meta.content =
+      document.documentElement.getAttribute('data-theme') === 'dark' ? '#100f0e' : '#fbfaf8';
+  }
+
+  syncAccentButtons(document.documentElement.getAttribute('data-accent') || 'ink');
+</script>

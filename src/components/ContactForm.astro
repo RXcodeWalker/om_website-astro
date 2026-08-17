@@ -1,86 +1,106 @@
 ---
+import { site } from '../config/site';
 ---
-<section class="glass-card contact-section reveal">
-  <div class="card-shine"></div>
-  <h2 class="section-title">Send a Message</h2>
-  <form class="contact-form" action="https://formspree.io/f/xzdajdnn" method="POST">
-    <input type="hidden" name="_subject" value="New message from Om's website">
-    <input type="hidden" name="_captcha" value="false">
-    
-    <div class="form-grid">
-      <div class="form-group">
-        <label for="name">Name</label>
-        <input type="text" id="name" name="name" placeholder="Your name" required>
-      </div>
-      <div class="form-group">
-        <label for="email">Email</label>
-        <input type="email" id="email" name="email" placeholder="your.email@example.com" required>
-      </div>
-    </div>
 
-    <div class="form-group">
-      <label for="message">Message</label>
-      <textarea id="message" name="message" placeholder="What would you like to discuss?" rows="6" required></textarea>
-    </div>
+<form
+  class="contact-form"
+  action={`https://formspree.io/f/${site.formspreeId}`}
+  method="POST"
+  novalidate
+>
+  <input type="hidden" name="_subject" value="New message from Beyond The Basics" />
 
-    <button type="submit" class="submit-btn btn-primary">
-      Send Message
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-    </button>
-  </form>
-</section>
+  <div class="contact-form__grid">
+    <div class="contact-form__field">
+      <label for="contact-name">Name</label>
+      <input id="contact-name" name="name" type="text" autocomplete="name" required />
+    </div>
+    <div class="contact-form__field">
+      <label for="contact-email">Email</label>
+      <input id="contact-email" name="email" type="email" autocomplete="email" required />
+    </div>
+  </div>
+
+  <div class="contact-form__field">
+    <label for="contact-message">Message</label>
+    <textarea id="contact-message" name="message" rows="6" required aria-describedby="contact-hint"></textarea>
+    <p id="contact-hint" class="contact-form__hint">I usually reply within 24 hours.</p>
+  </div>
+
+  <p class="contact-form__status visually-hidden" aria-live="polite" id="contact-status"></p>
+
+  <button type="submit" class="contact-form__submit">Send message</button>
+</form>
 
 <style>
-  .contact-section {
-    padding: 3rem;
-    margin-top: 2rem;
-  }
-  .section-title {
-    font-size: 1.8rem;
-    margin-bottom: 2rem;
-  }
-  .form-grid {
+  .contact-form {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.5rem;
-    margin-bottom: 1.5rem;
+    gap: var(--space-4);
+    max-width: var(--container-narrow);
   }
-  @media (max-width: 640px) {
-    .form-grid { grid-template-columns: 1fr; }
+
+  .contact-form__grid {
+    display: grid;
+    gap: var(--space-4);
   }
-  .form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.6rem;
-    margin-bottom: 1.5rem;
+
+  @media (min-width: 480px) {
+    .contact-form__grid {
+      grid-template-columns: 1fr 1fr;
+    }
   }
-  .form-group label {
+
+  .contact-form__field {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .contact-form__field label {
     font-family: var(--font-mono);
-    font-size: 0.7rem;
+    font-size: var(--step--2);
+    letter-spacing: var(--tracking-mono);
     text-transform: uppercase;
-    color: var(--accent-1);
-    letter-spacing: 0.1em;
+    color: var(--text-muted);
   }
-  .form-group input, 
-  .form-group textarea {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid var(--glass-border);
-    border-radius: 12px;
-    padding: 1rem;
-    color: var(--text-color);
-    font-family: inherit;
-    transition: all 0.3s ease;
-  }
-  .form-group input:focus, 
-  .form-group textarea:focus {
-    outline: none;
-    border-color: var(--accent-1);
-    background: rgba(255, 255, 255, 0.06);
-    box-shadow: 0 0 20px rgba(76, 201, 240, 0.1);
-  }
-  .submit-btn {
+
+  .contact-form__field input,
+  .contact-form__field textarea {
     width: 100%;
-    justify-content: center;
-    padding: 1.2rem;
+    padding: var(--space-3);
+    color: var(--text-primary);
+    background: var(--surface-raised);
+    border: 1px solid var(--border-interactive);
+    border-radius: var(--radius-sm);
+  }
+
+  .contact-form__field input:user-invalid,
+  .contact-form__field textarea:user-invalid {
+    border-color: #8c2f39;
+  }
+
+  .contact-form__hint {
+    margin: 0;
+    font-size: var(--step--2);
+    color: var(--text-muted);
+  }
+
+  .contact-form__submit {
+    justify-self: start;
+    min-height: 44px;
+    padding: var(--space-3) var(--space-5);
+    font-weight: 500;
+    color: var(--text-on-accent);
+    background: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .contact-form__submit:hover,
+    .contact-form__submit:focus-visible {
+      background: var(--accent-hover);
+      border-color: var(--accent-hover);
+    }
   }
 </style>

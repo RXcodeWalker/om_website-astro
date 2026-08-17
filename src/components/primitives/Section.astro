@@ -1,0 +1,63 @@
+---
+interface Props {
+  kicker?: string;
+  heading?: string;
+  headingLevel?: 'h1' | 'h2' | 'h3';
+  id?: string;
+  class?: string;
+}
+
+const {
+  kicker,
+  heading,
+  headingLevel = 'h2',
+  id,
+  class: className = '',
+} = Astro.props;
+
+const HeadingTag = headingLevel;
+---
+
+<section class:list={['section-band', className]} aria-labelledby={heading ? id : undefined}>
+  <div class="container section-band__inner">
+    {kicker && <p class="section-band__kicker">{kicker}</p>}
+    {heading && (
+      <HeadingTag id={id} class="section-band__heading">
+        {heading}
+      </HeadingTag>
+    )}
+    <div class="section-band__content">
+      <slot />
+    </div>
+  </div>
+</section>
+
+<style>
+  .section-band {
+    padding-block: var(--section-gap);
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  .section-band__inner {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .section-band__kicker {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .section-band__heading {
+    margin: 0;
+    max-width: var(--measure-wide);
+  }
+
+  .section-band__content {
+    max-width: var(--measure-wide);
+  }
+</style>

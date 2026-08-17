@@ -1,0 +1,26 @@
+---
+interface Props {
+  items: string[];
+  max?: number;
+  class?: string;
+}
+
+const { items, max = 5, class: className = '' } = Astro.props;
+const visible = items.slice(0, max);
+const overflow = Math.max(items.length - max, 0);
+---
+
+<ul class:list={['chip-list', className]} aria-label="Stack">
+  {
+    visible.map((item) => (
+      <li>
+        <span class="chip">{item}</span>
+      </li>
+    ))
+  }
+  {overflow > 0 && (
+    <li>
+      <span class="chip">+{overflow}</span>
+    </li>
+  )}
+</ul>

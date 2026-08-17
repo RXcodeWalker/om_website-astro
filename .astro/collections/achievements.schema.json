@@ -1,0 +1,112 @@
+{
+  "$ref": "#/definitions/achievements",
+  "definitions": {
+    "achievements": {
+      "type": "object",
+      "properties": {
+        "$schema": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "issuer": {
+            "type": "string",
+            "minLength": 1
+          },
+          "date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "integer",
+                "format": "unix-time"
+              }
+            ]
+          },
+          "domain": {
+            "type": "string",
+            "enum": [
+              "academics",
+              "music",
+              "sport",
+              "leadership",
+              "building"
+            ]
+          },
+          "credential": {
+            "type": "string"
+          },
+          "significance": {
+            "type": "string",
+            "minLength": 40,
+            "maxLength": 220
+          },
+          "highlight": {
+            "type": "boolean",
+            "default": false
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "href": {
+                  "type": "string",
+                  "format": "uri"
+                },
+                "kind": {
+                  "type": "string",
+                  "enum": [
+                    "repo",
+                    "live",
+                    "demo",
+                    "writeup",
+                    "video",
+                    "download",
+                    "profile",
+                    "certificate"
+                  ],
+                  "default": "live"
+                }
+              },
+              "required": [
+                "label",
+                "href"
+              ],
+              "additionalProperties": false
+            },
+            "default": []
+          },
+          "project": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "issuer",
+          "date",
+          "domain",
+          "significance"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}
