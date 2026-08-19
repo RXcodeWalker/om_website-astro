@@ -6,9 +6,10 @@ interface Props {
   date: string;
   excerpt?: string;
   readingTime?: number;
+  external?: boolean;
 }
 
-const { href, title, category, date, excerpt, readingTime } = Astro.props;
+const { href, title, category, date, excerpt, readingTime, external = false } = Astro.props;
 
 const parsed = new Date(date);
 const valid = !Number.isNaN(parsed.getTime());
@@ -21,7 +22,14 @@ const dateLabel = valid
 <article class="post-row">
   <h3 class="post-row__title">
     {/* One real link per row, stretched over the block: one tab stop, meaningful name. */}
-    <a href={href} class="post-row__link">{title}</a>
+    <a
+      href={href}
+      class="post-row__link"
+      target={external ? '_blank' : undefined}
+      rel={external ? 'noopener noreferrer' : undefined}
+    >
+      {title}{external && <span class="post-row__external" aria-hidden="true"> ↗</span>}
+    </a>
   </h3>
 
   <p class="post-row__meta tabular-nums">
@@ -63,6 +71,10 @@ const dateLabel = valid
   .post-row__link {
     color: inherit;
     text-decoration: none;
+  }
+
+  .post-row__external {
+    font-size: 0.85em;
   }
 
   .post-row__link::after {

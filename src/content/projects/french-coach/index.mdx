@@ -1,0 +1,47 @@
+---
+title: French Coach
+outcome: AI speaking practice for IGCSE French, because speaking is what students practise least.
+summary: >-
+  French Coach records spoken answers to Paper 3 style role-play and topic-conversation
+  questions, generates structured grammar and vocabulary feedback from the transcript, and
+  tracks mastery across grammar categories over time so each session builds on the last.
+kicker: Web · AI
+
+category: ai
+status: in-progress
+year: 2026
+role: Designer & developer
+
+stack:
+  - React
+  - Vite
+  - Supabase
+  - Gemini
+  - Web Speech API
+
+order: 1
+draft: false
+
+thumbnail:
+  src: ./media/thumbnail.png
+  alt: French Coach app homepage showing the headline "Practise the IGCSE French speaking exam by speaking, not by reading"
+
+links:
+  - label: Live preview
+    href: https://french.beyondthebasics.me
+    kind: live
+
+relatedPost:
+  title: Why I Started Building French Coach
+  url: https://blog.beyondthebasics.me/article/why-i-started-building-french-coach
+
+description: >-
+  An AI speaking coach for IGCSE French learners — record spoken answers, get structured
+  feedback, and track grammar mastery over time.
+---
+
+French Coach grew out of a classroom observation: students studying French for years could barely speak it under pressure, because speaking time per class averaged about sixty seconds each. The app puts speaking at the centre — record an answer, get feedback on grammar and vocabulary, and build a session history that actually remembers where you struggle.
+
+The core loop is deliberately narrow: role-play and topic-conversation scenarios modelled on the IGCSE Paper 3 structure, feedback generated from the transcript rather than from a chat interface, and a per-category mastery tracker that surfaces the patterns a teacher would notice across months.
+
+Building it has meant working through speech recognition reliability, LLM feedback latency, and the hardest part — making the memory system useful rather than noisy.

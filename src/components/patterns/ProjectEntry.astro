@@ -7,27 +7,39 @@ import StatusBadge from '../primitives/StatusBadge.astro';
 interface Props {
   project: CollectionEntry<'projects'>;
   variant?: 'row' | 'compact';
+  /** Defaults to /projects#<id> for in-page anchor navigation. */
+  href?: string;
 }
 
-const { project, variant = 'row' } = Astro.props;
+const { project, variant = 'row', href } = Astro.props;
 const { data } = project;
+const linkHref = href ?? `/projects#${project.id}`;
 ---
 
-<article class:list={['project-entry', `project-entry--${variant}`]}>
-  <div class="project-entry__media">
-    <Media
-      src={data.thumbnail.src}
-      alt={data.thumbnail.alt}
-      ratio="16:10"
-      sizes={variant === 'row' ? '(min-width: 1024px) 440px, 100vw' : '(min-width: 1024px) 320px, 100vw'}
-    />
-  </div>
+<article
+  id={project.id}
+  class:list={[
+    'project-entry',
+    `project-entry--${variant}`,
+    !data.thumbnail && 'project-entry--text-only',
+  ]}
+>
+  {data.thumbnail && (
+    <div class="project-entry__media">
+      <Media
+        src={data.thumbnail.src}
+        alt={data.thumbnail.alt}
+        ratio="16:10"
+        sizes={variant === 'row' ? '(min-width: 1024px) 440px, 100vw' : '(min-width: 1024px) 320px, 100vw'}
+      />
+    </div>
+  )}
 
   <div class="project-entry__body">
     {data.kicker && <p class="project-entry__kicker">{data.kicker}</p>}
 
     <h3 class="project-entry__title">
-      <a href={`/projects/${project.id}`} class="project-entry__link">{data.title}</a>
+      <a href={linkHref} class="project-entry__link">{data.title}</a>
     </h3>
 
     <p class="project-entry__outcome">{data.outcome}</p>
@@ -53,7 +65,7 @@ const { data } = project;
   }
 
   @media (min-width: 768px) {
-    .project-entry--row {
+    .project-entry--row:not(.project-entry--text-only) {
       grid-template-columns: 5fr 7fr;
       gap: var(--space-6);
       align-items: start;

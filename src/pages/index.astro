@@ -4,10 +4,11 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Section from '../components/primitives/Section.astro';
 import Button from '../components/primitives/Button.astro';
 import ProjectEntry from '../components/patterns/ProjectEntry.astro';
-import PostRow from '../components/patterns/PostRow.astro';
+import AchievementItem from '../components/patterns/AchievementItem.astro';
 import NowBand from '../components/patterns/NowBand.astro';
-import EmptyState from '../components/patterns/EmptyState.astro';
+import PostRow from '../components/patterns/PostRow.astro';
 import { site } from '../config/site';
+import type { Achievement } from '../schemas/achievement';
 
 const projects = (await getCollection('projects'))
   .filter((project) => !project.data.draft)
@@ -16,7 +17,16 @@ const projects = (await getCollection('projects'))
 const nowEntries = await getCollection('now');
 const now = nowEntries[0]?.data;
 
+// Writing picks are curated in YAML — preserve their order, do not sort.
 const picks = await getCollection('writing');
+
+// Achievements: only highlighted entries, newest first, capped at 3.
+const achievementEntries = await getCollection('achievements');
+const highlights = achievementEntries
+  .map((e) => e.data as Achievement)
+  .filter((a) => a.highlight)
+  .sort((a, b) => b.date.getTime() - a.date.getTime())
+  .slice(0, 3);
 ---
 
 <BaseLayout
@@ -25,89 +35,127 @@ const picks = await getCollection('writing');
   breadcrumbs={[{ name: 'Home', item: site.url }]}
 >
   <main id="main">
+
+    {/* ── 1. Hero ─────────────────────────────────────────────── */}
     <section class="hero">
       <div class="container hero__inner">
-        <p class="hero__kicker">{site.tagline}</p>
-        <h1 class="hero__title">I learn by building things and writing about them.</h1>
+        <p class="hero__kicker">Om Jhamvar · Mumbai</p>
+        <h1 class="hero__title">I build the tools I wish I'd had.</h1>
         <p class="hero__lede">
-          I am Om Jhamvar, a school student who turns what he learns into projects, essays and
-          performances. This site is where that work is kept honest and in public.
+          Currently: an AI speaking coach for IGCSE French learners, and an autonomous
+          robot built at an IIT makerspace. This site keeps the work honest and in public.
         </p>
         <div class="hero__actions">
           <Button href="/projects" variant="primary" size="lg">See the work</Button>
           <Button href="/about" variant="secondary" size="lg">About me</Button>
+          <Button href="/contact" variant="quiet" size="lg">Get in touch</Button>
         </div>
       </div>
     </section>
 
+    {/* ── 2. Selected work ────────────────────────────────────── */}
     <Section kicker="Selected work" heading="Projects" id="projects" headingLevel="h2">
-      {
-        projects.length > 0 ? (
-          <div class="stack">
-            {projects.map((project) => (
-              <ProjectEntry project={project} variant="compact" />
-            ))}
-          </div>
-        ) : (
-          <EmptyState title="Case studies in progress">
-            <p>
-              The project case studies are being written against the new content model. Each one
-              needs its own write-up, photographs and results before it is worth publishing.
-            </p>
-          </EmptyState>
-        )
-      }
+      {projects.length > 0 ? (
+        <div class="stack">
+          {projects.map((project) => (
+            <ProjectEntry
+              project={project}
+              variant="compact"
+              href={`/projects#${project.id}`}
+            />
+          ))}
+        </div>
+      ) : (
+        <p class="band-text">
+          Case studies in progress — each needs a full account of the problem, the build,
+          and the results before it earns a page here.
+        </p>
+      )}
       <p class="band-action">
-        <Button href="/projects" variant="quiet">All projects →</Button>
+        <Button href="/projects" variant="quiet" size="md">All projects →</Button>
       </p>
     </Section>
 
-    {
-      now && (
-        <Section kicker="Currently" heading="What I am working on" id="now" headingLevel="h2">
-          <NowBand entry={now} />
-        </Section>
-      )
-    }
+    {/* ── 3. Achievements ─────────────────────────────────────── */}
+    {highlights.length > 0 && (
+      <Section kicker="Evidence" heading="Achievements" id="achievements" headingLevel="h2">
+        <div>
+          {highlights.map((achievement) => (
+            <AchievementItem achievement={achievement} />
+          ))}
+        </div>
+        <p class="band-action">
+          <Button href="/achievements" variant="quiet" size="md">All achievements →</Button>
+        </p>
+      </Section>
+    )}
 
-    <Section kicker="Writing" heading="Recent posts" id="writing" headingLevel="h2">
-      {
-        picks.length > 0 ? (
-          <div class="stack stack--tight">
-            {picks.map((pick) => (
-              <PostRow
-                href={pick.data.url}
-                title={pick.data.title}
-                date={pick.data.date.toISOString()}
-                excerpt={pick.data.excerpt}
-              />
-            ))}
-          </div>
-        ) : (
-          <p class="band-text">
-            Essays and notes on coding, robotics, sport and whatever I am currently trying to
-            understand properly.
-          </p>
-        )
-      }
+    {/* ── 4. Currently ────────────────────────────────────────── */}
+    {now && (
+      <Section kicker="Currently" heading="What I am working on" id="now" headingLevel="h2">
+        <NowBand entry={now} />
+      </Section>
+    )}
+
+    {/* ── 5. About preview ────────────────────────────────────── */}
+    <Section kicker="The person" heading="About me" id="about" headingLevel="h2">
+      <div class="about-preview">
+        <p class="about-preview__text">
+          I learn by building things and writing about them. Guitar and music are the other
+          serious thread — LCM Grade 8 with High Distinction, working toward diploma level,
+          daily practice. I analyse sport the same way I analyse code: as systems where
+          structure decides outcomes.
+        </p>
+        <p class="about-preview__text">
+          This site is the long-term record of how I think and what I can do.
+        </p>
+      </div>
       <p class="band-action">
-        <Button href={site.blogUrl} variant="quiet" external>All writing ↗</Button>
+        <Button href="/about" variant="secondary" size="md">More about me</Button>
       </p>
     </Section>
 
-    <Section kicker="Contact" heading="Get in touch" id="contact" headingLevel="h2">
+    {/* ── 6. Writing ──────────────────────────────────────────── */}
+    <Section kicker="Writing" heading="Selected essays" id="writing" headingLevel="h2">
+      {picks.length > 0 ? (
+        <div class="stack stack--tight">
+          {picks.map((pick) => (
+            <PostRow
+              href={pick.data.url}
+              title={pick.data.title}
+              date={pick.data.date.toISOString()}
+              excerpt={pick.data.excerpt}
+              external
+            />
+          ))}
+        </div>
+      ) : (
+        <p class="band-text">
+          Essays and notes on coding, robotics, sport and whatever I am currently trying to
+          understand properly.
+        </p>
+      )}
+      <p class="band-action">
+        <Button href={site.blogUrl} variant="quiet" size="md" external>Explore all writing ↗</Button>
+      </p>
+    </Section>
+
+    {/* ── 7. Contact CTA ──────────────────────────────────────── */}
+    <Section kicker="Contact" heading="Let us talk" id="contact" headingLevel="h2">
       <p class="band-text">
-        I am always glad to hear from people building things, and I reply to everything within a
-        day or so.
+        Open to collaboration, academic conversations, project discussions, and
+        opportunities. I reply to everything within a day or so.
       </p>
       <p class="band-action">
-        <Button href="/contact" variant="secondary">Contact me</Button>
+        <Button href="/contact" variant="secondary" size="md">Get in touch</Button>
       </p>
     </Section>
+
   </main>
 </BaseLayout>
 
 <style>
+  /* ── Hero ─────────────────────────────────────────────────────── */
   .hero {
     padding-block: var(--space-9) var(--space-8);
   }
@@ -149,6 +197,7 @@ const picks = await getCollection('writing');
     margin-top: var(--space-3);
   }
 
+  /* ── Shared band utilities ────────────────────────────────────── */
   .stack--tight {
     --stack-gap: 0;
   }
@@ -161,5 +210,17 @@ const picks = await getCollection('writing');
 
   .band-action {
     margin: var(--space-5) 0 0;
+  }
+
+  /* ── About preview ────────────────────────────────────────────── */
+  .about-preview {
+    display: grid;
+    gap: var(--space-4);
+    max-width: var(--measure-prose);
+  }
+
+  .about-preview__text {
+    margin: 0;
+    color: var(--text-secondary);
   }
 </style>

@@ -1,15 +1,32 @@
-# The Currently band. Empty until there is something true to say.
-#
-# Add a single entry when ready:
-#
-#   current:
-#     updated: 2026-08-19
-#     focus: >-
-#       Two to four lines on what you are actively building right now.
-#     learning:
-#       - Item one
-#     project: robot            # optional, a project slug
-#
-# The build warns when `updated` is more than 90 days old. A stale band is
-# worse than no band, so the homepage renders nothing while this file is empty.
-{}
+# The Currently band. One entry only; update `updated` whenever the content changes.
+# The build warns when `updated` is more than 90 days old.
+# Do not use the word "placeholder" in this file — it will fail the lint check.
+
+- id: current
+
+  updated: 2026-08-19
+
+  focus: >-
+    Building French Coach — an AI speaking coach for IGCSE French learners — while reading
+    widely on investing, financial markets, and how capital is allocated. Also thinking about
+    how software and AI can make learning more effective without replacing the learner.
+
+  strands:
+    - label: Building
+      title: French Coach
+      detail: >-
+        Building an AI-powered French speaking examiner and learning system. The goal is to give
+        every learner the kind of personalised speaking practice that normally requires a human tutor.
+
+    - label: Learning
+      title: Investing & Finance
+      detail: >-
+        Deepening my understanding of investing, financial markets, businesses, valuation, and
+        how capital is allocated.
+
+    - label: Exploring
+      title: Technology & Learning
+      detail: >-
+        Exploring how technology can make learning more effective without replacing the learner.
+        Interested in how thoughtful software and AI can adapt to the individual while keeping
+        the learner actively engaged in the process.

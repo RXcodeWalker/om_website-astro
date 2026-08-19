@@ -18,15 +18,18 @@ const updatedLabel = entry.updated.toLocaleDateString('en-GB', {
   <p class="now-band__focus">{entry.focus}</p>
 
   {
-    entry.learning.length > 0 && (
-      <div class="now-band__learning">
-        <h3 class="now-band__label">Learning</h3>
-        <ul>
-          {entry.learning.map((item) => (
-            <li>{item}</li>
-          ))}
-        </ul>
-      </div>
+    entry.strands.length > 0 && (
+      <ul class="now-band__strands">
+        {entry.strands.map((strand) => (
+          <li class="now-strand">
+            <p class="now-strand__label">{strand.label}</p>
+            <div class="now-strand__body">
+              <p class="now-strand__title">{strand.title}</p>
+              <p class="now-strand__detail">{strand.detail}</p>
+            </div>
+          </li>
+        ))}
+      </ul>
     )
   }
 
@@ -39,7 +42,7 @@ const updatedLabel = entry.updated.toLocaleDateString('en-GB', {
 <style>
   .now-band {
     display: grid;
-    gap: var(--space-4);
+    gap: var(--space-5);
   }
 
   .now-band__focus {
@@ -49,19 +52,51 @@ const updatedLabel = entry.updated.toLocaleDateString('en-GB', {
     line-height: var(--leading-prose);
   }
 
-  .now-band__label {
-    margin: 0 0 var(--space-2);
+  .now-band__strands {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .now-strand {
+    display: grid;
+    gap: var(--space-2);
+    padding-block: var(--space-5);
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  @media (min-width: 768px) {
+    .now-strand {
+      grid-template-columns: 1fr 3fr;
+      gap: var(--space-5);
+    }
+  }
+
+  .now-strand__label {
+    margin: 0;
     font-family: var(--font-mono);
     font-size: var(--step--2);
     letter-spacing: var(--tracking-mono);
     text-transform: uppercase;
-    font-weight: 400;
     color: var(--text-muted);
+    padding-top: var(--space-1);
   }
 
-  .now-band__learning ul {
+  .now-strand__body {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .now-strand__title {
     margin: 0;
-    padding-left: var(--space-5);
+    font-family: var(--font-display);
+    font-size: var(--step-1);
+    font-weight: 500;
+  }
+
+  .now-strand__detail {
+    margin: 0;
+    max-width: var(--measure-prose);
     color: var(--text-secondary);
   }
 

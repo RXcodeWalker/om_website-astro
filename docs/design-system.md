@@ -140,8 +140,8 @@ export const projectSchema = ({ image }: SchemaContext) =>
       order: z.number().int(),                // manual curation; not date-sorted
       draft: z.boolean().default(false),
 
-      // Media — alt is required by construction, never optional
-      thumbnail: z.object({ src: image(), alt: z.string().min(4) }),
+      // Media — optional because hardware projects may have no publishable image yet
+      thumbnail: z.object({ src: image(), alt: z.string().min(4) }).optional(),
       hero: z.object({ src: image(), alt: z.string().min(4) }).optional(),
 
       // Structured blocks the body places via components
@@ -294,12 +294,16 @@ import { z } from 'astro/zod';
 export const nowSchema = z.object({
   updated: z.coerce.date(),
   focus: z.string().min(40).max(280),       // 2-4 lines: the active project
-  learning: z.array(z.string()).max(3).default([]),
+  strands: z.array(z.object({
+    label: z.string().min(1),               // e.g. "Building", "Learning", "Exploring"
+    title: z.string().min(1),
+    detail: z.string().min(20).max(320),
+  })).max(3).default([]),
   project: z.string().optional(),           // slug of the project being worked on
 });
 ```
 
-The homepage band renders `focus`, up to three `learning` items, and a visible "Updated {Month YYYY}" stamp. The stamp is not decoration: it is the honesty mechanism that makes a Currently band safe to ship where a `/now` route was not.
+The homepage band renders `focus`, up to three `strands` (each with a label, title, and one-to-two sentence detail), and a visible "Updated {Month YYYY}" stamp. The stamp is not decoration: it is the honesty mechanism that makes a Currently band safe to ship where a `/now` route was not.
 
 Add a staleness guard at build time: if `updated` is more than 90 days old, log a build warning. A stale Currently band is worse than none, and the only reliable reminder is a noisy build.
 
