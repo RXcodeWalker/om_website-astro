@@ -20,11 +20,12 @@ const now = nowEntries[0]?.data;
 // Writing picks are curated in YAML — preserve their order, do not sort.
 const picks = await getCollection('writing');
 
-// Achievements: only highlighted entries, capped at 3.
+// Achievements: only highlighted entries, newest first, capped at 3.
 const achievementEntries = await getCollection('achievements');
 const highlights = achievementEntries
   .map((e) => e.data as Achievement)
   .filter((a) => a.highlight)
+  .sort((a, b) => b.date.getTime() - a.date.getTime())
   .slice(0, 3);
 ---
 

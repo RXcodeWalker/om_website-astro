@@ -5,6 +5,28 @@
 # Seeded from docs/design-system.md section A4. Verify dates and credentials
 # before the site goes live, and add the remaining entries from the inventory.
 
+- id: igcse-2026
+  title: Cambridge IGCSE
+  issuer: Cambridge Assessment International Education
+  date: 2026-03-01
+  domain: academics
+  credential: 8 A*
+  significance: >-
+    Eight A* grades in the March 2026 sitting, including 97% in International
+    Mathematics and Physics.
+  highlight: true
+
+- id: delf-b1-2025
+  title: DELF B1
+  issuer: France Éducation international
+  date: 2025-12-01
+  domain: academics
+  credential: Distinction
+  significance: >-
+    Independent-user French (CEFR B1), awarded with distinction after a
+    four-skill examination of listening, speaking, reading and writing.
+  highlight: true
+
 - id: lodha-genius-2025
   title: Lodha Genius Programme
   issuer: Ashoka University
