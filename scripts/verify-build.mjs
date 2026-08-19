@@ -45,8 +45,7 @@ const ROUTES = [
   ['contact', 'contact/index.html'],
   ['projects', 'projects/index.html'],
   ['achievements', 'achievements/index.html'],
-  ['writing index', 'blog/index.html'],
-  ['blog post', 'blog/12/index.html'],
+  ['404', '404.html'],
 ];
 
 const routeCss = [];

@@ -23,9 +23,25 @@ function isActive(href: string, external?: boolean): boolean {
           href={item.href}
           class:list={['primary-nav__link', 'link-ui', item.external && 'link-external']}
           aria-current={isActive(item.href, item.external) ? 'page' : undefined}
+          target={item.external ? '_blank' : undefined}
           rel={item.external ? 'noopener noreferrer' : undefined}
         >
           {item.label}
+        </a>
+      </li>
+    ))
+  }
+  {
+    site.secondaryNav.map((item) => (
+      <li>
+        <a
+          href={item.href}
+          class:list={['primary-nav__link', 'link-ui', 'link-external']}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {item.label}
+          <span class="external-icon" aria-hidden="true">↗</span>
         </a>
       </li>
     ))
@@ -47,6 +63,17 @@ function isActive(href: string, external?: boolean): boolean {
     padding-block: var(--space-3);
     font-size: var(--step-0);
     border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .primary-nav__link[aria-current='page'] {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .external-icon {
+    display: inline-block;
+    margin-left: 0.2em;
+    font-size: 0.8em;
   }
 
   @media (min-width: 768px) {

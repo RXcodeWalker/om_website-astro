@@ -1,0 +1,56 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Button from '../components/primitives/Button.astro';
+---
+
+<BaseLayout title="Page not found" noindex>
+  <main id="main">
+    <div class="container not-found">
+      <p class="not-found__kicker">404</p>
+      <h1 class="not-found__title">Page not found</h1>
+      <p class="not-found__lede">
+        The page you are looking for does not exist, or has been moved.
+      </p>
+      <div class="not-found__actions">
+        <Button href="/" variant="primary">Go home</Button>
+        <Button href="/projects" variant="secondary">See projects</Button>
+      </div>
+    </div>
+  </main>
+</BaseLayout>
+
+<style>
+  .not-found {
+    padding-block: var(--space-9);
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .not-found__kicker {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    letter-spacing: var(--tracking-mono);
+    color: var(--text-muted);
+  }
+
+  .not-found__title {
+    margin: 0;
+    font-size: var(--step-4);
+  }
+
+  .not-found__lede {
+    margin: 0;
+    max-width: var(--measure-narrow);
+    color: var(--text-secondary);
+    font-size: var(--step-1);
+    line-height: var(--leading-prose);
+  }
+
+  .not-found__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-top: var(--space-3);
+  }
+</style>

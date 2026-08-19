@@ -17,10 +17,6 @@ const nowEntries = await getCollection('now');
 const now = nowEntries[0]?.data;
 
 const picks = await getCollection('writing');
-
-const posts = (await getCollection('blog'))
-  .sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime())
-  .slice(0, 3);
 ---
 
 <BaseLayout
@@ -88,21 +84,14 @@ const posts = (await getCollection('blog'))
             ))}
           </div>
         ) : (
-          <div class="stack stack--tight">
-            {posts.map((post) => (
-              <PostRow
-                href={`/blog/${post.id}`}
-                title={post.data.title}
-                category={post.data.category}
-                date={post.data.date}
-                excerpt={post.data.excerpt}
-              />
-            ))}
-          </div>
+          <p class="band-text">
+            Essays and notes on coding, robotics, sport and whatever I am currently trying to
+            understand properly.
+          </p>
         )
       }
       <p class="band-action">
-        <Button href="/blog" variant="quiet">All writing →</Button>
+        <Button href={site.blogUrl} variant="quiet" external>All writing ↗</Button>
       </p>
     </Section>
 

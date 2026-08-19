@@ -30,9 +30,18 @@ const year = new Date().getFullYear();
       <h2 id="footer-elsewhere" class="site-footer__heading">Elsewhere</h2>
       <ul class="site-footer__list">
         {
+          site.secondaryNav.map((item) => (
+            <li>
+              <a href={item.href} class="site-footer__link link-external" target="_blank" rel="noopener noreferrer">
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+        {
           site.socials.map((social) => (
             <li>
-              <a href={social.href} class="site-footer__link link-external" rel="noopener noreferrer">
+              <a href={social.href} class="site-footer__link link-external" target="_blank" rel="noopener noreferrer">
                 {social.label}
               </a>
             </li>

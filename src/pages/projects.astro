@@ -46,7 +46,7 @@ const projects = (await getCollection('projects'))
               project names with a sentence each is not a portfolio.
             </p>
             <p class="empty-actions">
-              <Button href="/blog" variant="quiet">Read the writing instead →</Button>
+              <Button href={site.blogUrl} variant="quiet" external>Read the writing instead ↗</Button>
             </p>
           </EmptyState>
         )
