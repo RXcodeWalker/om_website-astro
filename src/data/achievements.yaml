@@ -1,1 +1,32 @@
-[]
+# Achievement inventory. Every entry needs an issuing body and a significance
+# note explaining why it is hard — the schema enforces both. Aspirations have
+# no issuer and therefore cannot be listed here.
+#
+# Seeded from docs/design-system.md section A4. Verify dates and credentials
+# before the site goes live, and add the remaining entries from the inventory.
+
+- id: lodha-genius-2025
+  title: Lodha Genius Programme
+  issuer: Ashoka University
+  date: 2025-06-01
+  domain: academics
+  significance: >-
+    A selective residential programme at Ashoka University for students identified
+    through national testing; four weeks of university-level coursework taught by
+    faculty rather than school teachers.
+  highlight: true
+  evidence:
+    - label: Programme overview
+      href: https://www.ashoka.edu.in/lodha-genius-programme/
+      kind: profile
+
+- id: lcm-grade-8-guitar
+  title: Guitar, Grade 8
+  issuer: London College of Music
+  date: 2025-01-01
+  domain: music
+  credential: High Distinction
+  significance: >-
+    Pre-diploma standard, reached after roughly five years of graded examinations,
+    including a solo performance programme at annual concerts.
+  highlight: true

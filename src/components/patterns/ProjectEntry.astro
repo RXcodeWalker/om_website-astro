@@ -1,0 +1,140 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Media from '../primitives/Media.astro';
+import ChipList from '../primitives/ChipList.astro';
+import StatusBadge from '../primitives/StatusBadge.astro';
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+  variant?: 'row' | 'compact';
+}
+
+const { project, variant = 'row' } = Astro.props;
+const { data } = project;
+---
+
+<article class:list={['project-entry', `project-entry--${variant}`]}>
+  <div class="project-entry__media">
+    <Media
+      src={data.thumbnail.src}
+      alt={data.thumbnail.alt}
+      ratio="16:10"
+      sizes={variant === 'row' ? '(min-width: 1024px) 440px, 100vw' : '(min-width: 1024px) 320px, 100vw'}
+    />
+  </div>
+
+  <div class="project-entry__body">
+    {data.kicker && <p class="project-entry__kicker">{data.kicker}</p>}
+
+    <h3 class="project-entry__title">
+      <a href={`/projects/${project.id}`} class="project-entry__link">{data.title}</a>
+    </h3>
+
+    <p class="project-entry__outcome">{data.outcome}</p>
+
+    {variant === 'row' && <p class="project-entry__summary">{data.summary}</p>}
+
+    <div class="project-entry__meta">
+      <StatusBadge status={data.status} />
+      <span class="project-entry__year tabular-nums">{data.year}</span>
+    </div>
+
+    <ChipList items={[...data.stack]} max={variant === 'row' ? 5 : 3} />
+  </div>
+</article>
+
+<style>
+  .project-entry {
+    position: relative;
+    display: grid;
+    gap: var(--space-4);
+    padding-block: var(--space-6);
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  @media (min-width: 768px) {
+    .project-entry--row {
+      grid-template-columns: 5fr 7fr;
+      gap: var(--space-6);
+      align-items: start;
+    }
+  }
+
+  .project-entry__body {
+    display: grid;
+    gap: var(--space-3);
+    align-content: start;
+  }
+
+  .project-entry__kicker {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .project-entry__title {
+    margin: 0;
+    font-size: var(--step-2);
+  }
+
+  .project-entry__link {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .project-entry__link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
+  .project-entry__outcome {
+    margin: 0;
+    color: var(--text-primary);
+  }
+
+  .project-entry__summary {
+    margin: 0;
+    max-width: var(--measure-prose);
+    color: var(--text-secondary);
+  }
+
+  .project-entry__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-4);
+  }
+
+  .project-entry__year {
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    color: var(--text-muted);
+  }
+
+  .project-entry__media :global(.media) {
+    transition: transform var(--dur-base) var(--ease-out);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .project-entry:hover {
+      border-color: var(--border-strong);
+    }
+
+    .project-entry:hover .project-entry__link {
+      text-decoration: underline;
+      text-underline-offset: 0.15em;
+    }
+
+    .project-entry:hover .project-entry__media :global(img) {
+      transform: scale(1.02);
+    }
+  }
+
+  .project-entry:has(:focus-visible) {
+    border-color: var(--border-strong);
+  }
+</style>

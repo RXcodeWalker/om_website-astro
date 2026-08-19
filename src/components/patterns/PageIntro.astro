@@ -1,0 +1,44 @@
+---
+interface Props {
+  kicker?: string;
+  title: string;
+  lede?: string;
+}
+
+const { kicker, title, lede } = Astro.props;
+---
+
+<header class="page-intro">
+  {kicker && <p class="page-intro__kicker">{kicker}</p>}
+  <h1 class="page-intro__title">{title}</h1>
+  {lede && <p class="page-intro__lede">{lede}</p>}
+</header>
+
+<style>
+  .page-intro {
+    padding-block: var(--space-8) var(--space-7);
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .page-intro__kicker {
+    margin: 0 0 var(--space-3);
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .page-intro__title {
+    margin: 0;
+    max-width: var(--measure-wide);
+  }
+
+  .page-intro__lede {
+    margin: var(--space-4) 0 0;
+    max-width: var(--measure-narrow);
+    font-size: var(--step-1);
+    line-height: var(--leading-prose);
+    color: var(--text-secondary);
+  }
+</style>

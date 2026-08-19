@@ -1,38 +1,10 @@
 /*
-  Global CSS entry — new foundation layer + legacy routes until page rebuild.
+  Global CSS entry. Three files only: fonts, tokens, base, utilities.
+  Everything else is a component <style> block, scoped and split per route.
+  No page-specific CSS may enter this chain.
 */
 
+@import './fonts.css';
 @import './tokens.css';
 @import './base.css';
 @import './utilities.css';
-
-/* Legacy styles (blog and unrebuilt pages) */
-@import './style.css';
-@import './spectacular.css';
-@import './interactions.css';
-@import './editorial.css';
-@import './pages.css';
-@import './blog-list.css';
-@import './blog-post.css';
-@import './blog-spectacular.css';
-
-/* Foundation overrides — reveal must stay visible without JS */
-.reveal {
-  opacity: 1;
-  transform: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  html.js .reveal {
-    opacity: 0;
-    transform: translateY(8px);
-    transition:
-      opacity var(--dur-slow) var(--ease-out),
-      transform var(--dur-slow) var(--ease-out);
-  }
-
-  html.js .reveal.is-visible {
-    opacity: 1;
-    transform: none;
-  }
-}

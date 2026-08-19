@@ -1,178 +1,302 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getCollection, render } from 'astro:content';
-import { extractKeyIdeas, extractStrikingLine } from '../../utils/postInsights';
-
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostRow from '../../components/patterns/PostRow.astro';
+import Button from '../../components/primitives/Button.astro';
+import { site } from '../../config/site';
+import { readingTime } from '../../utils/readingTime';
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog');
   return posts.map((post) => ({
     params: { slug: post.id },
+    props: { post },
   }));
 }
 
-const { slug } = Astro.params;
-const allPosts = await getCollection('blog');
-const post = allPosts.find(
-  (p) => p.id === slug || p.data.id === slug || p.data.id?.toString() === slug?.toString(),
-);
+const { post } = Astro.props;
+const { Content, headings } = await render(post);
 
-const renderResult = post ? await render(post) : null;
-const Content = renderResult ? renderResult.Content : null;
-const postId = post ? post.data.id ?? post.id : slug ?? '';
-const postSlug = post?.id ?? slug ?? '';
-const postBody = post?.body ?? '';
-const introIdeas = post ? extractKeyIdeas(postBody, 3) : [];
-const introLine = post ? extractStrikingLine(postBody, post.data.excerpt) : '';
+const allPosts = await getCollection('blog');
+const related = allPosts
+  .filter((entry) => entry.data.category === post.data.category && entry.id !== post.id)
+  .sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime())
+  .slice(0, 3);
+
+const parsed = new Date(post.data.date);
+const validDate = !Number.isNaN(parsed.getTime());
+const dateISO = validDate ? parsed.toISOString().slice(0, 10) : undefined;
+const dateLabel = validDate
+  ? parsed.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+  : post.data.date;
+
+const minutes = readingTime(post.body ?? '');
+const toc = headings.filter((heading) => heading.depth === 2);
+const url = new URL(`/blog/${post.id}`, site.url).href;
 ---
 
-<BaseLayout title={post ? post.data.title : "Post Not Found"}>
+<BaseLayout
+  title={post.data.title}
+  description={post.data.excerpt}
+  canonical={url}
+  ogType="article"
+  jsonLd="CreativeWork"
+  creativeWork={{
+    name: post.data.title,
+    description: post.data.excerpt,
+    url,
+    datePublished: dateISO,
+  }}
+>
+  <div class="progress" id="reading-progress" aria-hidden="true"></div>
+
   <main id="main">
-  <div class="reading-progress-bar" id="reading-progress-bar"></div>
-  <div class="post-backdrop"></div>
+    <div class="container post">
+      <p class="post__back">
+        <Button href="/blog" variant="quiet">← All writing</Button>
+      </p>
 
-  <a href="/blog" class="back-btn" style="font-family:var(--font-display);font-weight:600;">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <line x1="19" y1="12" x2="5" y2="12"></line>
-      <polyline points="12 19 5 12 12 5"></polyline>
-    </svg>
-    Back to Blog
-  </a>
-  
-  <div class="post-container" id="post-container">
-    <article class="reading-canvas editorial-post glass-card" id="post-content" data-post-id={postId} data-post-slug={postSlug}>
-      {post && Content ? (
-        <>
-          {/* improvement #17: prominent meta — category badge first, inline on mobile */}
-          <header class="post-header-premium">
-            <h1 class="post-title-premium">{post.data.title}</h1>
+      <article class="post__article">
+        <header class="post__header">
+          <p class="post__kicker">{post.data.category}</p>
+          <h1 class="post__title">{post.data.title}</h1>
+          <p class="post__meta tabular-nums">
+            <time datetime={dateISO}>{dateLabel}</time>
+            <span aria-hidden="true">·</span>
+            <span>{minutes} min read</span>
+          </p>
+        </header>
 
-            <div class="blog-meta-premium blog-meta-inline">
-              <span class="category-badge">{post.data.category}</span>
-              <span class="meta-sep" aria-hidden="true">·</span>
-              <span class="blog-date">{post.data.date}</span>
-              <span class="meta-sep" aria-hidden="true">·</span>
-              <span class="blog-reading-time post-meta-muted">Calculating...</span>
-              <span class="meta-sep" aria-hidden="true">·</span>
-              <span class="blog-views post-meta-muted">Loading...</span>
-              <span class="meta-sep" aria-hidden="true">·</span>
-              <span class="blog-likes post-meta-muted">0</span>
-              <span class="post-meta-muted"> likes</span>
-            </div>
-          </header>
+        {
+          toc.length >= 4 && (
+            <nav class="post__toc" aria-labelledby="toc-heading">
+              <h2 id="toc-heading" class="post__toc-heading">
+                On this page
+              </h2>
+              <ol>
+                {toc.map((heading) => (
+                  <li>
+                    <a href={`#${heading.slug}`}>{heading.text}</a>
+                  </li>
+                ))}
+              </ol>
+            </nav>
+          )
+        }
 
-          <div class="editorial-body depth-track" id="post-body">
-            <Content />
-          </div>
-
-          <footer class="post-footer-premium">
-            <div class="post-signoff">
-              <p>Thank you for reading. This piece was written by Om.</p>
-            </div>
-          </footer>
-        </>
-      ) : (
-        <div style="padding: 4rem; text-align: center;">
-          <h1>Post Not Found</h1>
-          <p>We couldn't find a post with slug: "{slug}"</p>
-          <a href="/blog" class="read-more-btn" style="display: inline-block; margin-top: 2rem;">Return to Blog</a>
+        <div class="prose post__body">
+          <Content />
         </div>
-      )}
-    </article>
-  </div>
 
-  {/* improvement #18: related posts — single column on mobile, no right padding, no kicker */}
-  {post && (
-    <div class="related-posts-section">
-      <h2 class="related-heading">More like this</h2>
-      <div class="blog-grid related-posts-grid" style="margin-top: 1.5rem;">
-        {allPosts
-          .filter(p => p.data.category === post.data.category && p.id !== post.id)
-          .sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime())
-          .slice(0, 3)
-          .map(related => (
-            <article class="glass-card glass-card-hover blog-card" data-category={related.data.category}>
-              <h3><a href={`/blog/${related.id}`} class="blog-card-stretched-link">{related.data.title}</a></h3>
-              <div class="blog-meta">
-                <span class="category-badge">{related.data.category}</span>
-                <span class="blog-date">{related.data.date}</span>
-              </div>
-              <p class="blog-excerpt">{related.data.excerpt}</p>
-              <a href={`/blog/${related.id}`} class="read-more-btn" tabindex="-1" aria-hidden="true">
-                Read More
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <line x1="5" y1="12" x2="19" y2="12"></line>
-                  <polyline points="12 5 19 12 12 19"></polyline>
-                </svg>
-              </a>
-            </article>
-          ))}
-      </div>
+        <footer class="post__footer">
+          <p class="post__signoff">Thank you for reading. — Om</p>
+          <button type="button" class="post__share" id="copy-link">Copy link to this post</button>
+          <span class="post__share-status" role="status" aria-live="polite" id="copy-status"
+          ></span>
+        </footer>
+      </article>
+
+      {
+        related.length > 0 && (
+          <section class="post__related" aria-labelledby="related-heading">
+            <h2 id="related-heading" class="post__related-heading">
+              More in {post.data.category}
+            </h2>
+            {related.map((entry) => (
+              <PostRow
+                href={`/blog/${entry.id}`}
+                title={entry.data.title}
+                date={entry.data.date}
+                excerpt={entry.data.excerpt}
+                readingTime={readingTime(entry.body ?? '')}
+              />
+            ))}
+          </section>
+        )
+      }
     </div>
-  )}
-
-  <aside class="post-sidebar glass-card" id="post-sidebar" aria-label="Post toolbar">
-    <div class="sidebar-progress-wrap" title="Reading progress">
-      <svg class="progress-ring" width="44" height="44" viewBox="0 0 44 44">
-        <circle class="progress-ring-track" cx="22" cy="22" r="18"/>
-        <circle class="progress-ring-fill" id="progress-ring-fill" cx="22" cy="22" r="18"/>
-      </svg>
-      <span class="progress-percent" id="progress-percent">0%</span>
-    </div>
-    <div class="sidebar-divider"></div>
-    <button class="sidebar-btn like-btn" id="like-btn" aria-label="Like this post" title="Like this post">
-      <span class="like-count" id="like-count"></span>
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-      </svg>
-    </button>
-    <button class="sidebar-btn bookmark-btn" id="bookmark-btn" aria-label="Bookmark this post" title="Bookmark">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
-      </svg>
-    </button>
-    <button class="sidebar-btn share-btn" id="share-btn" aria-label="Share this post" title="Share">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
-        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
-        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
-      </svg>
-    </button>
-    <div class="sidebar-divider"></div>
-    <button class="sidebar-btn" id="focus-mode-btn" title="Focus mode"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
-    <button class="sidebar-btn" id="copy-link-btn" title="Copy link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
-  </aside>
-
-  <aside class="sidebar-toc" id="sidebar-toc">
-    <div class="toc-label">On this page</div>
-    <nav id="premium-toc-nav">
-      <!-- Generated by JS -->
-    </nav>
-  </aside>
-
-  <!-- Share panel -->
-  <div class="share-panel glass-card" id="share-panel" aria-hidden="true">
-    <div class="share-panel-title">Share this post</div>
-    <div class="share-actions">
-      <button class="share-action-btn" id="share-copy">Copy link</button>
-      <a class="share-action-btn" id="share-twitter" href="#" target="_blank">Twitter / X</a>
-      <a class="share-action-btn" id="share-linkedin" href="#" target="_blank">LinkedIn</a>
-    </div>
-  </div>
-
-  <div class="toast" id="toast"></div>
   </main>
-
-  <script is:inline src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script is:inline>
-    window.supabaseClient = window.supabase.createClient(
-      "https://ypvgtqhbltjzxiwprdfb.supabase.co",
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlwdmd0cWhibHRqenhpd3ByZGZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3NDY0NTUsImV4cCI6MjA4NzMyMjQ1NX0.F1lmv_4P6Q41ha3YOqI7yYj9IkbaZpNPbZPeGzAMK_I"
-    );
-  </script>
-
-  <script is:inline src="/js/spectacular-shared.js"></script>
-  <script is:inline src="/js/post.js"></script>
-  <script is:inline src="/js/reader.js"></script>
-  <script is:inline src="/js/summarizer.js"></script>
 </BaseLayout>
+
+<style>
+  .progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: var(--z-overlay);
+    width: 100%;
+    height: 2px;
+    transform: scaleX(0);
+    transform-origin: 0 50%;
+    background: var(--accent);
+  }
+
+  .post {
+    padding-block: var(--space-5) var(--space-8);
+  }
+
+  .post__back {
+    margin: 0 0 var(--space-6);
+  }
+
+  .post__article {
+    max-width: var(--measure-prose);
+  }
+
+  .post__header {
+    display: grid;
+    gap: var(--space-3);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .post__kicker {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .post__title {
+    margin: 0;
+  }
+
+  .post__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    color: var(--text-muted);
+  }
+
+  .post__toc {
+    margin-top: var(--space-6);
+    padding: var(--space-4) var(--space-5);
+    background: var(--surface-sunken);
+    border: 1px solid var(--border-subtle);
+  }
+
+  .post__toc-heading {
+    margin: 0 0 var(--space-3);
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    font-weight: 400;
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .post__toc ol {
+    margin: 0;
+    padding-left: var(--space-5);
+    display: grid;
+    gap: var(--space-2);
+    font-size: var(--step--1);
+  }
+
+  .post__toc a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .post__toc a:hover,
+    .post__toc a:focus-visible {
+      text-decoration: underline;
+      text-underline-offset: 0.15em;
+    }
+  }
+
+  .post__body {
+    margin-top: var(--space-7);
+  }
+
+  .post__footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-4);
+    margin-top: var(--space-8);
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  .post__signoff {
+    margin: 0;
+    font-family: var(--font-display);
+    font-style: italic;
+    color: var(--text-secondary);
+  }
+
+  .post__share {
+    margin-left: auto;
+    min-height: 40px;
+    padding-inline: var(--space-4);
+    font-size: var(--step--1);
+    color: var(--text-primary);
+    background: transparent;
+    border: 1px solid var(--border-interactive);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .post__share:hover,
+    .post__share:focus-visible {
+      background: var(--surface-sunken);
+      border-color: var(--text-primary);
+    }
+  }
+
+  .post__share-status {
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    color: var(--text-muted);
+  }
+
+  .post__related {
+    margin-top: var(--space-9);
+  }
+
+  .post__related-heading {
+    margin: 0 0 var(--space-2);
+    font-size: var(--step-3);
+  }
+</style>
+
+<script>
+  const bar = document.getElementById('reading-progress');
+  if (bar) {
+    let ticking = false;
+    const update = () => {
+      const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+      const ratio = scrollable > 0 ? Math.min(Math.max(window.scrollY / scrollable, 0), 1) : 0;
+      bar.style.transform = `scaleX(${ratio})`;
+      ticking = false;
+    };
+    const request = () => {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(update);
+    };
+    window.addEventListener('scroll', request, { passive: true });
+    window.addEventListener('resize', request, { passive: true });
+    update();
+  }
+
+  const copy = document.getElementById('copy-link');
+  const copyStatus = document.getElementById('copy-status');
+  copy?.addEventListener('click', async () => {
+    if (!copyStatus) return;
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      copyStatus.textContent = 'Link copied';
+    } catch {
+      copyStatus.textContent = window.location.href;
+    }
+  });
+</script>

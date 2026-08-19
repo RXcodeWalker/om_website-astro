@@ -1,80 +1,66 @@
 ---
+import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import PageHeader from '../components/ui/PageHeader.astro';
-import Card from '../components/ui/Card.astro';
+import PageIntro from '../components/patterns/PageIntro.astro';
+import ProjectEntry from '../components/patterns/ProjectEntry.astro';
+import EmptyState from '../components/patterns/EmptyState.astro';
+import Button from '../components/primitives/Button.astro';
+import { site } from '../config/site';
 
-const projects = [
-  {
-    title: "Personal Website",
-    description: "This website! A modern, responsive personal portfolio and blog built with liquid glass design aesthetics and smooth animations. Features dynamic theming and content management.",
-    tags: ["HTML", "CSS", "JavaScript", "Astro"],
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>',
-    gradient: "linear-gradient(135deg, var(--accent-2), var(--accent-3))"
-  },
-  {
-    title: "Coding Projects",
-    description: "Various coding projects and experiments as I learn and grow. From algorithms to web development, documenting my journey in tech and building practical solutions.",
-    tags: ["JavaScript", "Python", "Web APIs"],
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>',
-    gradient: "linear-gradient(135deg, var(--accent-3), var(--accent-1))"
-  }
-];
+// Nothing about this page is hardcoded. Adding a project is one new directory
+// under src/content/projects/ and one `order` value.
+const projects = (await getCollection('projects'))
+  .filter((project) => !project.data.draft)
+  .sort((a, b) => a.data.order - b.data.order);
 ---
 
-<BaseLayout title="Om — Projects">
-  <main id="main" class="container main-content">
-    
-    <PageHeader 
-      eyebrow="What I've Built" 
-      title="My Projects" 
-      description="A showcase of my work in software development and design — from first ideas to shipped code."
-      useTypewriter={true}
-    />
+<BaseLayout
+  title="Projects"
+  description="Case studies of what Om Jhamvar has built across web, AI and hardware."
+  jsonLd="BreadcrumbList"
+  breadcrumbs={[
+    { name: 'Home', item: site.url },
+    { name: 'Projects', item: `${site.url}/projects` },
+  ]}
+>
+  <main id="main">
+    <div class="container">
+      <PageIntro
+        kicker="What I have built"
+        title="Projects"
+        lede="Each project gets a full case study: what it was for, how it was made, what it cost, and what I would change."
+      />
 
-    <div class="projects-grid">
-      {projects.map((project, index) => (
-        <Card 
-          title={project.title}
-          description={project.description}
-          tags={project.tags}
-          icon={project.icon}
-          gradient={project.gradient}
-          delay={`${index * 0.1}s`}
-        />
-      ))}
+      {
+        projects.length > 0 ? (
+          <div class="project-list">
+            {projects.map((project) => (
+              <ProjectEntry project={project} variant="row" />
+            ))}
+          </div>
+        ) : (
+          <EmptyState title="Nothing published yet">
+            <p>
+              The case studies are being written. Each needs its own account of the problem, the
+              build, the results and the photographs before it earns a page here — a list of
+              project names with a sentence each is not a portfolio.
+            </p>
+            <p class="empty-actions">
+              <Button href="/blog" variant="quiet">Read the writing instead →</Button>
+            </p>
+          </EmptyState>
+        )
+      }
     </div>
-
-    <section class="glass-card glass-feature reveal" style="margin-top: 3rem;">
-      <p class="text-muted">More projects coming soon! Currently working on expanding my portfolio while balancing school and music.</p>
-    </section>
-
   </main>
-
-  <style>
-    .projects-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 2rem;
-    }
-    .glass-feature {
-      text-align: center;
-      padding: 3rem;
-    }
-  </style>
-
-  <script is:inline>
-    // Universal 3D Tilt Script
-    document.querySelectorAll('.tilt-card').forEach(card => {
-      card.addEventListener('mousemove', e => {
-        const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left, y = e.clientY - rect.top;
-        const centerX = rect.width / 2, centerY = rect.height / 2;
-        const rotateX = (y - centerY) / centerY * -8, rotateY = (x - centerX) / centerX * 8;
-        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(10px)`;
-        card.style.setProperty('--mouse-x', (x / rect.width * 100) + '%');
-        card.style.setProperty('--mouse-y', (y / rect.height * 100) + '%');
-      });
-      card.addEventListener('mouseleave', () => card.style.transform = '');
-    });
-  </script>
 </BaseLayout>
+
+<style>
+  .project-list {
+    margin-top: var(--space-6);
+  }
+
+  .empty-actions {
+    margin-top: var(--space-4);
+  }
+</style>

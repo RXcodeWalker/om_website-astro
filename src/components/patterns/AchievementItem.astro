@@ -1,0 +1,99 @@
+---
+import type { Achievement } from '../../schemas/achievement';
+
+interface Props {
+  achievement: Achievement;
+}
+
+const { achievement } = Astro.props;
+
+const dateISO = achievement.date.toISOString().slice(0, 10);
+const dateLabel = achievement.date.toLocaleDateString('en-GB', {
+  month: 'short',
+  year: 'numeric',
+});
+---
+
+<article class="achievement">
+  <div class="achievement__head">
+    <h3 class="achievement__title">{achievement.title}</h3>
+    <p class="achievement__meta tabular-nums">
+      <span>{achievement.issuer}</span>
+      <span aria-hidden="true">·</span>
+      <time datetime={dateISO}>{dateLabel}</time>
+      {achievement.credential && (
+        <>
+          <span aria-hidden="true">·</span>
+          <span>{achievement.credential}</span>
+        </>
+      )}
+    </p>
+  </div>
+
+  <p class="achievement__significance">{achievement.significance}</p>
+
+  {
+    achievement.evidence.length > 0 && (
+      <ul class="achievement__evidence">
+        {achievement.evidence.map((item) => (
+          <li>
+            <a href={item.href} class="link-external" rel="noopener noreferrer">
+              {item.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    )
+  }
+</article>
+
+<style>
+  .achievement {
+    display: grid;
+    gap: var(--space-3);
+    padding-block: var(--space-5);
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  .achievement__head {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .achievement__title {
+    margin: 0;
+    font-size: var(--step-2);
+  }
+
+  .achievement__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    color: var(--text-muted);
+  }
+
+  .achievement__significance {
+    margin: 0;
+    max-width: var(--measure-prose);
+    color: var(--text-secondary);
+  }
+
+  .achievement__evidence {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--step--1);
+  }
+
+  .achievement__evidence a {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+  }
+</style>

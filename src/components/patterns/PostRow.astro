@@ -1,0 +1,106 @@
+---
+interface Props {
+  href: string;
+  title: string;
+  category?: string;
+  date: string;
+  excerpt?: string;
+  readingTime?: number;
+}
+
+const { href, title, category, date, excerpt, readingTime } = Astro.props;
+
+const parsed = new Date(date);
+const valid = !Number.isNaN(parsed.getTime());
+const dateISO = valid ? parsed.toISOString().slice(0, 10) : undefined;
+const dateLabel = valid
+  ? parsed.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })
+  : date;
+---
+
+<article class="post-row">
+  <h3 class="post-row__title">
+    {/* One real link per row, stretched over the block: one tab stop, meaningful name. */}
+    <a href={href} class="post-row__link">{title}</a>
+  </h3>
+
+  <p class="post-row__meta tabular-nums">
+    {category && (
+      <>
+        <span>{category}</span>
+        <span aria-hidden="true">·</span>
+      </>
+    )}
+    <time datetime={dateISO}>{dateLabel}</time>
+    {readingTime && (
+      <>
+        <span aria-hidden="true">·</span>
+        <span>{readingTime} min read</span>
+      </>
+    )}
+  </p>
+
+  {excerpt && <p class="post-row__excerpt">{excerpt}</p>}
+</article>
+
+<style>
+  .post-row {
+    position: relative;
+    display: grid;
+    gap: var(--space-2);
+    padding-block: var(--space-5);
+    border-top: 1px solid var(--border-subtle);
+    transition:
+      background-color var(--dur-fast) var(--ease-out),
+      border-color var(--dur-fast) var(--ease-out);
+  }
+
+  .post-row__title {
+    margin: 0;
+    font-size: var(--step-2);
+  }
+
+  .post-row__link {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .post-row__link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
+  .post-row__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .post-row__excerpt {
+    margin: 0;
+    max-width: var(--measure-prose);
+    color: var(--text-secondary);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .post-row:hover {
+      border-color: var(--border-strong);
+    }
+
+    .post-row:hover .post-row__link {
+      text-decoration: underline;
+      text-underline-offset: 0.15em;
+    }
+  }
+
+  .post-row:has(:focus-visible) {
+    border-color: var(--border-strong);
+  }
+</style>

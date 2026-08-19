@@ -22,6 +22,12 @@ const {
   class: className = '',
 } = Astro.props;
 
+if (typeof alt !== 'string' || alt.trim().length === 0) {
+  throw new Error(
+    `Media.astro requires meaningful alt text. Decorative media is not permitted (src: ${src.src}).`,
+  );
+}
+
 const aspectRatios: Record<Exclude<Ratio, 'free'>, string> = {
   '16:10': '16 / 10',
   '4:3': '4 / 3',
@@ -30,7 +36,8 @@ const aspectRatios: Record<Exclude<Ratio, 'free'>, string> = {
 };
 ---
 
-<figure
+{/* Renders no <figure>; Figure.astro is the sole figure owner. */}
+<div
   class:list={['media', ratio !== 'free' && 'media--framed', className]}
   style={ratio !== 'free' ? `--media-ratio: ${aspectRatios[ratio]}` : undefined}
 >
@@ -45,11 +52,10 @@ const aspectRatios: Record<Exclude<Ratio, 'free'>, string> = {
     fetchpriority={eager ? 'high' : 'auto'}
     class="media__picture"
   />
-</figure>
+</div>
 
 <style>
   .media {
-    margin: 0;
     background: var(--surface-sunken);
   }
 

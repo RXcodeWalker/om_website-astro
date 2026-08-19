@@ -1,119 +1,148 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import PageHeader from '../components/ui/PageHeader.astro';
-import Card from '../components/ui/Card.astro';
+import PageIntro from '../components/patterns/PageIntro.astro';
+import Section from '../components/primitives/Section.astro';
+import Button from '../components/primitives/Button.astro';
+import { site } from '../config/site';
 
 const interests = [
   {
-    title: "Football",
-    description: "Die-hard Arsenal fan. I analyze tactics, follow transfers, and write about the beautiful game.",
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>',
-    gradient: "linear-gradient(135deg, #FF4B2B, #FF416C)"
+    title: 'Building',
+    detail:
+      'Web development and software engineering, mostly learned by shipping things and then finding out what breaks.',
   },
   {
-    title: "Coding",
-    description: "Passionate about web development, software engineering, and learning new technologies.",
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>',
-    gradient: "linear-gradient(135deg, #4cc9f0, #4361ee)"
+    title: 'Guitar',
+    detail:
+      'LCM Grade 8 with High Distinction, now working towards the diploma. Rock repertoire and live performance.',
   },
   {
-    title: "Guitar",
-    description: "LCM Grade 8, High Distinction. Currently working towards my Diploma. Rock music & live performance.",
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>',
-    gradient: "linear-gradient(135deg, #7209b7, #b5179e)"
+    title: 'Sport',
+    detail:
+      'Football, Formula 1, tennis, cricket and the NFL — read as systems: tactics, decisions under pressure, patterns over a season.',
   },
   {
-    title: "Growth",
-    description: "Committed to continuous learning and personal development in all areas of life.",
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>',
-    gradient: "linear-gradient(135deg, #4ecdc4, #45b7af)"
-  }
+    title: 'Writing',
+    detail:
+      'The forcing function. If I cannot explain what I built and why it works, I did not understand it.',
+  },
 ];
 ---
 
-<BaseLayout title="Om — About">
-  <main id="main" class="container main-content">
-    
-    <PageHeader 
-      eyebrow="The Story" 
-      title="About Me" 
-      description="Hey there! Here's some info about who I am and what drives me."
-    />
-
-    <section class="glass-card main-bio reveal">
-      <div class="about-content">
-        <p>I am Om Jhamvar, an 11th grade student who learns best by building things, writing about them, and sharing that process in public.</p>
-        <p>I started this website as a way to make my learning visible and accountable. Instead of just consuming information, I try to turn everything I learn into something concrete, whether that is a project, a system, or a piece of writing that forces me to think clearly. Most of what I write comes from coding, robotics, and the projects I am actively working on. I focus on how ideas actually translate into execution, where things break, and what it takes to fix them.</p>
-        <p>A big part of how I think comes from sports. I spend a lot of time analyzing football, Formula 1, tennis, cricket, and the NFL, not just watching games but breaking down what is really happening beneath the surface. I look at tactics, decision making under pressure, momentum shifts, and patterns in performance over time. That habit of analysis carries into everything else I do, especially in technology and problem solving.</p>
-        <p>Music is another major part of my life and something I take seriously. I play guitar and piano, sing, and have performed live in multiple concerts. I completed LCM Grade 8 Guitar with High Distinction, which required years of consistent practice and discipline, and I am now working toward diploma level. Practicing music daily has shaped how I approach mastery, patience, and attention to detail.</p>
-        <p>Over the past few years, I have also been building a strong interest in computers and programming. I started learning Python early on and have been exploring different areas of development through projects and experiments. I am now focused on becoming much more consistent and deliberate in how I build, with the goal of creating work that is both technically solid and meaningful.</p>
-        <p>This website is not just a place to post occasionally. I am building it into a long term platform that reflects how I think and what I can do. My aim is to grow it into a strong personal brand supported by consistent writing, high quality projects, and clear direction. I want it to open real opportunities, whether that is for college applications, internships, or a serious newsletter with people who genuinely find value in what I create.</p>
-        <p>Everything here is part of that process.</p>
-      </div>
-    </section>
-
-    <div class="section-label reveal">What Drives Me</div>
-    <div class="interests-grid">
-      {interests.map((interest, index) => (
-        <Card 
-          title={interest.title}
-          description={interest.description}
-          icon={interest.icon}
-          gradient={interest.gradient}
-          delay={`${index * 0.1}s`}
-        />
-      ))}
+<BaseLayout
+  title="About"
+  description="Om Jhamvar — school student, builder, guitarist. How I work and what I am trying to do."
+  jsonLd="BreadcrumbList"
+  breadcrumbs={[
+    { name: 'Home', item: site.url },
+    { name: 'About', item: `${site.url}/about` },
+  ]}
+>
+  <main id="main">
+    <div class="container">
+      <PageIntro
+        kicker="The story"
+        title="About me"
+        lede="I am Om Jhamvar, an 11th grade student who learns best by building things, writing about them, and doing both in public."
+      />
     </div>
 
-    <section class="glass-card glass-feature reveal">
-      <div class="feature-content">
-        <h2>Let's Connect</h2>
-        <p class="text-muted">I'm always excited to meet new people, discuss ideas, or collaborate on interesting projects.</p>
-        <a href="/contact" class="btn-primary">Get in Touch</a>
+    <Section kicker="Background" heading="How I got here" id="background" headingLevel="h2">
+      <div class="prose">
+        <p>
+          I started this website to make my learning visible and accountable. Instead of only
+          consuming information, I try to turn everything I learn into something concrete — a
+          project, a system, or a piece of writing that forces me to think clearly.
+        </p>
+        <p>
+          Most of what I write comes out of coding, robotics, and whatever I am actively building.
+          I care about how an idea actually survives contact with execution: where it breaks, what
+          it costs to fix, and what I would do differently the second time.
+        </p>
+        <p>
+          A lot of how I think comes from sport. I spend a great deal of time analysing football,
+          Formula 1, tennis, cricket and the NFL — not just watching, but working out what is
+          happening underneath: tactics, decision-making under pressure, momentum, and patterns in
+          performance over time. That habit of analysis carries into everything else I do.
+        </p>
+        <p>
+          Music is the other serious thread. I play guitar and piano, sing, and have performed live
+          at several concerts. I completed LCM Grade 8 Guitar with High Distinction, which took
+          years of consistent graded practice, and I am now working toward diploma level. Daily
+          practice is where I learned what mastery and patience actually cost.
+        </p>
+        <p>
+          This site is not a place I post at occasionally. I am building it into a long-term record
+          of how I think and what I can do — consistent writing, real projects, and a clear
+          direction. Everything here is part of that process.
+        </p>
       </div>
-    </section>
+    </Section>
 
+    <Section kicker="What drives me" heading="Four things" id="interests" headingLevel="h2">
+      <ul class="interest-list">
+        {
+          interests.map((interest) => (
+            <li class="interest">
+              <h3 class="interest__title">{interest.title}</h3>
+              <p class="interest__detail">{interest.detail}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </Section>
+
+    <Section kicker="Contact" heading="Let us talk" id="connect" headingLevel="h2">
+      <p class="band-text">
+        I am always glad to meet people building things, discuss ideas, or work on something
+        together.
+      </p>
+      <p class="band-action">
+        <Button href="/contact" variant="primary">Get in touch</Button>
+      </p>
+    </Section>
   </main>
-
-  <style>
-    .main-bio {
-      padding: 2.5rem;
-      margin-bottom: 3rem;
-    }
-    .about-content p {
-      margin-bottom: 1.5rem;
-      line-height: 1.8;
-      font-size: 1.1rem;
-      color: var(--text-color);
-    }
-    .interests-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 1.5rem;
-      margin-bottom: 4rem;
-    }
-    .glass-feature {
-      text-align: center;
-      padding: 4rem 2rem;
-      background: linear-gradient(135deg, rgba(76,201,240,0.05), rgba(138,79,255,0.05));
-    }
-    .feature-content h2 { margin-bottom: 1rem; }
-    .feature-content p { margin-bottom: 2rem; max-width: 600px; margin-inline: auto; }
-  </style>
-
-  <script is:inline>
-    // Universal 3D Tilt Script
-    document.querySelectorAll('.tilt-card').forEach(card => {
-      card.addEventListener('mousemove', e => {
-        const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left, y = e.clientY - rect.top;
-        const centerX = rect.width / 2, centerY = rect.height / 2;
-        const rotateX = (y - centerY) / centerY * -8, rotateY = (x - centerX) / centerX * 8;
-        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(10px)`;
-        card.style.setProperty('--mouse-x', (x / rect.width * 100) + '%');
-        card.style.setProperty('--mouse-y', (y / rect.height * 100) + '%');
-      });
-      card.addEventListener('mouseleave', () => card.style.transform = '');
-    });
-  </script>
 </BaseLayout>
+
+<style>
+  .interest-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .interest {
+    display: grid;
+    gap: var(--space-2);
+    padding-block: var(--space-5);
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  @media (min-width: 768px) {
+    .interest {
+      grid-template-columns: 1fr 3fr;
+      gap: var(--space-5);
+    }
+  }
+
+  .interest__title {
+    margin: 0;
+    font-size: var(--step-1);
+  }
+
+  .interest__detail {
+    margin: 0;
+    max-width: var(--measure-prose);
+    color: var(--text-secondary);
+  }
+
+  .band-text {
+    margin: 0;
+    max-width: var(--measure-prose);
+    color: var(--text-secondary);
+  }
+
+  .band-action {
+    margin: var(--space-5) 0 0;
+  }
+</style>

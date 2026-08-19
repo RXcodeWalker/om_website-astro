@@ -1,0 +1,37 @@
+---
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<div class="empty-state">
+  <p class="empty-state__title">{title}</p>
+  <div class="empty-state__body">
+    <slot />
+  </div>
+</div>
+
+<style>
+  .empty-state {
+    display: grid;
+    gap: var(--space-3);
+    padding-block: var(--space-6);
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  .empty-state__title {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .empty-state__body {
+    max-width: var(--measure-prose);
+    color: var(--text-secondary);
+  }
+</style>

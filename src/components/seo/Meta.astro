@@ -21,7 +21,6 @@ const {
 
 const pageTitle = title === site.name ? title : `${title} · ${site.name}`;
 const absoluteOgImage = new URL(ogImage, site.url).href;
-const themeColor = '#fbfaf8';
 ---
 
 <meta name="description" content={description} />
@@ -40,15 +39,4 @@ const themeColor = '#fbfaf8';
 <meta name="twitter:description" content={description} />
 <meta name="twitter:image" content={absoluteOgImage} />
 
-<meta name="theme-color" content={themeColor} id="theme-color-meta" />
-
 <title>{pageTitle}</title>
-
-<script is:inline define:vars={{ light: '#fbfaf8', dark: '#100f0e' }}>
-  (() => {
-    const meta = document.getElementById('theme-color-meta');
-    if (!meta) return;
-    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-    meta.setAttribute('content', isDark ? dark : light);
-  })();
-</script>

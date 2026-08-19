@@ -9,8 +9,14 @@ import Icon from '../primitives/Icon.astro';
     id="theme-toggle"
     aria-label="Toggle dark mode"
   >
-    <Icon name="sun" class="theme-controls__icon theme-controls__icon--light" />
-    <Icon name="moon" class="theme-controls__icon theme-controls__icon--dark" />
+    {/* Wrappers, not the icons themselves: scoped styles cannot reach into
+        another component's root element. */}
+    <span class="theme-controls__icon theme-controls__icon--light">
+      <Icon name="sun" />
+    </span>
+    <span class="theme-controls__icon theme-controls__icon--dark">
+      <Icon name="moon" />
+    </span>
   </button>
 
   <details class="accent-picker">
@@ -45,15 +51,15 @@ import Icon from '../primitives/Icon.astro';
   }
 
   .theme-controls__icon {
-    width: 18px;
-    height: 18px;
+    display: inline-flex;
+    font-size: 18px;
   }
 
-  html[data-theme='dark'] .theme-controls__icon--light {
+  :global(html[data-theme='dark']) .theme-controls__icon--light {
     display: none;
   }
 
-  html:not([data-theme='dark']) .theme-controls__icon--dark {
+  :global(html:not([data-theme='dark'])) .theme-controls__icon--dark {
     display: none;
   }
 
@@ -119,44 +125,29 @@ import Icon from '../primitives/Icon.astro';
 </style>
 
 <script>
+  // All theme, accent and theme-color writes go through window.__theme,
+  // defined by the blocking init script in BaseLayout.
   const themeToggle = document.getElementById('theme-toggle');
   const accentButtons = document.querySelectorAll<HTMLButtonElement>('[data-accent]');
 
+  const syncAccentButtons = (active: string) => {
+    accentButtons.forEach((button) => {
+      button.setAttribute('aria-pressed', String(button.dataset.accent === active));
+    });
+  };
+
   themeToggle?.addEventListener('click', () => {
-    const root = document.documentElement;
-    const isDark = root.getAttribute('data-theme') === 'dark';
-    if (isDark) {
-      root.removeAttribute('data-theme');
-      localStorage.setItem('theme', 'light');
-    } else {
-      root.setAttribute('data-theme', 'dark');
-      localStorage.setItem('theme', 'dark');
-    }
-    updateThemeColor();
+    window.__theme.set(window.__theme.theme === 'dark' ? 'light' : 'dark');
   });
 
   accentButtons.forEach((button) => {
     button.addEventListener('click', () => {
       const accent = button.dataset.accent;
       if (!accent) return;
-      document.documentElement.setAttribute('data-accent', accent);
-      localStorage.setItem('accent', accent);
+      window.__theme.set(window.__theme.theme, accent);
       syncAccentButtons(accent);
     });
   });
 
-  function syncAccentButtons(active: string) {
-    accentButtons.forEach((button) => {
-      button.setAttribute('aria-pressed', String(button.dataset.accent === active));
-    });
-  }
-
-  function updateThemeColor() {
-    const meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
-    if (!meta) return;
-    meta.content =
-      document.documentElement.getAttribute('data-theme') === 'dark' ? '#100f0e' : '#fbfaf8';
-  }
-
-  syncAccentButtons(document.documentElement.getAttribute('data-accent') || 'ink');
+  syncAccentButtons(window.__theme.accent);
 </script>

@@ -1,0 +1,54 @@
+/*
+  Self-hosted faces, latin subset only. Files are vendored into public/fonts/
+  by `npm run fonts:sync` from the Fontsource packages.
+
+  Budget: 124.5KB against a 140KB cap. Newsreader italic (63KB) and a second
+  mono weight (21KB) do not fit and are synthesised by the browser instead.
+
+  No unicode-range: the files are already latin-only and there are no
+  competing subsets of the same families, so the descriptors would cost bytes
+  in the critical stylesheet without changing what gets downloaded.
+*/
+
+@font-face {
+  font-family: 'Newsreader Variable';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 200 800;
+  src: url('/fonts/newsreader-latin-wght-normal.woff2') format('woff2-variations');
+}
+
+@font-face {
+  font-family: 'Inter Variable';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('/fonts/inter-latin-wght-normal.woff2') format('woff2-variations');
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url('/fonts/jetbrains-mono-latin-400-normal.woff2') format('woff2');
+}
+
+/* Metric-matched fallbacks so the swap does not shift layout. */
+@font-face {
+  font-family: 'Inter Fallback';
+  src: local('Segoe UI'), local('Helvetica Neue'), local('Arial');
+  size-adjust: 107%;
+  ascent-override: 90%;
+  descent-override: 22%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'Newsreader Fallback';
+  src: local('Georgia'), local('Times New Roman');
+  size-adjust: 103%;
+  ascent-override: 92%;
+  descent-override: 25%;
+  line-gap-override: 0%;
+}

@@ -1,1 +1,7 @@
+# Exactly three hand-picked posts, with absolute URLs to the writing subdomain.
+# Curation is the feature: an automatic latest-posts feed would greet a reader
+# with whatever happened to be published most recently.
+#
+# Empty until blog.beyondthebasics.me is live and the three picks are chosen.
+# Until then the site links to /blog directly.
 []

@@ -24,7 +24,8 @@ export const site = {
   nav: [
     { label: 'Projects', href: '/projects', external: false },
     { label: 'Achievements', href: '/achievements', external: false },
-    { label: 'Writing', href: 'https://blog.beyondthebasics.me', external: true },
+    // Stays internal until blog.beyondthebasics.me is actually live.
+    { label: 'Writing', href: '/blog', external: false },
     { label: 'About', href: '/about', external: false },
     { label: 'Contact', href: '/contact', external: false },
   ],

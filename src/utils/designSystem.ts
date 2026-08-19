@@ -29,22 +29,50 @@ function relativeLuminance([r, g, b]: [number, number, number]): number {
   return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
 }
 
-export const TOKEN_CONTRAST_PAIRS = [
-  { name: 'light body text', fg: '#171512', bg: '#fbfaf8', min: 7 },
-  { name: 'light secondary', fg: '#4a463f', bg: '#fbfaf8', min: 4.5 },
-  { name: 'light muted', fg: '#6e6862', bg: '#fbfaf8', min: 4.5 },
-  { name: 'light accent ink', fg: '#1b3fa0', bg: '#fbfaf8', min: 4.5 },
-  { name: 'light accent oxblood', fg: '#8c2f39', bg: '#fbfaf8', min: 4.5 },
-  { name: 'light accent ivy', fg: '#265d45', bg: '#fbfaf8', min: 4.5 },
-  { name: 'dark body text', fg: '#edeae4', bg: '#100f0e', min: 7 },
-  { name: 'dark secondary', fg: '#b5b0a8', bg: '#100f0e', min: 4.5 },
-  { name: 'dark muted', fg: '#857f76', bg: '#100f0e', min: 4.5 },
-  { name: 'dark accent ink', fg: '#9fc0ff', bg: '#100f0e', min: 4.5 },
-  { name: 'dark accent oxblood', fg: '#e8969c', bg: '#100f0e', min: 4.5 },
-  { name: 'dark accent ivy', fg: '#86c7a5', bg: '#100f0e', min: 4.5 },
-] as const;
+/**
+ * Parses a CSS file's custom properties and resolves `var(--x)` chains so
+ * assertions can be made against the real token values rather than a copy.
+ */
+export function parseTokens(css: string): Map<string, Map<string, string>> {
+  const blocks = new Map<string, Map<string, string>>();
+  const source = css.replace(/\/\*[\s\S]*?\*\//g, '');
+  const blockPattern = /([^{}]+)\{([^{}]*)\}/g;
 
-export function checkNowStaleness(updated: Date, thresholdDays = 90): boolean {
-  const ageMs = Date.now() - updated.getTime();
-  return ageMs > thresholdDays * 24 * 60 * 60 * 1000;
+  let match: RegExpExecArray | null;
+  while ((match = blockPattern.exec(source)) !== null) {
+    const selector = match[1].trim().replace(/\s+/g, ' ');
+    const declarations = blocks.get(selector) ?? new Map<string, string>();
+
+    for (const line of match[2].split(';')) {
+      const separator = line.indexOf(':');
+      if (separator === -1) continue;
+      const name = line.slice(0, separator).trim();
+      if (!name.startsWith('--')) continue;
+      declarations.set(name, line.slice(separator + 1).trim());
+    }
+
+    if (declarations.size > 0) blocks.set(selector, declarations);
+  }
+
+  return blocks;
+}
+
+/** Resolves a token to a literal, following `var(--x)` indirection. */
+export function resolveToken(
+  name: string,
+  scopes: Map<string, string>[],
+  depth = 0,
+): string | undefined {
+  if (depth > 10) return undefined;
+
+  let raw: string | undefined;
+  for (const scope of scopes) {
+    if (scope.has(name)) raw = scope.get(name);
+  }
+  if (raw === undefined) return undefined;
+
+  const reference = raw.match(/^var\(\s*(--[\w-]+)\s*\)$/);
+  if (reference) return resolveToken(reference[1], scopes, depth + 1);
+
+  return raw;
 }

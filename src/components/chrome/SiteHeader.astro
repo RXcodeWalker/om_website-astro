@@ -10,13 +10,14 @@ interface Props {
 const { currentPath = Astro.url.pathname } = Astro.props;
 ---
 
+{/*
+  One nav, one data path. Below 768px the list is visible by default so the
+  site is navigable without JavaScript; the blocking head script sets html.js,
+  which is the only thing that turns the list into a disclosure menu.
+*/}
 <header class="site-header">
   <div class="container site-header__inner">
     <a href="/" class="site-header__brand link-ui">{site.name}</a>
-
-    <nav aria-label="Primary">
-      <PrimaryNav {currentPath} />
-    </nav>
 
     <div class="site-header__actions">
       <ThemeControls />
@@ -25,7 +26,7 @@ const { currentPath = Astro.url.pathname } = Astro.props;
         class="menu-toggle"
         id="menu-toggle"
         aria-expanded="false"
-        aria-controls="mobile-nav-panel"
+        aria-controls="site-nav"
       >
         <span class="visually-hidden">Menu</span>
         <span class="menu-toggle__bar" aria-hidden="true"></span>
@@ -33,25 +34,9 @@ const { currentPath = Astro.url.pathname } = Astro.props;
         <span class="menu-toggle__bar" aria-hidden="true"></span>
       </button>
     </div>
-  </div>
 
-  <div class="mobile-nav-panel" id="mobile-nav-panel" hidden>
-    <nav aria-label="Primary mobile">
-      <ul class="mobile-nav-panel__list">
-        {
-          site.nav.map((item) => (
-            <li>
-              <a
-                href={item.href}
-                class="mobile-nav-panel__link"
-                {...(item.external ? { rel: 'noopener noreferrer' } : {})}
-              >
-                {item.label}
-              </a>
-            </li>
-          ))
-        }
-      </ul>
+    <nav class="site-nav" id="site-nav" aria-label="Primary">
+      <PrimaryNav {currentPath} />
     </nav>
   </div>
 </header>
@@ -61,20 +46,20 @@ const { currentPath = Astro.url.pathname } = Astro.props;
     position: sticky;
     top: 0;
     z-index: var(--z-header);
-    height: var(--header-h);
     background: var(--surface-raised);
     box-shadow: var(--shadow-header);
   }
 
   .site-header__inner {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    justify-content: space-between;
     gap: var(--space-4);
-    height: var(--header-h);
+    min-height: var(--header-h);
   }
 
   .site-header__brand {
+    margin-right: auto;
     font-family: var(--font-display);
     font-size: var(--step-1);
     font-weight: 500;
@@ -86,10 +71,19 @@ const { currentPath = Astro.url.pathname } = Astro.props;
     display: flex;
     align-items: center;
     gap: var(--space-2);
+    order: 2;
   }
 
+  /* Mobile: nav occupies its own full-width row beneath the bar. */
+  .site-nav {
+    order: 3;
+    flex-basis: 100%;
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  /* The toggle only exists as an enhancement. */
   .menu-toggle {
-    display: flex;
+    display: none;
     flex-direction: column;
     justify-content: center;
     gap: 5px;
@@ -102,10 +96,12 @@ const { currentPath = Astro.url.pathname } = Astro.props;
     cursor: pointer;
   }
 
-  @media (min-width: 768px) {
-    .menu-toggle {
-      display: none;
-    }
+  :global(html.js) .menu-toggle {
+    display: flex;
+  }
+
+  :global(html.js) .site-nav[data-open='false'] {
+    display: none;
   }
 
   .menu-toggle__bar {
@@ -116,37 +112,31 @@ const { currentPath = Astro.url.pathname } = Astro.props;
     background: var(--text-primary);
   }
 
-  .mobile-nav-panel {
-    border-top: 1px solid var(--border-subtle);
-    background: var(--surface-raised);
-    padding: var(--space-4) var(--gutter) var(--space-5);
-  }
-
   @media (min-width: 768px) {
-    .mobile-nav-panel {
+    .site-header__inner {
+      flex-wrap: nowrap;
+    }
+
+    .site-header__brand {
+      margin-right: 0;
+    }
+
+    .site-nav {
+      order: 2;
+      flex-basis: auto;
+      margin-left: auto;
+      border-top: 0;
+    }
+
+    .site-header__actions {
+      order: 3;
+    }
+
+    :global(html.js) .menu-toggle {
       display: none;
     }
-  }
 
-  .mobile-nav-panel__list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: grid;
-    gap: var(--space-2);
-  }
-
-  .mobile-nav-panel__link {
-    display: block;
-    padding: var(--space-3) 0;
-    font-size: var(--step-0);
-    text-decoration: none;
-    color: var(--text-primary);
-    border-bottom: 1px solid var(--border-subtle);
-  }
-
-  @media (max-width: 767px) {
-    .mobile-nav-panel:not([hidden]) {
+    :global(html.js) .site-nav[data-open='false'] {
       display: block;
     }
   }
@@ -154,23 +144,63 @@ const { currentPath = Astro.url.pathname } = Astro.props;
 
 <script>
   const toggle = document.getElementById('menu-toggle');
-  const panel = document.getElementById('mobile-nav-panel');
+  const nav = document.getElementById('site-nav');
 
-  if (toggle && panel) {
-    const setOpen = (open: boolean) => {
+  if (toggle && nav) {
+    const desktop = window.matchMedia('(min-width: 768px)');
+
+    // Collapsed is the JS-only starting state; without this attribute the
+    // list stays visible, which is the no-JS fallback.
+    nav.setAttribute('data-open', 'false');
+
+    const focusables = () =>
+      Array.from(nav.querySelectorAll<HTMLAnchorElement>('a[href]')).filter(
+        (el) => el.offsetParent !== null,
+      );
+
+    const setOpen = (open: boolean, restoreFocus = true) => {
+      nav.setAttribute('data-open', String(open));
       toggle.setAttribute('aria-expanded', String(open));
-      panel.hidden = !open;
-      if (!open) toggle.focus();
+      if (open) {
+        focusables()[0]?.focus();
+      } else if (restoreFocus) {
+        toggle.focus();
+      }
     };
 
-    toggle.addEventListener('click', () => {
-      setOpen(toggle.getAttribute('aria-expanded') !== 'true');
-    });
+    const isOpen = () => toggle.getAttribute('aria-expanded') === 'true';
+
+    toggle.addEventListener('click', () => setOpen(!isOpen()));
 
     document.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape' && toggle.getAttribute('aria-expanded') === 'true') {
+      if (!isOpen() || desktop.matches) return;
+
+      if (event.key === 'Escape') {
+        event.preventDefault();
         setOpen(false);
+        return;
       }
+
+      if (event.key !== 'Tab') return;
+
+      // Trap focus between the toggle and the last link while the menu is open.
+      const items = [toggle, ...focusables()];
+      const first = items[0];
+      const last = items[items.length - 1];
+      const active = document.activeElement;
+
+      if (event.shiftKey && active === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && active === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    });
+
+    // Leaving the mobile breakpoint must not strand a collapsed nav.
+    desktop.addEventListener('change', (event) => {
+      if (event.matches) setOpen(false, false);
     });
   }
 </script>

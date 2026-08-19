@@ -1,0 +1,74 @@
+---
+import type { NowEntry } from '../../schemas/now';
+
+interface Props {
+  entry: NowEntry;
+}
+
+const { entry } = Astro.props;
+
+const updatedISO = entry.updated.toISOString().slice(0, 10);
+const updatedLabel = entry.updated.toLocaleDateString('en-GB', {
+  month: 'long',
+  year: 'numeric',
+});
+---
+
+<div class="now-band">
+  <p class="now-band__focus">{entry.focus}</p>
+
+  {
+    entry.learning.length > 0 && (
+      <div class="now-band__learning">
+        <h3 class="now-band__label">Learning</h3>
+        <ul>
+          {entry.learning.map((item) => (
+            <li>{item}</li>
+          ))}
+        </ul>
+      </div>
+    )
+  }
+
+  {/* The stamp is the honesty mechanism, not decoration. */}
+  <p class="now-band__stamp tabular-nums">
+    Updated <time datetime={updatedISO}>{updatedLabel}</time>
+  </p>
+</div>
+
+<style>
+  .now-band {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .now-band__focus {
+    margin: 0;
+    max-width: var(--measure-prose);
+    font-size: var(--step-1);
+    line-height: var(--leading-prose);
+  }
+
+  .now-band__label {
+    margin: 0 0 var(--space-2);
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+    font-weight: 400;
+    color: var(--text-muted);
+  }
+
+  .now-band__learning ul {
+    margin: 0;
+    padding-left: var(--space-5);
+    color: var(--text-secondary);
+  }
+
+  .now-band__stamp {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    color: var(--text-muted);
+  }
+</style>

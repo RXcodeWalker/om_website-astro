@@ -1,79 +1,108 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import PageHeader from '../components/ui/PageHeader.astro';
-import Card from '../components/ui/Card.astro';
-import ContactForm from '../components/ContactForm.astro';
-
-const contactInfo = [
-  {
-    title: "Email",
-    description: "omjhamvar29@gmail.com",
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>',
-    gradient: "linear-gradient(135deg, var(--accent-1), var(--accent-2))"
-  },
-  {
-    title: "Social",
-    description: "Connect on social media",
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>',
-    gradient: "linear-gradient(135deg, var(--accent-2), var(--accent-3))"
-  },
-  {
-    title: "Quick Response",
-    description: "Usually within 24 hours",
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>',
-    gradient: "linear-gradient(135deg, var(--accent-3), var(--accent-1))"
-  }
-];
+import PageIntro from '../components/patterns/PageIntro.astro';
+import ContactForm from '../components/patterns/ContactForm.astro';
+import { site } from '../config/site';
 ---
 
-<BaseLayout title="Om — Contact">
-  <main id="main" class="container main-content">
-    
-    <PageHeader 
-      eyebrow="Say Hello" 
-      title="Get In Touch" 
-      description="Have a question, want to collaborate, or just want to talk sports? I'd love to hear from you!"
-      useTypewriter={true}
-    />
+<BaseLayout
+  title="Contact"
+  description="Get in touch with Om Jhamvar about projects, collaboration, or anything else."
+  jsonLd="BreadcrumbList"
+  breadcrumbs={[
+    { name: 'Home', item: site.url },
+    { name: 'Contact', item: `${site.url}/contact` },
+  ]}
+>
+  <main id="main">
+    <div class="container">
+      <PageIntro
+        kicker="Say hello"
+        title="Get in touch"
+        lede="A question, a collaboration, or an argument about football tactics — all welcome. I reply within a day or so."
+      />
 
-    <div class="contact-grid">
-      {contactInfo.map((info, index) => (
-        <Card 
-          title={info.title}
-          description={info.description}
-          icon={info.icon}
-          gradient={info.gradient}
-          delay={`${index * 0.1}s`}
-        />
-      ))}
+      <div class="contact-layout">
+        <section aria-labelledby="contact-form-heading">
+          <h2 id="contact-form-heading" class="contact-heading">Send a message</h2>
+          <ContactForm />
+        </section>
+
+        <section aria-labelledby="contact-direct-heading">
+          <h2 id="contact-direct-heading" class="contact-heading">Or reach me directly</h2>
+          <dl class="contact-direct">
+            <div>
+              <dt>Email</dt>
+              <dd><a href={`mailto:${site.email}`}>{site.email}</a></dd>
+            </div>
+            {
+              site.socials.map((social) => (
+                <div>
+                  <dt>{social.label}</dt>
+                  <dd>
+                    <a href={social.href} class="link-external" rel="noopener noreferrer">
+                      {social.href.replace(/^https:\/\/(www\.)?/, '')}
+                    </a>
+                  </dd>
+                </div>
+              ))
+            }
+          </dl>
+        </section>
+      </div>
     </div>
-
-    <ContactForm />
-
   </main>
-
-  <style>
-    .contact-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 1.5rem;
-      margin-bottom: 2rem;
-    }
-  </style>
-
-  <script is:inline>
-    // Universal 3D Tilt Script
-    document.querySelectorAll('.tilt-card').forEach(card => {
-      card.addEventListener('mousemove', e => {
-        const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left, y = e.clientY - rect.top;
-        const centerX = rect.width / 2, centerY = rect.height / 2;
-        const rotateX = (y - centerY) / centerY * -8, rotateY = (x - centerX) / centerX * 8;
-        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(10px)`;
-        card.style.setProperty('--mouse-x', (x / rect.width * 100) + '%');
-        card.style.setProperty('--mouse-y', (y / rect.height * 100) + '%');
-      });
-      card.addEventListener('mouseleave', () => card.style.transform = '');
-    });
-  </script>
 </BaseLayout>
+
+<style>
+  .contact-layout {
+    display: grid;
+    gap: var(--space-8);
+    margin-top: var(--space-7);
+    padding-bottom: var(--space-8);
+  }
+
+  @media (min-width: 1024px) {
+    .contact-layout {
+      grid-template-columns: 7fr 4fr;
+      gap: var(--space-9);
+    }
+  }
+
+  .contact-heading {
+    margin: 0 0 var(--space-5);
+    font-size: var(--step-2);
+  }
+
+  .contact-direct {
+    display: grid;
+    gap: var(--space-4);
+    margin: 0;
+  }
+
+  .contact-direct div {
+    display: grid;
+    gap: var(--space-1);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  .contact-direct dt {
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .contact-direct dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .contact-direct a {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+  }
+</style>

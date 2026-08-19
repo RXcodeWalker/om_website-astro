@@ -46,6 +46,7 @@
   /* Status */
   --status-shipped: #2f6b4f;
   --status-progress: #8a5a12;
+  --status-error: #8c2f39;
   --status-quiet: var(--text-muted);
 
   /* Elevation */
@@ -82,9 +83,10 @@
   --radius-full: 999px;
 
   /* Typography families */
-  --font-display: 'Newsreader Variable', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
-  --font-body: 'Inter Variable', -apple-system, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: 'JetBrains Mono Variable', ui-monospace, 'SF Mono', Menlo, monospace;
+  --font-display: 'Newsreader Variable', 'Newsreader Fallback', 'Iowan Old Style',
+    'Palatino Linotype', Georgia, serif;
+  --font-body: 'Inter Variable', 'Inter Fallback', -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
 
   /* Type scale */
   --step--2: 0.75rem;
@@ -143,6 +145,7 @@ html[data-theme='dark'] {
   --focus-ring: #9fc0ff;
   --status-shipped: #86c7a5;
   --status-progress: #e3b267;
+  --status-error: #e8969c;
   --shadow-header: 0 1px 0 var(--border-subtle);
 }
 

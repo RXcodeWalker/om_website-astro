@@ -1,6 +1,15 @@
-current:
-  updated: 2026-01-01
-  focus: >-
-    Schema placeholder for the Currently band. Replace this focus text with what
-    you are actively building before the homepage ships.
-  learning: []
+# The Currently band. Empty until there is something true to say.
+#
+# Add a single entry when ready:
+#
+#   current:
+#     updated: 2026-08-19
+#     focus: >-
+#       Two to four lines on what you are actively building right now.
+#     learning:
+#       - Item one
+#     project: robot            # optional, a project slug
+#
+# The build warns when `updated` is more than 90 days old. A stale band is
+# worse than no band, so the homepage renders nothing while this file is empty.
+{}

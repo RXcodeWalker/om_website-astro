@@ -1,34 +1,156 @@
 ---
 import { site } from '../../config/site';
-import ContactForm from '../ContactForm.astro';
 ---
 
-<section class="contact-form-section">
-  <h2 class="contact-form-section__title">Send a message</h2>
-  <ContactForm />
-  <p class="contact-form-section__email">
-    Or email <a href={`mailto:${site.email}`}>{site.email}</a>
-  </p>
-</section>
+<form
+  class="contact-form"
+  action={`https://formspree.io/f/${site.formspreeId}`}
+  method="POST"
+  novalidate
+>
+  <input type="hidden" name="_subject" value="New message from Beyond The Basics" />
+
+  <div class="contact-form__grid">
+    <div class="contact-form__field">
+      <label for="contact-name">Name</label>
+      <input id="contact-name" name="name" type="text" autocomplete="name" required />
+    </div>
+    <div class="contact-form__field">
+      <label for="contact-email">Email</label>
+      <input id="contact-email" name="email" type="email" autocomplete="email" required />
+    </div>
+  </div>
+
+  <div class="contact-form__field">
+    <label for="contact-message">Message</label>
+    <textarea
+      id="contact-message"
+      name="message"
+      rows="6"
+      required
+      aria-describedby="contact-hint"></textarea>
+    <p id="contact-hint" class="contact-form__hint">I usually reply within 24 hours.</p>
+  </div>
+
+  <p class="contact-form__status" aria-live="polite" id="contact-status"></p>
+
+  <button type="submit" class="contact-form__submit">Send message</button>
+</form>
 
 <style>
-  .contact-form-section {
-    padding-block: var(--space-6);
-    border-top: 1px solid var(--border-subtle);
+  .contact-form {
+    display: grid;
+    gap: var(--space-4);
+    max-width: var(--container-narrow);
   }
 
-  .contact-form-section__title {
-    margin: 0 0 var(--space-5);
-    font-size: var(--step-2);
+  .contact-form__grid {
+    display: grid;
+    gap: var(--space-4);
   }
 
-  .contact-form-section__email {
-    margin-top: var(--space-4);
+  @media (min-width: 480px) {
+    .contact-form__grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .contact-form__field {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .contact-form__field label {
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .contact-form__field input,
+  .contact-form__field textarea {
+    width: 100%;
+    padding: var(--space-3);
+    color: var(--text-primary);
+    background: var(--surface-raised);
+    border: 1px solid var(--border-interactive);
+    border-radius: var(--radius-sm);
+  }
+
+  .contact-form__field input:user-invalid,
+  .contact-form__field textarea:user-invalid {
+    border-color: var(--status-error);
+  }
+
+  .contact-form__hint {
+    margin: 0;
+    font-size: var(--step--2);
+    color: var(--text-muted);
+  }
+
+  .contact-form__status:empty {
+    display: none;
+  }
+
+  .contact-form__status {
+    margin: 0;
     font-size: var(--step--1);
     color: var(--text-secondary);
   }
 
-  .contact-form-section__email a {
-    color: var(--accent);
+  .contact-form__submit {
+    justify-self: start;
+    min-height: 44px;
+    padding: var(--space-3) var(--space-5);
+    font-weight: 500;
+    color: var(--text-on-accent);
+    background: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .contact-form__submit:hover,
+    .contact-form__submit:focus-visible {
+      background: var(--accent-hover);
+      border-color: var(--accent-hover);
+    }
   }
 </style>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('.contact-form');
+  const status = document.getElementById('contact-status');
+
+  form?.addEventListener('submit', async (event) => {
+    if (!status) return;
+    event.preventDefault();
+
+    const submit = form.querySelector<HTMLButtonElement>('.contact-form__submit');
+    if (!form.checkValidity()) {
+      status.textContent = 'Please complete every field before sending.';
+      form.reportValidity();
+      return;
+    }
+
+    status.textContent = 'Sending…';
+    if (submit) submit.disabled = true;
+
+    try {
+      const response = await fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form),
+        headers: { Accept: 'application/json' },
+      });
+      if (!response.ok) throw new Error(String(response.status));
+      status.textContent = 'Sent. Thank you — I will reply within 24 hours.';
+      form.reset();
+    } catch {
+      status.textContent = 'Could not send. Please email omjhamvar29@gmail.com instead.';
+    } finally {
+      if (submit) submit.disabled = false;
+    }
+  });
+</script>

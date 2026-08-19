@@ -6,6 +6,9 @@ dist/
 build/
 .out/
 
+# Astro generated types and collection schemas
+.astro/
+
 # Logs
 npm-debug.log*
 yarn-debug.log*

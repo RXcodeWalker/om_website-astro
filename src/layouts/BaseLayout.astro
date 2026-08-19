@@ -15,6 +15,12 @@ interface Props {
   noindex?: boolean;
   jsonLd?: 'Person' | 'BreadcrumbList' | 'CreativeWork';
   breadcrumbs?: { name: string; item: string }[];
+  creativeWork?: {
+    name: string;
+    description: string;
+    url: string;
+    datePublished?: string;
+  };
 }
 
 const {
@@ -26,6 +32,7 @@ const {
   noindex,
   jsonLd = 'Person',
   breadcrumbs,
+  creativeWork,
 } = Astro.props;
 ---
 
@@ -37,26 +44,83 @@ const {
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" href="/favicon.ico" />
 
+    {/*
+      Emitted before the init script so there is exactly one element to
+      update and no dead lookup. window.__theme is the only mechanism that
+      writes theme, accent, or theme-color anywhere in the codebase.
+    */}
+    <meta name="theme-color" content="#fbfaf8" />
+
     <script is:inline>
       (() => {
+        const COLORS = { light: '#fbfaf8', dark: '#100f0e' };
         const root = document.documentElement;
+
+        const apply = (theme, accent) => {
+          if (theme === 'dark') {
+            root.setAttribute('data-theme', 'dark');
+          } else {
+            root.removeAttribute('data-theme');
+          }
+          root.setAttribute('data-accent', accent);
+          const meta = document.querySelector('meta[name="theme-color"]');
+          if (meta) meta.setAttribute('content', COLORS[theme] || COLORS.light);
+        };
+
+        window.__theme = {
+          get theme() {
+            return root.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+          },
+          get accent() {
+            return root.getAttribute('data-accent') || 'ink';
+          },
+          set(theme, accent) {
+            const next = theme === 'dark' ? 'dark' : 'light';
+            const nextAccent = accent || window.__theme.accent;
+            try {
+              localStorage.setItem('theme', next);
+              localStorage.setItem('accent', nextAccent);
+            } catch {
+              /* storage unavailable — apply for this page only */
+            }
+            apply(next, nextAccent);
+          },
+        };
+
         root.classList.add('js');
-        const theme = localStorage.getItem('theme');
-        const accent = localStorage.getItem('accent') || 'ink';
-        if (theme === 'dark') root.setAttribute('data-theme', 'dark');
-        root.setAttribute('data-accent', accent);
-        const meta = document.querySelector('meta[name="theme-color"]');
-        if (meta) {
-          meta.setAttribute(
-            'content',
-            theme === 'dark' ? '#100f0e' : '#fbfaf8',
-          );
+
+        let stored = null;
+        let storedAccent = null;
+        try {
+          stored = localStorage.getItem('theme');
+          storedAccent = localStorage.getItem('accent');
+        } catch {
+          /* storage unavailable */
         }
+
+        const prefersDark =
+          window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        apply(stored || (prefersDark ? 'dark' : 'light'), storedAccent || 'ink');
       })();
     </script>
 
+    <link
+      rel="preload"
+      href="/fonts/inter-latin-wght-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/fonts/newsreader-latin-wght-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+
     <Meta {title} {description} {canonical} {ogImage} {ogType} {noindex} />
-    <JsonLd type={jsonLd} breadcrumbs={breadcrumbs} />
+    <JsonLd type={jsonLd} breadcrumbs={breadcrumbs} creativeWork={creativeWork} />
     <slot name="head" />
   </head>
   <body>
@@ -65,6 +129,25 @@ const {
     <slot />
     <SiteFooter />
 
-    <script is:inline src="/js/scroll.js"></script>
+    <script>
+      // Entrance reveal. Content is visible by default; this only adds the
+      // animated state when motion is welcome.
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        const targets = document.querySelectorAll('.reveal');
+        if (targets.length > 0) {
+          const observer = new IntersectionObserver(
+            (entries) => {
+              for (const entry of entries) {
+                if (!entry.isIntersecting) continue;
+                entry.target.classList.add('is-visible');
+                observer.unobserve(entry.target);
+              }
+            },
+            { threshold: 0.1, rootMargin: '0px 0px -40px 0px' },
+          );
+          targets.forEach((target) => observer.observe(target));
+        }
+      }
+    </script>
   </body>
 </html>

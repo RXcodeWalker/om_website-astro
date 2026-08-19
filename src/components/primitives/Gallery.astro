@@ -32,9 +32,12 @@ const { caption, class: className = '' } = Astro.props;
     }
   }
 
-  .gallery__grid :global(figure),
+  /* Children are images. Gallery owns the figure and figcaption for the group. */
   .gallery__grid :global(img) {
     margin: 0;
+    display: block;
+    width: 100%;
+    height: auto;
   }
 
   .gallery__caption {
