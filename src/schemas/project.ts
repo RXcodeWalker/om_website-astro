@@ -21,7 +21,7 @@ export const projectSchema = ({ image }: SchemaContext) =>
       order: z.number().int(),
       draft: z.boolean().default(false),
 
-      thumbnail: z.object({ src: image(), alt: z.string().min(4) }),
+      thumbnail: z.object({ src: image(), alt: z.string().min(4) }).optional(),
       hero: z.object({ src: image(), alt: z.string().min(4) }).optional(),
 
       metrics: z.array(metric).max(4).default([]),

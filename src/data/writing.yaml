@@ -1,7 +1,28 @@
-# Exactly three hand-picked posts, with absolute URLs to the writing subdomain.
-# Curation is the feature: an automatic latest-posts feed would greet a reader
-# with whatever happened to be published most recently.
-#
-# Empty until blog.beyondthebasics.me is live and the three picks are chosen.
-# Until then the site links to /blog directly.
-[]
+# Exactly three hand-picked posts from blog.beyondthebasics.me.
+# Order is curated — do not sort automatically.
+# Each URL must be a full absolute URL to the post on the blog subdomain.
+
+- id: french-coach-origin
+  title: Why I Started Building French Coach
+  url: https://blog.beyondthebasics.me/article/why-i-started-building-french-coach
+  date: 2026-06-28
+  excerpt: >-
+    Students don't struggle because they don't know French — they struggle because they never get
+    to actually speak it. This is the story of how that observation became a software project.
+  why: The piece behind French Coach — where the idea came from and why it matters.
+
+- id: ashoka-summer
+  title: My Summer at Ashoka University
+  url: https://blog.beyondthebasics.me/article/my-summer-at-ashoka-university
+  date: 2026-02-27
+  excerpt: >-
+    A month living on campus at Ashoka University as part of the Lodha Genius Programme. On
+    independence, discomfort, and what it actually means to own your time.
+
+- id: tribute-jota
+  title: "Beyond the Badge: A Tribute to Jota"
+  url: https://blog.beyondthebasics.me/article/beyond-the-badge-a-tribute-to-jota
+  date: 2025-07-03
+  excerpt: >-
+    Football makes it easy to reduce people to shirts and rivalries. Losing Diogo Jota at 28
+    is a reminder of what lies behind the opposition kit.
