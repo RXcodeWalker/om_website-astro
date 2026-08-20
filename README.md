@@ -1,6 +1,6 @@
 # Om — Personal site (Astro)
 
-A fast, content-driven personal website and blog built with Astro. It includes an archive, client-side search and filters, an in-browser article reader (TTS), and Netlify serverless functions for AI summarization and view counting.
+A fast, content-driven personal website and blog built with Astro. It includes an archive, client-side search and filters, an in-browser article reader (TTS), and Vercel serverless functions for AI summarization and view counting.
 
 ## Features
 
@@ -8,15 +8,15 @@ A fast, content-driven personal website and blog built with Astro. It includes a
 - Content managed via `astro:content` collection (`src/content/config.ts`).
 - Client-side blog index with search, category filters, and bookmarks (`public/js/blog.js`).
 - In-browser audio reader using the Web Speech API with paragraph-level highlighting and controls (`public/js/reader.js`).
-- AI-powered post summarizer: client UI calls a Netlify serverless function which proxies Anthropic (Claude) (`public/js/summarizer.js`, `netlify/functions/summarize.js`). NOTE: THIS DOESN'T WORK RIGHT NOW AS I DON'T HAVE ACCESS TO THE API KEY.
-- View counter backed by Supabase via a Netlify function (`netlify/functions/incrementViews.js`).
+- AI-powered post summarizer: client UI calls a Vercel serverless function which proxies Anthropic (Claude) (`public/js/summarizer.js`, `api/summarize.js`). NOTE: THIS DOESN'T WORK RIGHT NOW AS I DON'T HAVE ACCESS TO THE API KEY.
+- View counter backed by Supabase via a Vercel function (`api/incrementViews.js`).
 - Utilities for estimating read time and extracting key ideas from Markdown (`src/utils/postInsights.ts`).
 
 ## Installation
 
 Requirements:
 
-- Node.js (v20 recommended by `netlify.toml` build environment)
+- Node.js (v20 recommended by `.nvmrc`)
 - npm
 
 Local setup:
@@ -36,10 +36,11 @@ This runs Astro in dev mode (see `package.json` scripts).
 - Build: `npm run build` — generates the `dist/` output for static hosting.
 - Preview production build locally: `npm run preview`.
 
-Netlify deployment notes:
+Vercel deployment notes:
 
-- `netlify.toml` is configured to publish `dist` and serve serverless functions from `netlify/functions`.
-- Set environment variables in Netlify for serverless integrations (see Configuration below).
+- `vercel.json` is configured to build with `npm run build`, publish `dist`, and serve serverless functions from `api/`.
+- Set environment variables in Vercel for serverless integrations (see Configuration below).
+- A rewrite maps `/.netlify/functions/:path*` to `/api/:path*` so older function URLs still resolve.
 
 ## Project Structure
 
@@ -50,36 +51,38 @@ Netlify deployment notes:
   - `utils/` — helper utilities (e.g., `postInsights.ts`)
 - `public/` — static assets and client-side JS
   - `js/` — interactive scripts: `blog.js`, `reader.js`, `summarizer.js`, etc.
-- `netlify/functions/` — serverless functions
+- `api/` — Vercel serverless functions
   - `summarize.js` — Anthropic proxy for post summarization
   - `incrementViews.js` — logs views to Supabase and returns counts
-- `astro.config.mjs`, `package.json`, `netlify.toml` — project and deployment config
+- `astro.config.mjs`, `package.json`, `vercel.json` — project and deployment config
 
 ## Technologies Used
 
 - Astro (Static site generator)
 - JavaScript/TypeScript (Astro pages and utilities)
-- Netlify Functions (serverless endpoints)
-- Anthropic API (Claude) — proxied server-side in `summarize.js`
-- Supabase — used for view counting (`incrementViews.js`) via service role key
+- Vercel Serverless Functions
+- Anthropic API (Claude) — proxied server-side in `api/summarize.js`
+- Supabase — used for view counting (`api/incrementViews.js`) via service role key
 - Web Speech API — in-browser TTS in `reader.js`
 
 ## Configuration
 
-Required environment variables for full functionality (set in Netlify or local environment when testing functions):
+Required environment variables for full functionality (set in Vercel → Project → Settings → Environment Variables, for Production, Preview, and Development):
 
-- `ANTHROPIC_API_KEY` — required by `netlify/functions/summarize.js` to call Anthropic.
-- `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` — required by `netlify/functions/incrementViews.js` for view tracking.
+- `ANTHROPIC_API_KEY` — required by `api/summarize.js` to call Anthropic.
+- `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` — required by `api/incrementViews.js` for view tracking.
 
-Local testing of Netlify functions:
+Copy these from the old Netlify site config if they are already set there. Do not commit them.
 
-- You can use Netlify CLI or a compatible runner to invoke functions locally. If omitted, summarizer and view counter endpoints will fail with clear error messages.
+Local testing of Vercel functions:
+
+- Use `npx vercel dev` so `/api/summarize` and `/api/incrementViews` run locally. If omitted, summarizer and view counter endpoints will fail with clear error messages.
 
 If any of the above environment variables are not set, the repository will still build and the static site will work, but serverless behaviors (AI summary, view tracking) will return errors.
 
 ## Future Improvements
 
-- Add automated tests for the utility functions (`postInsights.ts`) and Netlify functions.
+- Add automated tests for the utility functions (`postInsights.ts`) and serverless functions.
 - Add CI configuration for linting and build checks.
 - Provide optional server-side rendering or edge functions for summarization to reduce latency.
 - Add authentication for bookmarking syncing across devices (current bookmarks use `localStorage`).
@@ -94,11 +97,11 @@ If any of the above environment variables are not set, the repository will still
 
 ## Why I Built This
 
-This project is a personal site and writing archive focused on fast static delivery with a handful of progressive enhancements: an accessible in-browser reader, client-side discovery features, and experimentations with AI-assisted summarization. The Netlify functions keep sensitive API keys server-side while enabling richer UX on the client.
+This project is a personal site and writing archive focused on fast static delivery with a handful of progressive enhancements: an accessible in-browser reader, client-side discovery features, and experimentations with AI-assisted summarization. The Vercel functions keep sensitive API keys server-side while enabling richer UX on the client.
 
 ## Challenges Solved
 
-- Safely calling an LLM from the web without leaking API keys — solved by `netlify/functions/summarize.js`.
+- Safely calling an LLM from the web without leaking API keys — solved by `api/summarize.js`.
 - Extracting useful preview metadata (read time, key ideas, striking lines) from Markdown without a heavy NLP dependency (`src/utils/postInsights.ts`).
 - Providing resilient audio playback across browsers using the Web Speech API, with keep-alive handling for Chrome (`public/js/reader.js`).
 

@@ -1,40 +1,44 @@
-// netlify/functions/summarize.js
+// api/summarize.js
 // ─────────────────────────────────────────────────────────────
 //  Serverless proxy for the Anthropic API.
 //  Keeps the API key server-side — never exposed to the browser.
 //
-//  Deploy: drop this file into netlify/functions/summarize.js
-//  Env var: set ANTHROPIC_API_KEY in Netlify → Site config → Environment variables
+//  Deploy: this file is a Vercel Serverless Function at /api/summarize
+//  Env var: set ANTHROPIC_API_KEY in Vercel → Project → Settings → Environment Variables
 //
 //  Expects:  POST  { title: string, text: string }
 //  Returns:  { tldr, keyPoints, tone, wordCount }
 // ─────────────────────────────────────────────────────────────
 
-exports.handler = async function (event) {
-  // Only allow POST
-  if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, body: JSON.stringify({ error: 'Method not allowed' }) };
+function parseBody(body) {
+  if (body == null || body === '') return {};
+  if (typeof body === 'object') return body;
+  return JSON.parse(body);
+}
+
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
   }
 
   const key = process.env.ANTHROPIC_API_KEY;
   if (!key) {
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: 'ANTHROPIC_API_KEY not configured in Netlify environment variables.' }),
-    };
+    return res.status(500).json({
+      error: 'ANTHROPIC_API_KEY not configured in Vercel environment variables.',
+    });
   }
 
   let title = '', text = '';
   try {
-    const body = JSON.parse(event.body || '{}');
+    const body = parseBody(req.body);
     title = (body.title || '').slice(0, 200);
-    text  = (body.text  || '').slice(0, 12000); // ~6k words max context
+    text = (body.text || '').slice(0, 12000); // ~6k words max context
   } catch {
-    return { statusCode: 400, body: JSON.stringify({ error: 'Invalid JSON body' }) };
+    return res.status(400).json({ error: 'Invalid JSON body' });
   }
 
   if (!text.trim()) {
-    return { statusCode: 400, body: JSON.stringify({ error: 'No text provided' }) };
+    return res.status(400).json({ error: 'No text provided' });
   }
 
   const wordCount = text.split(/\s+/).filter(Boolean).length;
@@ -77,33 +81,28 @@ ${text}`;
 
     if (!response.ok) {
       const err = await response.text();
-      return { statusCode: 502, body: JSON.stringify({ error: 'Anthropic API error: ' + err }) };
+      return res.status(502).json({ error: 'Anthropic API error: ' + err });
     }
 
     const data = await response.json();
-    const raw  = data.content?.[0]?.text?.trim() || '';
+    const raw = data.content?.[0]?.text?.trim() || '';
 
-    // Strip any accidental markdown fences
     const clean = raw.replace(/^```[a-z]*\n?/i, '').replace(/\n?```$/i, '').trim();
 
     let parsed;
     try {
       parsed = JSON.parse(clean);
     } catch {
-      return { statusCode: 502, body: JSON.stringify({ error: 'Could not parse AI response', raw }) };
+      return res.status(502).json({ error: 'Could not parse AI response', raw });
     }
 
-    return {
-      statusCode: 200,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        tldr:       String(parsed.tldr      || ''),
-        keyPoints:  Array.isArray(parsed.keyPoints) ? parsed.keyPoints.map(String) : [],
-        tone:       String(parsed.tone      || 'Thoughtful'),
-        wordCount,
-      }),
-    };
+    return res.status(200).json({
+      tldr: String(parsed.tldr || ''),
+      keyPoints: Array.isArray(parsed.keyPoints) ? parsed.keyPoints.map(String) : [],
+      tone: String(parsed.tone || 'Thoughtful'),
+      wordCount,
+    });
   } catch (err) {
-    return { statusCode: 500, body: JSON.stringify({ error: err.message }) };
+    return res.status(500).json({ error: err.message });
   }
-};
+}
