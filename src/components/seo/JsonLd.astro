@@ -8,55 +8,82 @@ interface BreadcrumbItem {
   item: string;
 }
 
+interface CreativeWorkData {
+  name: string;
+  description: string;
+  url: string;
+  datePublished?: string;
+}
+
 interface Props {
   type?: SchemaType;
   breadcrumbs?: BreadcrumbItem[];
-  creativeWork?: {
-    name: string;
-    description: string;
-    url: string;
-    datePublished?: string;
-  };
+  creativeWork?: CreativeWorkData;
 }
 
 const { type = 'Person', breadcrumbs = [], creativeWork } = Astro.props;
 
+function defined<T extends Record<string, unknown>>(obj: T): Record<string, unknown> {
+  return Object.fromEntries(
+    Object.entries(obj).filter(([, value]) => value !== undefined && value !== null && value !== ''),
+  );
+}
+
+function breadcrumbList(items: BreadcrumbItem[]) {
+  return defined({
+    '@type': 'BreadcrumbList',
+    itemListElement: items.map((crumb, index) =>
+      defined({
+        '@type': 'ListItem',
+        position: index + 1,
+        name: crumb.name,
+        item: crumb.item,
+      }),
+    ),
+  });
+}
+
+function creativeWorkNode(work: CreativeWorkData) {
+  return defined({
+    '@type': 'CreativeWork',
+    name: work.name,
+    description: work.description,
+    url: work.url,
+    author: defined({
+      '@type': 'Person',
+      name: site.author,
+      url: site.url,
+    }),
+    datePublished: work.datePublished,
+  });
+}
+
 let schema: Record<string, unknown>;
 
-if (type === 'BreadcrumbList') {
+if (breadcrumbs.length > 0 && creativeWork) {
   schema = {
     '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: breadcrumbs.map((crumb, index) => ({
-      '@type': 'ListItem',
-      position: index + 1,
-      name: crumb.name,
-      item: crumb.item,
-    })),
+    '@graph': [breadcrumbList(breadcrumbs), creativeWorkNode(creativeWork)],
+  };
+} else if (type === 'BreadcrumbList') {
+  schema = {
+    '@context': 'https://schema.org',
+    ...breadcrumbList(breadcrumbs),
   };
 } else if (type === 'CreativeWork' && creativeWork) {
   schema = {
     '@context': 'https://schema.org',
-    '@type': 'CreativeWork',
-    name: creativeWork.name,
-    description: creativeWork.description,
-    url: creativeWork.url,
-    author: {
-      '@type': 'Person',
-      name: site.author,
-      url: site.url,
-    },
-    ...(creativeWork.datePublished ? { datePublished: creativeWork.datePublished } : {}),
+    ...creativeWorkNode(creativeWork),
   };
 } else {
-  schema = {
+  schema = defined({
     '@context': 'https://schema.org',
     '@type': 'Person',
     name: site.author,
     url: site.url,
     email: site.email,
     sameAs: site.socials.map((social) => social.href),
-  };
+  });
 }
 ---
 

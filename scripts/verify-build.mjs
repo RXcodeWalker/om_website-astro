@@ -44,6 +44,8 @@ const ROUTES = [
   ['about', 'about/index.html'],
   ['contact', 'contact/index.html'],
   ['projects', 'projects/index.html'],
+  ['french-coach', 'projects/french-coach/index.html'],
+  ['robot', 'projects/robot/index.html'],
   ['achievements', 'achievements/index.html'],
   ['404', '404.html'],
 ];
@@ -218,6 +220,98 @@ record(
   routeJs.every((route) => route.total <= 5 * 1024),
   `${worstJs.name} ${kb(worstJs.total)}`,
   '5 KB',
+);
+
+/* -------------------------------------------------------- case studies */
+
+const frenchPath = join(dist, 'projects/french-coach/index.html');
+const robotPath = join(dist, 'projects/robot/index.html');
+const collapsedPath = join(dist, 'projects/frenchcoach/index.html');
+const frenchHtml = existsSync(frenchPath) ? readFileSync(frenchPath, 'utf8') : '';
+const robotHtml = existsSync(robotPath) ? readFileSync(robotPath, 'utf8') : '';
+const mainOf = (html) => (html.match(/<main\b[^>]*>([\s\S]*?)<\/main>/i) ?? [, ''])[1];
+const jsonLdOf = (html) => {
+  const raw = html.match(/<script[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/i);
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw[1]);
+  } catch {
+    return null;
+  }
+};
+const h1Count = (html) => countIn(html, /<h1[\s>]/g);
+
+record('Case studies', 'french-coach HTML exists', existsSync(frenchPath), existsSync(frenchPath), true);
+record('Case studies', 'robot HTML exists', existsSync(robotPath), existsSync(robotPath), true);
+record('Case studies', 'frenchcoach HTML absent', !existsSync(collapsedPath), existsSync(collapsedPath) ? 'present' : 'absent', 'absent');
+record('Case studies', 'french-coach one h1', h1Count(frenchHtml) === 1, h1Count(frenchHtml), 1);
+record('Case studies', 'robot one h1', h1Count(robotHtml) === 1, h1Count(robotHtml), 1);
+
+record(
+  'Case studies',
+  'french-coach GitHub URL',
+  frenchHtml.includes('https://github.com/RXcodeWalker/french-coach'),
+  frenchHtml.includes('https://github.com/RXcodeWalker/french-coach'),
+  true,
+);
+record(
+  'Case studies',
+  'french-coach live URL',
+  frenchHtml.includes('https://french.beyondthebasics.me'),
+  frenchHtml.includes('https://french.beyondthebasics.me'),
+  true,
+);
+record(
+  'Case studies',
+  'french-coach picture/img with alt',
+  /<(?:picture|img)\b/i.test(frenchHtml) &&
+    frenchHtml.includes('Practise the IGCSE French speaking exam by speaking, not by reading'),
+  /<(?:picture|img)\b/i.test(frenchHtml),
+  true,
+);
+record(
+  'Case studies',
+  'french-coach canonical',
+  /rel="canonical"[^>]+href="https:\/\/beyondthebasics\.me\/projects\/french-coach"/i.test(frenchHtml) ||
+    /href="https:\/\/beyondthebasics\.me\/projects\/french-coach"[^>]+rel="canonical"/i.test(frenchHtml),
+  (frenchHtml.match(/rel="canonical"[^>]+href="([^"]+)"/) ?? [])[1] ?? 'missing',
+  'https://beyondthebasics.me/projects/french-coach',
+);
+
+const frenchLd = jsonLdOf(frenchHtml);
+const graphTypes = Array.isArray(frenchLd?.['@graph'])
+  ? frenchLd['@graph'].map((node) => node['@type']).sort()
+  : [];
+record('Case studies', 'french-coach JSON-LD parses', frenchLd !== null, frenchLd !== null, true);
+record(
+  'Case studies',
+  'french-coach @graph types',
+  graphTypes.join(',') === 'BreadcrumbList,CreativeWork',
+  graphTypes.join(',') || 'none',
+  'BreadcrumbList, CreativeWork',
+);
+record(
+  'Case studies',
+  'french-coach no datePublished',
+  !JSON.stringify(frenchLd ?? {}).includes('datePublished'),
+  JSON.stringify(frenchLd ?? {}).includes('datePublished'),
+  false,
+);
+
+const robotMain = mainOf(robotHtml);
+record(
+  'Case studies',
+  'robot linksNote',
+  robotMain.includes('Built as a physical prototype at an IIT makerspace'),
+  robotMain.includes('Built as a physical prototype at an IIT makerspace'),
+  true,
+);
+record(
+  'Case studies',
+  'robot main has no github.com',
+  !/github\.com/i.test(robotMain),
+  /github\.com/i.test(robotMain) ? 'present' : 'absent',
+  'absent',
 );
 
 /* --------------------------------------------------------------- report */

@@ -1,0 +1,75 @@
+---
+import { z } from 'astro/zod';
+import { metric } from '../../schemas/primitives';
+
+interface Props {
+  items?: unknown;
+}
+
+const { items } = Astro.props;
+
+const empty = items === undefined || items === null || (Array.isArray(items) && items.length === 0);
+
+let parsed: z.infer<typeof metric>[] = [];
+
+if (!empty) {
+  const result = z.array(metric).safeParse(items);
+  if (!result.success) {
+    throw new Error(`Metrics: ${result.error.message}`);
+  }
+  parsed = result.data;
+}
+---
+
+{
+  parsed.length > 0 && (
+    <dl class="metrics tabular-nums">
+      {parsed.map((item) => (
+        <div class="metrics__item">
+          <dt class="metrics__label">{item.label}</dt>
+          <dd class="metrics__value">
+            {item.value}
+            {item.note && <span class="metrics__note">{item.note}</span>}
+          </dd>
+        </div>
+      ))}
+    </dl>
+  )
+}
+
+<style>
+  .metrics {
+    display: grid;
+    gap: var(--space-4);
+    margin: var(--space-6) 0;
+  }
+
+  .metrics__item {
+    margin: 0;
+  }
+
+  .metrics__label {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .metrics__value {
+    margin: var(--space-1) 0 0;
+    font-family: var(--font-display);
+    font-size: var(--step-2);
+    color: var(--text-primary);
+  }
+
+  .metrics__note {
+    display: block;
+    margin-top: var(--space-1);
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    font-weight: 400;
+    color: var(--text-muted);
+  }
+</style>

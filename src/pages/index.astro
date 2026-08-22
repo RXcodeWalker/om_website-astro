@@ -9,10 +9,9 @@ import NowBand from '../components/patterns/NowBand.astro';
 import PostRow from '../components/patterns/PostRow.astro';
 import { site } from '../config/site';
 import type { Achievement } from '../schemas/achievement';
+import { publishedProjects } from '../utils/projects';
 
-const projects = (await getCollection('projects'))
-  .filter((project) => !project.data.draft)
-  .sort((a, b) => a.data.order - b.data.order);
+const projects = publishedProjects(await getCollection('projects'));
 
 const nowEntries = await getCollection('now');
 const now = nowEntries[0]?.data;
@@ -61,7 +60,7 @@ const highlights = achievementEntries
             <ProjectEntry
               project={project}
               variant="compact"
-              href={`/projects#${project.id}`}
+              href={`/projects/${project.id}`}
             />
           ))}
         </div>

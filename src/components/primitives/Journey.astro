@@ -1,0 +1,73 @@
+---
+import { z } from 'astro/zod';
+import { timelineEntry } from '../../schemas/primitives';
+
+interface Props {
+  entries?: unknown;
+}
+
+const { entries } = Astro.props;
+
+const empty =
+  entries === undefined || entries === null || (Array.isArray(entries) && entries.length === 0);
+
+let parsed: z.infer<typeof timelineEntry>[] = [];
+
+if (!empty) {
+  const result = z.array(timelineEntry).safeParse(entries);
+  if (!result.success) {
+    throw new Error(`Journey: ${result.error.message}`);
+  }
+  parsed = result.data;
+}
+---
+
+{
+  parsed.length > 0 && (
+    <ol class="journey">
+      {parsed.map((item) => (
+        <li class="journey__item">
+          <time class="journey__date tabular-nums" datetime={item.date.toISOString()}>
+            {item.date.toISOString().slice(0, 10)}
+            {item.end && ` – ${item.end.toISOString().slice(0, 10)}`}
+          </time>
+          <p class="journey__title">{item.title}</p>
+          {item.detail && <p class="journey__detail">{item.detail}</p>}
+        </li>
+      ))}
+    </ol>
+  )
+}
+
+<style>
+  .journey {
+    margin: var(--space-6) 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  .journey__item {
+    margin: 0;
+    display: grid;
+    gap: var(--space-1);
+  }
+
+  .journey__date {
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    color: var(--text-muted);
+  }
+
+  .journey__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--step-1);
+  }
+
+  .journey__detail {
+    margin: 0;
+    color: var(--text-secondary);
+  }
+</style>

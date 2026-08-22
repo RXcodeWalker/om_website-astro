@@ -1,0 +1,67 @@
+---
+import { z } from 'astro/zod';
+
+const spec = z.object({ label: z.string(), value: z.string() });
+
+interface Props {
+  items?: unknown;
+}
+
+const { items } = Astro.props;
+
+const empty = items === undefined || items === null || (Array.isArray(items) && items.length === 0);
+
+let parsed: z.infer<typeof spec>[] = [];
+
+if (!empty) {
+  const result = z.array(spec).safeParse(items);
+  if (!result.success) {
+    throw new Error(`SpecSheet: ${result.error.message}`);
+  }
+  parsed = result.data;
+}
+---
+
+{
+  parsed.length > 0 && (
+    <dl class="spec-sheet tabular-nums">
+      {parsed.map((item) => (
+        <div class="spec-sheet__row">
+          <dt class="spec-sheet__label">{item.label}</dt>
+          <dd class="spec-sheet__value">{item.value}</dd>
+        </div>
+      ))}
+    </dl>
+  )
+}
+
+<style>
+  .spec-sheet {
+    margin: var(--space-6) 0;
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .spec-sheet__row {
+    display: grid;
+    grid-template-columns: minmax(8ch, 1fr) 2fr;
+    gap: var(--space-4);
+    margin: 0;
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .spec-sheet__label {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .spec-sheet__value {
+    margin: 0;
+    color: var(--text-primary);
+  }
+</style>

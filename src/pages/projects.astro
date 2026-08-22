@@ -37,7 +37,7 @@ const { featured, remaining } = projectIndexSections(published);
                 project={project}
                 variant="featured"
                 headingLevel="h2"
-                linked={false}
+                href={`/projects/${project.id}`}
               />
             ))}
             {remaining.map((project) => (
@@ -45,7 +45,7 @@ const { featured, remaining } = projectIndexSections(published);
                 project={project}
                 variant="row"
                 headingLevel="h2"
-                linked={false}
+                href={`/projects/${project.id}`}
               />
             ))}
           </div>

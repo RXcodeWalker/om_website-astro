@@ -1,0 +1,57 @@
+---
+import { getCollection, render } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CaseStudyLayout from '../../layouts/CaseStudyLayout.astro';
+import Figure from '../../components/primitives/Figure.astro';
+import Gallery from '../../components/primitives/Gallery.astro';
+import Metrics from '../../components/primitives/Metrics.astro';
+import Journey from '../../components/primitives/Journey.astro';
+import SpecSheet from '../../components/primitives/SpecSheet.astro';
+import { site } from '../../config/site';
+import { nextPublishedProject, publishedProjects } from '../../utils/projects';
+
+export async function getStaticPaths() {
+  const published = publishedProjects(await getCollection('projects'));
+  return published.map((project) => ({
+    params: { slug: project.id },
+    props: { project, published },
+  }));
+}
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+  published: CollectionEntry<'projects'>[];
+}
+
+const { project, published } = Astro.props;
+const { Content, headings } = await render(project);
+const next = nextPublishedProject(published, project.id);
+const { data } = project;
+const canonical = `${site.url}/projects/${project.id}`;
+const description = data.description ?? data.summary;
+
+const components = { Figure, Gallery, Metrics, Journey, SpecSheet };
+---
+
+<BaseLayout
+  title={data.title}
+  description={description}
+  canonical={canonical}
+  breadcrumbs={[
+    { name: 'Home', item: site.url },
+    { name: 'Projects', item: `${site.url}/projects` },
+    { name: data.title, item: canonical },
+  ]}
+  creativeWork={{
+    name: data.title,
+    description,
+    url: canonical,
+  }}
+>
+  <main id="main">
+    <CaseStudyLayout project={project} headings={headings} next={next}>
+      <Content components={components} />
+    </CaseStudyLayout>
+  </main>
+</BaseLayout>

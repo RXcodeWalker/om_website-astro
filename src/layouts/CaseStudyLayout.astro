@@ -1,0 +1,254 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import type { MarkdownHeading } from 'astro';
+import Media from '../components/primitives/Media.astro';
+import StatusBadge from '../components/primitives/StatusBadge.astro';
+import MetaRow from '../components/primitives/MetaRow.astro';
+import ChipList from '../components/primitives/ChipList.astro';
+import Prose from '../components/primitives/Prose.astro';
+import { tocH2s } from '../utils/projects';
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+  headings: MarkdownHeading[];
+  next: CollectionEntry<'projects'> | null;
+}
+
+const { project, headings, next } = Astro.props;
+const { data } = project;
+const hero = data.hero ?? data.thumbnail;
+const toc = tocH2s(headings);
+---
+
+<div class="container">
+  <article class="grid grid--12 case-study">
+    <header class="case-study__header reveal">
+      {data.kicker && <p class="case-study__kicker">{data.kicker}</p>}
+      <h1 class="case-study__title">{data.title}</h1>
+      <p class="case-study__outcome">{data.outcome}</p>
+    </header>
+
+    {
+      hero && (
+        <div class="case-study__hero">
+          <Media
+            src={hero.src}
+            alt={hero.alt}
+            ratio="16:10"
+            eager
+            sizes="(min-width: 1024px) 736px, 100vw"
+          />
+        </div>
+      )
+    }
+
+    <aside class="case-study__rail reveal">
+      <StatusBadge status={data.status} />
+      <MetaRow
+        items={[
+          { label: 'Year', value: String(data.year), datetime: String(data.year) },
+          { label: 'Role', value: data.role },
+        ]}
+      />
+      <ChipList items={[...data.stack]} max={8} />
+
+      {
+        data.links.length > 0 ? (
+          <ul class="case-study__links" aria-label={`Explore ${data.title}`}>
+            {data.links.map((item) => (
+              <li>
+                <a class="link-ui link-external" href={item.href}>
+                  {item.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          data.linksNote && <p class="case-study__note">{data.linksNote}</p>
+        )
+      }
+
+      {
+        toc.length > 0 && (
+          <nav class="case-study__toc" aria-label="On this page">
+            <ol>
+              {toc.map((item) => (
+                <li>
+                  <a href={`#${item.slug}`}>{item.text}</a>
+                </li>
+              ))}
+            </ol>
+          </nav>
+        )
+      }
+    </aside>
+
+    <div class="case-study__prose reveal">
+      <Prose>
+        <slot />
+      </Prose>
+    </div>
+
+    <footer class="case-study__footer reveal">
+      {
+        next && (
+          <p class="case-study__next">
+            <a href={`/projects/${next.id}`}>Next project: {next.data.title}</a>
+          </p>
+        )
+      }
+      <p class="case-study__index">
+        <a class="link-ui" href="/projects">All projects</a>
+      </p>
+    </footer>
+  </article>
+</div>
+
+<style>
+  .case-study {
+    padding-block: var(--space-8) var(--space-9);
+    align-items: start;
+  }
+
+  .case-study__header {
+    display: grid;
+    gap: var(--space-3);
+    margin-bottom: var(--space-6);
+  }
+
+  .case-study__kicker {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .case-study__title {
+    margin: 0;
+    max-width: var(--measure-wide);
+  }
+
+  .case-study__outcome {
+    margin: 0;
+    max-width: var(--measure-narrow);
+    font-size: var(--step-1);
+    line-height: var(--leading-prose);
+    color: var(--text-secondary);
+  }
+
+  .case-study__hero {
+    margin-bottom: var(--space-6);
+  }
+
+  .case-study__rail {
+    display: grid;
+    gap: var(--space-4);
+    align-content: start;
+    padding-block: var(--space-5);
+    border-top: 1px solid var(--border-subtle);
+    border-bottom: 1px solid var(--border-subtle);
+    margin-bottom: var(--space-6);
+  }
+
+  .case-study__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .case-study__links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+
+  .case-study__note {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    color: var(--text-muted);
+  }
+
+  .case-study__toc {
+    margin-top: var(--space-2);
+  }
+
+  .case-study__toc ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .case-study__toc a {
+    color: var(--text-secondary);
+    text-decoration: none;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .case-study__toc a:hover,
+    .case-study__toc a:focus-visible {
+      color: var(--accent);
+      text-decoration: underline;
+      text-underline-offset: 0.15em;
+    }
+  }
+
+  .case-study__prose {
+    min-width: 0;
+  }
+
+  .case-study__footer {
+    display: grid;
+    gap: var(--space-4);
+    margin-top: var(--space-8);
+    padding-top: var(--space-6);
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  .case-study__next,
+  .case-study__index {
+    margin: 0;
+  }
+
+  .case-study__next a {
+    color: var(--text-primary);
+    text-decoration: none;
+    font-family: var(--font-display);
+    font-size: var(--step-1);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .case-study__next a:hover,
+    .case-study__next a:focus-visible {
+      text-decoration: underline;
+      text-underline-offset: 0.15em;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .case-study__header,
+    .case-study__hero,
+    .case-study__prose,
+    .case-study__footer {
+      grid-column: 2 / 10;
+    }
+
+    .case-study__rail {
+      grid-column: 10 / 13;
+      grid-row: 1 / -1;
+      position: sticky;
+      top: calc(var(--header-h) + var(--space-4));
+      margin-bottom: 0;
+      padding-block: 0;
+      border-top: 0;
+      border-bottom: 0;
+    }
+  }
+</style>

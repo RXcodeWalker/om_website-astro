@@ -10,10 +10,10 @@ interface Props {
   headingLevel?: 'h2' | 'h3';
   /**
    * When false, the title is not a link and no stretched overlay is emitted.
-   * Homepage compact keeps the default (true) and still anchors to /projects#id.
+   * Homepage compact keeps the default (true) and links to /projects/<id>.
    */
   linked?: boolean;
-  /** Defaults to /projects#<id> when linked. */
+  /** Defaults to /projects/<id> when linked. */
   href?: string;
 }
 
@@ -25,7 +25,7 @@ const {
   href,
 } = Astro.props;
 const { data } = project;
-const linkHref = href ?? `/projects#${project.id}`;
+const linkHref = href ?? `/projects/${project.id}`;
 const Heading = headingLevel;
 const showSummary = variant !== 'compact';
 const showExplore = variant !== 'compact';
