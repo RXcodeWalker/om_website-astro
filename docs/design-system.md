@@ -138,6 +138,7 @@ export const projectSchema = ({ image }: SchemaContext) =>
 
       // Ordering and lifecycle
       order: z.number().int(),                // manual curation; not date-sorted
+      featured: z.boolean().default(false),   // index emphasis only; homepage ignores this
       draft: z.boolean().default(false),
 
       // Media — optional because hardware projects may have no publishable image yet
@@ -164,12 +165,25 @@ export const projectSchema = ({ image }: SchemaContext) =>
     });
 ```
 
+### Featured on the index
+
+`featured` is a data flag, not inferred from `order`. The homepage ignores it and always renders published projects as `variant="compact"` sorted by `order`.
+
+The index uses featured visual treatment only when **some, but not all**, published projects are flagged:
+
+- `published` = non-drafts sorted by `order`
+- `featured` = `published.filter(featured)` (order preserved)
+- `remaining` = `published.filter(!featured)` (order preserved)
+- if `featured.length > 0 && featured.length < published.length`: featured entries use `variant="featured"`, then remaining entries use `variant="row"`
+- otherwise every published project uses `variant="row"`
+
+Zero featured, one-of-one featured, and all-featured therefore render as a single row list. That is deliberate: a boolean that would mark the entire inventory is not curation.
+
 ### Fields deliberately not implemented
 
-The brief listed a longer field set. Four were dropped because the existing architecture offers something better:
+The brief listed a longer field set. These were dropped because the existing architecture offers something better:
 
 - **`slug`** — the directory name is the slug. A `slug` field lets frontmatter and URL drift apart, which is exactly how the blog ended up with 26 numeric URLs.
-- **`featured`** — with three projects, everything is featured. The homepage shows all three in `order`. Reintroduce `featured` past eight projects, alongside grouping.
 - **`subtitle` / `description` as separate prose fields** — collapsed into `outcome` (one line, for cards) and `summary` (2-4 sentences, for the page lede and the meta description). Three overlapping prose fields is how you end up writing the same sentence three ways.
 - **`technologies`** — named `stack`, matching the "stack chips" language of the IA and the way it renders.
 - **`sections` as a frontmatter array** — see below.
@@ -357,9 +371,9 @@ If any step below requires touching a component or a page, the model has failed:
 2. Fill frontmatter. Zod rejects a missing outcome, an empty stack, a missing thumbnail alt, or links with no explanation.
 3. Drop images into `src/content/projects/<slug>/media/`.
 4. Write the body: H2 prose sections, plus any of the nine sanctioned components.
-5. Set `order`.
+5. Set `order`. Set `featured` only when this entry should receive the index's featured treatment.
 
-The index reads `getCollection('projects')`, filters drafts, sorts by `order`, and maps over `ProjectRow`. The homepage does the same with `variant="compact"`. `[slug].astro` uses `getStaticPaths()`. Nothing is hardcoded — which is the direct correction of today's `projects.astro`, where two projects, their SVG icons, and their gradients are literals inside the page file.
+The index reads `getCollection('projects')`, drops drafts, sorts by `order`, then applies the some-but-not-all featured split and maps over `ProjectEntry`. The homepage maps the same published list as `variant="compact"` and does not read `featured`. `[slug].astro` uses `getStaticPaths()`. Nothing is hardcoded — which is the direct correction of today's `projects.astro`, where two projects, their SVG icons, and their gradients are literals inside the page file.
 
 ---
 

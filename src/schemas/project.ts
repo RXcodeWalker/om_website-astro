@@ -19,6 +19,7 @@ export const projectSchema = ({ image }: SchemaContext) =>
       stack: z.array(z.string()).min(1).max(8),
 
       order: z.number().int(),
+      featured: z.boolean().default(false),
       draft: z.boolean().default(false),
 
       thumbnail: z.object({ src: image(), alt: z.string().min(4) }).optional(),

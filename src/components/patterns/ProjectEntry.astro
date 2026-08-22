@@ -6,14 +6,36 @@ import StatusBadge from '../primitives/StatusBadge.astro';
 
 interface Props {
   project: CollectionEntry<'projects'>;
-  variant?: 'row' | 'compact';
-  /** Defaults to /projects#<id> for in-page anchor navigation. */
+  variant?: 'row' | 'compact' | 'featured';
+  headingLevel?: 'h2' | 'h3';
+  /**
+   * When false, the title is not a link and no stretched overlay is emitted.
+   * Homepage compact keeps the default (true) and still anchors to /projects#id.
+   */
+  linked?: boolean;
+  /** Defaults to /projects#<id> when linked. */
   href?: string;
 }
 
-const { project, variant = 'row', href } = Astro.props;
+const {
+  project,
+  variant = 'row',
+  headingLevel = 'h3',
+  linked = true,
+  href,
+} = Astro.props;
 const { data } = project;
 const linkHref = href ?? `/projects#${project.id}`;
+const Heading = headingLevel;
+const showSummary = variant !== 'compact';
+const showExplore = variant !== 'compact';
+const explore = [
+  ...data.links,
+  ...(data.relatedPost
+    ? [{ label: data.relatedPost.title, href: data.relatedPost.url }]
+    : []),
+];
+const chipMax = variant === 'compact' ? 3 : 5;
 ---
 
 <article
@@ -30,7 +52,14 @@ const linkHref = href ?? `/projects#${project.id}`;
         src={data.thumbnail.src}
         alt={data.thumbnail.alt}
         ratio="16:10"
-        sizes={variant === 'row' ? '(min-width: 1024px) 440px, 100vw' : '(min-width: 1024px) 320px, 100vw'}
+        eager={variant === 'featured'}
+        sizes={
+          variant === 'featured'
+            ? '(min-width: 1120px) 1120px, 100vw'
+            : variant === 'row'
+              ? '(min-width: 1024px) 440px, 100vw'
+              : '(min-width: 1024px) 320px, 100vw'
+        }
       />
     </div>
   )}
@@ -38,20 +67,42 @@ const linkHref = href ?? `/projects#${project.id}`;
   <div class="project-entry__body">
     {data.kicker && <p class="project-entry__kicker">{data.kicker}</p>}
 
-    <h3 class="project-entry__title">
-      <a href={linkHref} class="project-entry__link">{data.title}</a>
-    </h3>
+    <Heading class="project-entry__title">
+      {linked ? (
+        <a href={linkHref} class="project-entry__link">{data.title}</a>
+      ) : (
+        data.title
+      )}
+    </Heading>
 
     <p class="project-entry__outcome">{data.outcome}</p>
 
-    {variant === 'row' && <p class="project-entry__summary">{data.summary}</p>}
+    {showSummary && <p class="project-entry__summary">{data.summary}</p>}
 
     <div class="project-entry__meta">
       <StatusBadge status={data.status} />
-      <span class="project-entry__year tabular-nums">{data.year}</span>
+      <time class="project-entry__year tabular-nums" datetime={String(data.year)}>
+        {data.year}
+      </time>
     </div>
 
-    <ChipList items={[...data.stack]} max={variant === 'row' ? 5 : 3} />
+    <ChipList items={[...data.stack]} max={chipMax} />
+
+    {showExplore && explore.length > 0 && (
+      <ul class="project-entry__actions" aria-label={`Explore ${data.title}`}>
+        {explore.map((item) => (
+          <li>
+            <a class="link-ui link-external" href={item.href} rel="noopener">
+              {item.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    )}
+
+    {showExplore && explore.length === 0 && data.linksNote && (
+      <p class="project-entry__note">{data.linksNote}</p>
+    )}
   </div>
 </article>
 
@@ -62,6 +113,10 @@ const linkHref = href ?? `/projects#${project.id}`;
     gap: var(--space-4);
     padding-block: var(--space-6);
     border-top: 1px solid var(--border-subtle);
+  }
+
+  .project-entry--featured {
+    padding-block: var(--space-8);
   }
 
   @media (min-width: 768px) {
@@ -75,7 +130,6 @@ const linkHref = href ?? `/projects#${project.id}`;
   .project-entry__body {
     display: grid;
     gap: var(--space-3);
-    align-content: start;
   }
 
   .project-entry__kicker {
@@ -90,6 +144,10 @@ const linkHref = href ?? `/projects#${project.id}`;
   .project-entry__title {
     margin: 0;
     font-size: var(--step-2);
+  }
+
+  .project-entry--featured .project-entry__title {
+    font-size: var(--step-3);
   }
 
   .project-entry__link {
@@ -124,6 +182,31 @@ const linkHref = href ?? `/projects#${project.id}`;
   .project-entry__year {
     font-family: var(--font-mono);
     font-size: var(--step--2);
+    color: var(--text-muted);
+  }
+
+  .project-entry__actions {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .project-entry__actions a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+
+  .project-entry__note {
+    margin: 0;
+    max-width: var(--measure-prose);
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
     color: var(--text-muted);
   }
 

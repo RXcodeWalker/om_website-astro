@@ -6,17 +6,15 @@ import ProjectEntry from '../components/patterns/ProjectEntry.astro';
 import EmptyState from '../components/patterns/EmptyState.astro';
 import Button from '../components/primitives/Button.astro';
 import { site } from '../config/site';
+import { projectIndexSections, publishedProjects } from '../utils/projects';
 
-// Nothing about this page is hardcoded. Adding a project is one new directory
-// under src/content/projects/ and one `order` value.
-const projects = (await getCollection('projects'))
-  .filter((project) => !project.data.draft)
-  .sort((a, b) => a.data.order - b.data.order);
+const published = publishedProjects(await getCollection('projects'));
+const { featured, remaining } = projectIndexSections(published);
 ---
 
 <BaseLayout
   title="Projects"
-  description="Case studies of what Om Jhamvar has built across web, AI and hardware."
+  description="A short list of what Om Jhamvar has built, with links to look at the work where it is public."
   jsonLd="BreadcrumbList"
   breadcrumbs={[
     { name: 'Home', item: site.url },
@@ -28,22 +26,34 @@ const projects = (await getCollection('projects'))
       <PageIntro
         kicker="What I have built"
         title="Projects"
-        lede="Each project gets a full case study: what it was for, how it was made, what it cost, and what I would change."
+        lede="A short list, on purpose. Each entry says what it is, why it exists, and where you can look at it — a live site, a repository, a write-up, or a note when nothing is public yet."
       />
 
       {
-        projects.length > 0 ? (
+        published.length > 0 ? (
           <div class="project-list">
-            {projects.map((project) => (
-              <ProjectEntry project={project} variant="row" />
+            {featured.map((project) => (
+              <ProjectEntry
+                project={project}
+                variant="featured"
+                headingLevel="h2"
+                linked={false}
+              />
+            ))}
+            {remaining.map((project) => (
+              <ProjectEntry
+                project={project}
+                variant="row"
+                headingLevel="h2"
+                linked={false}
+              />
             ))}
           </div>
         ) : (
           <EmptyState title="Nothing published yet">
             <p>
-              The case studies are being written. Each needs its own account of the problem, the
-              build, the results and the photographs before it earns a page here — a list of
-              project names with a sentence each is not a portfolio.
+              Projects appear here once they have a title, a short account of the work, and either
+              a public link or a note explaining why there is not one.
             </p>
             <p class="empty-actions">
               <Button href={site.blogUrl} variant="quiet" external>Read the writing instead ↗</Button>
