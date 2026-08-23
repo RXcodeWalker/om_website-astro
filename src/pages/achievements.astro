@@ -5,33 +5,13 @@ import PageIntro from '../components/patterns/PageIntro.astro';
 import AchievementItem from '../components/patterns/AchievementItem.astro';
 import EmptyState from '../components/patterns/EmptyState.astro';
 import { site } from '../config/site';
-import type { Achievement } from '../schemas/achievement';
+import { achievementGroups, relatedProjectHref } from '../utils/achievements';
+import { publishedProjects } from '../utils/projects';
 
+const publishedIds = publishedProjects(await getCollection('projects')).map((entry) => entry.id);
 const entries = await getCollection('achievements');
-const achievements = entries
-  .map((entry) => entry.data as Achievement)
-  .sort((a, b) => b.date.getTime() - a.date.getTime());
-
-// A highlights band that repeats the entire inventory is noise, not curation.
-const flagged = achievements.filter((item) => item.highlight);
-const highlights = flagged.length < achievements.length ? flagged.slice(0, 5) : [];
-
-const DOMAIN_LABELS: Record<Achievement['domain'], string> = {
-  academics: 'Academics',
-  music: 'Music',
-  sport: 'Sport',
-  leadership: 'Leadership',
-  building: 'Building',
-};
-
-// Domains are group headings, never chips.
-const groups = (Object.keys(DOMAIN_LABELS) as Achievement['domain'][])
-  .map((domain) => ({
-    domain,
-    label: DOMAIN_LABELS[domain],
-    items: achievements.filter((item) => item.domain === domain),
-  }))
-  .filter((group) => group.items.length > 0);
+const achievements = entries.map((entry) => entry.data);
+const groups = achievementGroups(achievements);
 ---
 
 <BaseLayout
@@ -46,9 +26,9 @@ const groups = (Object.keys(DOMAIN_LABELS) as Achievement['domain'][])
   <main id="main">
     <div class="container">
       <PageIntro
-        kicker="Milestones"
+        kicker="Evidence"
         title="Achievements"
-        lede="Every entry names its issuing body and explains why it is hard. Anything without both does not belong on this page."
+        lede="A short list of things that were awarded, not claimed. Each one names who issued it and what the standard actually is."
       />
 
       {
@@ -60,29 +40,20 @@ const groups = (Object.keys(DOMAIN_LABELS) as Achievement['domain'][])
             </p>
           </EmptyState>
         ) : (
-          <>
-            {highlights.length > 0 && (
-              <section class="group" aria-labelledby="highlights">
-                <h2 id="highlights" class="group__heading">
-                  Selected highlights
-                </h2>
-                {highlights.map((achievement) => (
-                  <AchievementItem achievement={achievement} />
-                ))}
-              </section>
-            )}
-
-            {groups.map((group) => (
-              <section class="group" aria-labelledby={`group-${group.domain}`}>
-                <h2 id={`group-${group.domain}`} class="group__heading">
-                  {group.label}
-                </h2>
-                {group.items.map((achievement) => (
-                  <AchievementItem achievement={achievement} />
-                ))}
-              </section>
-            ))}
-          </>
+          groups.map((group) => (
+            <section class="group" aria-labelledby={`group-${group.domain}`}>
+              <h2 id={`group-${group.domain}`} class="group__heading">
+                {group.label}
+              </h2>
+              {group.items.map((achievement) => (
+                <AchievementItem
+                  achievement={achievement}
+                  variant={achievement.highlight ? 'featured' : 'row'}
+                  relatedHref={relatedProjectHref(achievement.project, publishedIds)}
+                />
+              ))}
+            </section>
+          ))
         )
       }
     </div>
@@ -97,5 +68,19 @@ const groups = (Object.keys(DOMAIN_LABELS) as Achievement['domain'][])
   .group__heading {
     margin: 0 0 var(--space-2);
     font-size: var(--step-3);
+  }
+
+  /* Featured weight is page-specific so homepage rows do not ship it. */
+  .group :global(.achievement--featured) {
+    padding-block: var(--space-7);
+  }
+
+  .group :global(.achievement--featured .achievement__title) {
+    font-size: var(--step-3);
+  }
+
+  .group :global(.achievement--featured .achievement__significance) {
+    font-size: var(--step-1);
+    line-height: var(--leading-prose);
   }
 </style>

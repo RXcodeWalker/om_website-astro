@@ -1,37 +1,22 @@
 ---
+import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PageIntro from '../components/patterns/PageIntro.astro';
 import Section from '../components/primitives/Section.astro';
+import Prose from '../components/primitives/Prose.astro';
 import Button from '../components/primitives/Button.astro';
+import NowBand from '../components/patterns/NowBand.astro';
+import ProjectEntry from '../components/patterns/ProjectEntry.astro';
 import { site } from '../config/site';
+import { publishedProjects } from '../utils/projects';
 
-const interests = [
-  {
-    title: 'Building',
-    detail:
-      'Web development and software engineering, mostly learned by shipping things and then finding out what breaks.',
-  },
-  {
-    title: 'Guitar',
-    detail:
-      'LCM Grade 8 with High Distinction, now working towards the diploma. Rock repertoire and live performance.',
-  },
-  {
-    title: 'Sport',
-    detail:
-      'Football, Formula 1, tennis, cricket and the NFL — read as systems: tactics, decisions under pressure, patterns over a season.',
-  },
-  {
-    title: 'Writing',
-    detail:
-      'The forcing function. If I cannot explain what I built and why it works, I did not understand it.',
-  },
-];
+const projects = publishedProjects(await getCollection('projects'));
+const now = (await getCollection('now'))[0]?.data;
 ---
 
 <BaseLayout
   title="About"
-  description="Om Jhamvar — school student, builder, guitarist. How I work and what I am trying to do."
+  description="Om Jhamvar — how I work, what I am building, and the long-term record this site is for."
   jsonLd="BreadcrumbList"
   breadcrumbs={[
     { name: 'Home', item: site.url },
@@ -41,61 +26,103 @@ const interests = [
   <main id="main">
     <div class="container">
       <PageIntro
-        kicker="The story"
+        kicker="The person"
         title="About me"
-        lede="I am Om Jhamvar, an 11th grade student who learns best by building things, writing about them, and doing both in public."
+        lede="I am Om Jhamvar, an 11th grade student in Mumbai. I learn best by building things, writing about them, and doing both in public."
       />
     </div>
 
-    <Section kicker="Background" heading="How I got here" id="background" headingLevel="h2">
-      <div class="prose">
+    <Section kicker="How I work" heading="Make it real, then explain it" id="how-i-work" headingLevel="h2">
+      <Prose>
         <p>
-          I started this website to make my learning visible and accountable. Instead of only
-          consuming information, I try to turn everything I learn into something concrete — a
-          project, a system, or a piece of writing that forces me to think clearly.
+          I started this site so learning would have somewhere to go. Instead of stopping at a
+          tutorial or a class, I try to turn what I am studying into something I can point at — a
+          project, a system, or a piece of writing that will not let me stay vague.
         </p>
         <p>
-          Most of what I write comes out of coding, robotics, and whatever I am actively building.
-          I care about how an idea actually survives contact with execution: where it breaks, what
-          it costs to fix, and what I would do differently the second time.
+          That is also how I check whether I understood anything. If I cannot explain what I built
+          and why a decision survived contact with execution — where it broke, what it cost to
+          fix, what I would do the second time — I did not understand it yet.
         </p>
         <p>
-          A lot of how I think comes from sport. I spend a great deal of time analysing football,
-          Formula 1, tennis, cricket and the NFL — not just watching, but working out what is
-          happening underneath: tactics, decision-making under pressure, momentum, and patterns in
-          performance over time. That habit of analysis carries into everything else I do.
+          A lot of that habit comes from watching sport as a system, not a highlight reel.
+          Football, Formula 1, tennis, cricket, and the NFL are hours of tactics, decisions under
+          pressure, and patterns over a season. I read code the same way.
         </p>
         <p>
-          Music is the other serious thread. I play guitar and piano, sing, and have performed live
-          at several concerts. I completed LCM Grade 8 Guitar with High Distinction, which took
-          years of consistent graded practice, and I am now working toward diploma level. Daily
-          practice is where I learned what mastery and patience actually cost.
+          Music is the long thread. I play guitar and piano, sing, and have performed at school
+          concerts. LCM Grade 8 Guitar with High Distinction took years of graded exams; I am
+          working toward the diploma. Daily practice is where I learned what patience actually
+          costs, which is a more useful lesson than it sounds.
         </p>
         <p>
-          This site is not a place I post at occasionally. I am building it into a long-term record
-          of how I think and what I can do — consistent writing, real projects, and a clear
-          direction. Everything here is part of that process.
+          A month at Ashoka University on the Lodha Genius Programme was the first time my days
+          were mostly mine to structure. The useful part was not the brochure — it was noticing
+          that independence is a set of small choices, not a personality trait. I wrote that up
+          in{' '}
+          <a
+            class="link-external"
+            href="https://blog.beyondthebasics.me/article/my-summer-at-ashoka-university"
+            rel="noopener"
+          >
+            My Summer at Ashoka University
+          </a>.
         </p>
-      </div>
+      </Prose>
     </Section>
 
-    <Section kicker="What drives me" heading="Four things" id="interests" headingLevel="h2">
-      <ul class="interest-list">
-        {
-          interests.map((interest) => (
-            <li class="interest">
-              <h3 class="interest__title">{interest.title}</h3>
-              <p class="interest__detail">{interest.detail}</p>
-            </li>
-          ))
-        }
-      </ul>
+    {
+      now && (
+        <Section kicker="Currently" heading="What has my attention" id="now" headingLevel="h2">
+          <NowBand entry={now} />
+        </Section>
+      )
+    }
+
+    <Section kicker="What I build" heading="Tools I wish I had" id="build" headingLevel="h2">
+      <Prose>
+        <p>
+          The work on this site is narrow on purpose: software that gives a learner more useful
+          practice than a classroom minute allows, and hardware when I need to understand a system
+          in the physical world. Two projects are published so far.
+        </p>
+      </Prose>
+      {
+        projects.length > 0 && (
+          <div class="stack">
+            {projects.map((project) => (
+              <ProjectEntry
+                project={project}
+                variant="compact"
+                href={`/projects/${project.id}`}
+              />
+            ))}
+          </div>
+        )
+      }
+      <p class="band-action">
+        <Button href="/projects" variant="quiet" size="md">All projects →</Button>
+      </p>
     </Section>
 
-    <Section kicker="Contact" heading="Let us talk" id="connect" headingLevel="h2">
+    <Section kicker="Direction" heading="A record, not a pitch" id="direction" headingLevel="h2">
+      <Prose>
+        <p>
+          I am not using this site as a campaign. I am trying to keep an honest public record of
+          how I think and what I can actually do — the projects, the writing, and the few
+          credentials that have an issuing body. If that is useful to someone else later, good.
+          The first reader is me in six months.
+        </p>
+      </Prose>
+      <p class="band-action">
+        <Button href="/achievements" variant="quiet" size="md">Achievements →</Button>
+      </p>
+    </Section>
+
+    <Section kicker="Contact" heading="If you want to talk" id="connect" headingLevel="h2">
       <p class="band-text">
-        I am always glad to meet people building things, discuss ideas, or work on something
-        together.
+        A question about a project, a collaboration, or an argument about football tactics — the
+        contact page is the right door. I reply within a day or so.
       </p>
       <p class="band-action">
         <Button href="/contact" variant="primary">Get in touch</Button>
@@ -105,37 +132,6 @@ const interests = [
 </BaseLayout>
 
 <style>
-  .interest-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-
-  .interest {
-    display: grid;
-    gap: var(--space-2);
-    padding-block: var(--space-5);
-    border-top: 1px solid var(--border-subtle);
-  }
-
-  @media (min-width: 768px) {
-    .interest {
-      grid-template-columns: 1fr 3fr;
-      gap: var(--space-5);
-    }
-  }
-
-  .interest__title {
-    margin: 0;
-    font-size: var(--step-1);
-  }
-
-  .interest__detail {
-    margin: 0;
-    max-width: var(--measure-prose);
-    color: var(--text-secondary);
-  }
-
   .band-text {
     margin: 0;
     max-width: var(--measure-prose);

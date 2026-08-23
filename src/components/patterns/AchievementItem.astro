@@ -3,18 +3,22 @@ import type { Achievement } from '../../schemas/achievement';
 
 interface Props {
   achievement: Achievement;
+  variant?: 'featured' | 'row';
+  relatedHref?: string;
 }
 
-const { achievement } = Astro.props;
+const { achievement, variant = 'row', relatedHref } = Astro.props;
 
 const dateISO = achievement.date.toISOString().slice(0, 10);
 const dateLabel = achievement.date.toLocaleDateString('en-GB', {
   month: 'short',
   year: 'numeric',
 });
+
+const evidence = achievement.evidence;
 ---
 
-<article class="achievement">
+<article class:list={['achievement', `achievement--${variant}`]}>
   <div class="achievement__head">
     <h3 class="achievement__title">{achievement.title}</h3>
     <p class="achievement__meta tabular-nums">
@@ -33,15 +37,22 @@ const dateLabel = achievement.date.toLocaleDateString('en-GB', {
   <p class="achievement__significance">{achievement.significance}</p>
 
   {
-    achievement.evidence.length > 0 && (
-      <ul class="achievement__evidence">
-        {achievement.evidence.map((item) => (
+    (evidence.length > 0 || relatedHref) && (
+      <ul class="achievement__links">
+        {evidence.map((item) => (
           <li>
-            <a href={item.href} class="link-external" rel="noopener noreferrer">
+            <a href={item.href} class="link-ui link-external" rel="noopener">
               {item.label}
             </a>
           </li>
         ))}
+        {relatedHref && (
+          <li>
+            <a class="link-ui" href={relatedHref}>
+              Related project
+            </a>
+          </li>
+        )}
       </ul>
     )
   }
@@ -81,19 +92,19 @@ const dateLabel = achievement.date.toLocaleDateString('en-GB', {
     color: var(--text-secondary);
   }
 
-  .achievement__evidence {
+  .achievement__links {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-4);
+    gap: var(--space-3);
     margin: 0;
     padding: 0;
     list-style: none;
     font-size: var(--step--1);
   }
 
-  .achievement__evidence a {
-    color: var(--accent);
-    text-decoration: underline;
-    text-underline-offset: 0.15em;
+  .achievement__links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
   }
 </style>

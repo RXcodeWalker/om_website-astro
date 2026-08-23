@@ -8,8 +8,8 @@ import AchievementItem from '../components/patterns/AchievementItem.astro';
 import NowBand from '../components/patterns/NowBand.astro';
 import PostRow from '../components/patterns/PostRow.astro';
 import { site } from '../config/site';
-import type { Achievement } from '../schemas/achievement';
 import { publishedProjects } from '../utils/projects';
+import { sortAchievementsNewestFirst } from '../utils/achievements';
 
 const projects = publishedProjects(await getCollection('projects'));
 
@@ -20,12 +20,10 @@ const now = nowEntries[0]?.data;
 const picks = await getCollection('writing');
 
 // Achievements: only highlighted entries, newest first, capped at 3.
-const achievementEntries = await getCollection('achievements');
-const highlights = achievementEntries
-  .map((e) => e.data as Achievement)
-  .filter((a) => a.highlight)
-  .sort((a, b) => b.date.getTime() - a.date.getTime())
-  .slice(0, 3);
+// Variant stays the default row — featured weight belongs on /achievements.
+const highlights = sortAchievementsNewestFirst(
+  (await getCollection('achievements')).map((entry) => entry.data).filter((item) => item.highlight),
+).slice(0, 3);
 ---
 
 <BaseLayout

@@ -1,9 +1,6 @@
 # Achievement inventory. Every entry needs an issuing body and a significance
-# note explaining why it is hard — the schema enforces both. Aspirations have
-# no issuer and therefore cannot be listed here.
-#
-# Seeded from docs/design-system.md section A4. Verify dates and credentials
-# before the site goes live, and add the remaining entries from the inventory.
+# note explaining why it is hard. Aspirations have no issuer and therefore
+# cannot be listed here. Evidence links are optional — absence is not a defect.
 
 - id: igcse-2026
   title: Cambridge IGCSE
@@ -25,13 +22,12 @@
   significance: >-
     Independent-user French (CEFR B1), awarded with distinction after a
     four-skill examination of listening, speaking, reading and writing.
-  highlight: true
 
 - id: lodha-genius-2025
   title: Lodha Genius Programme
   issuer: Ashoka University
   date: 2025-06-01
-  domain: academics
+  domain: programmes
   significance: >-
     A selective residential programme at Ashoka University for students identified
     through national testing; four weeks of university-level coursework taught by
@@ -41,6 +37,9 @@
     - label: Programme overview
       href: https://www.ashoka.edu.in/lodha-genius-programme/
       kind: profile
+    - label: My summer at Ashoka
+      href: https://blog.beyondthebasics.me/article/my-summer-at-ashoka-university
+      kind: writeup
 
 - id: lcm-grade-8-guitar
   title: Guitar, Grade 8
