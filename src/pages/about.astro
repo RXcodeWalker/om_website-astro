@@ -9,8 +9,10 @@ import NowBand from '../components/patterns/NowBand.astro';
 import ProjectEntry from '../components/patterns/ProjectEntry.astro';
 import { site } from '../config/site';
 import { publishedProjects } from '../utils/projects';
+import { relatedProjectHref } from '../utils/achievements';
 
 const projects = publishedProjects(await getCollection('projects'));
+const publishedIds = projects.map((project) => project.id);
 const now = (await getCollection('now'))[0]?.data;
 ---
 
@@ -74,7 +76,7 @@ const now = (await getCollection('now'))[0]?.data;
     {
       now && (
         <Section kicker="Currently" heading="What has my attention" id="now" headingLevel="h2">
-          <NowBand entry={now} />
+          <NowBand entry={now} projectHref={relatedProjectHref(now.project, publishedIds)} />
         </Section>
       )
     }

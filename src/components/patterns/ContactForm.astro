@@ -6,18 +6,33 @@ import { site } from '../../config/site';
   class="contact-form"
   action={`https://formspree.io/f/${site.formspreeId}`}
   method="POST"
-  novalidate
+  data-fallback={`Could not send. Please email ${site.email} instead.`}
 >
-  <input type="hidden" name="_subject" value="New message from Beyond The Basics" />
+  <input type="hidden" name="subject" value="New message from Beyond The Basics" />
+
+  <p class="visually-hidden">
+    <label for="contact-gotcha">Leave this field blank</label>
+    <input
+      id="contact-gotcha"
+      class="visually-hidden"
+      type="text"
+      name="_gotcha"
+      tabindex="-1"
+      autocomplete="off"
+      aria-hidden="true"
+    />
+  </p>
 
   <div class="contact-form__grid">
     <div class="contact-form__field">
       <label for="contact-name">Name</label>
       <input id="contact-name" name="name" type="text" autocomplete="name" required />
+      <p id="contact-name-error" class="contact-form__error" hidden></p>
     </div>
     <div class="contact-form__field">
       <label for="contact-email">Email</label>
       <input id="contact-email" name="email" type="email" autocomplete="email" required />
+      <p id="contact-email-error" class="contact-form__error" hidden></p>
     </div>
   </div>
 
@@ -30,9 +45,21 @@ import { site } from '../../config/site';
       required
       aria-describedby="contact-hint"></textarea>
     <p id="contact-hint" class="contact-form__hint">I usually reply within 24 hours.</p>
+    <p id="contact-message-error" class="contact-form__error" hidden></p>
   </div>
 
-  <p class="contact-form__status" aria-live="polite" id="contact-status"></p>
+  <p class="contact-form__privacy">
+    Submissions go through Formspree so they can be emailed. Do not send secrets.
+  </p>
+
+  <p
+    class="contact-form__status"
+    id="contact-status"
+    role="status"
+    aria-live="polite"
+    aria-atomic="true"
+    tabindex="-1"
+  ></p>
 
   <button type="submit" class="contact-form__submit">Send message</button>
 </form>
@@ -71,6 +98,7 @@ import { site } from '../../config/site';
   .contact-form__field input,
   .contact-form__field textarea {
     width: 100%;
+    min-height: 44px;
     padding: var(--space-3);
     color: var(--text-primary);
     background: var(--surface-raised);
@@ -79,14 +107,23 @@ import { site } from '../../config/site';
   }
 
   .contact-form__field input:user-invalid,
-  .contact-form__field textarea:user-invalid {
+  .contact-form__field textarea:user-invalid,
+  .contact-form__field input[aria-invalid='true'],
+  .contact-form__field textarea[aria-invalid='true'] {
     border-color: var(--status-error);
   }
 
-  .contact-form__hint {
+  .contact-form__hint,
+  .contact-form__privacy {
     margin: 0;
     font-size: var(--step--2);
     color: var(--text-muted);
+  }
+
+  .contact-form__error {
+    margin: 0;
+    font-size: var(--step--2);
+    color: var(--status-error);
   }
 
   .contact-form__status:empty {
@@ -111,8 +148,13 @@ import { site } from '../../config/site';
     cursor: pointer;
   }
 
+  .contact-form__submit:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+
   @media (hover: hover) and (pointer: fine) {
-    .contact-form__submit:hover,
+    .contact-form__submit:hover:not(:disabled),
     .contact-form__submit:focus-visible {
       background: var(--accent-hover);
       border-color: var(--accent-hover);
@@ -123,20 +165,109 @@ import { site } from '../../config/site';
 <script>
   const form = document.querySelector<HTMLFormElement>('.contact-form');
   const status = document.getElementById('contact-status');
+  const fallback = form?.dataset.fallback ?? 'Could not send. Please email instead.';
+
+  function isFailurePayload(body: unknown) {
+    if (!body || typeof body !== 'object') return false;
+    const record = body as Record<string, unknown>;
+    if (record.ok === false) return true;
+    if (typeof record.error === 'string' && record.error.length > 0) return true;
+    if (Array.isArray(record.errors) && record.errors.length > 0) return true;
+    return false;
+  }
+
+  function formspreeErrorMessage(body: unknown, fallbackMessage: string) {
+    if (!body || typeof body !== 'object') return fallbackMessage;
+    const record = body as Record<string, unknown>;
+    if (Array.isArray(record.errors)) {
+      const messages = record.errors
+        .map((item: unknown) =>
+          item && typeof item === 'object' && 'message' in item && typeof item.message === 'string'
+            ? item.message
+            : '',
+        )
+        .filter(Boolean);
+      if (messages.length > 0) return messages.join(' ');
+    }
+    if (typeof record.error === 'string' && record.error.length > 0) return record.error;
+    return fallbackMessage;
+  }
+
+  function setFieldInvalid(
+    field: HTMLInputElement | HTMLTextAreaElement,
+    errorId: string,
+    baseDescribedBy?: string,
+  ) {
+    const error = document.getElementById(errorId);
+    field.setAttribute('aria-invalid', 'true');
+    field.setAttribute(
+      'aria-describedby',
+      [baseDescribedBy, errorId].filter(Boolean).join(' '),
+    );
+    if (error) {
+      error.hidden = false;
+      error.textContent = field.validationMessage;
+    }
+  }
+
+  function clearFieldInvalid(
+    field: HTMLInputElement | HTMLTextAreaElement,
+    errorId: string,
+    baseDescribedBy?: string,
+  ) {
+    const error = document.getElementById(errorId);
+    field.removeAttribute('aria-invalid');
+    if (baseDescribedBy) field.setAttribute('aria-describedby', baseDescribedBy);
+    else field.removeAttribute('aria-describedby');
+    if (error) {
+      error.hidden = true;
+      error.textContent = '';
+    }
+  }
 
   form?.addEventListener('submit', async (event) => {
-    if (!status) return;
+    if (!(form instanceof HTMLFormElement) || !status) return;
     event.preventDefault();
 
-    const submit = form.querySelector<HTMLButtonElement>('.contact-form__submit');
-    if (!form.checkValidity()) {
-      status.textContent = 'Please complete every field before sending.';
-      form.reportValidity();
+    if (form.getAttribute('aria-busy') === 'true') return;
+
+    const submit = form.querySelector('.contact-form__submit');
+    const name = form.querySelector('#contact-name');
+    const email = form.querySelector('#contact-email');
+    const message = form.querySelector('#contact-message');
+    if (
+      !(name instanceof HTMLInputElement) ||
+      !(email instanceof HTMLInputElement) ||
+      !(message instanceof HTMLTextAreaElement)
+    ) {
       return;
     }
 
-    status.textContent = 'Sending…';
-    if (submit) submit.disabled = true;
+    clearFieldInvalid(name, 'contact-name-error');
+    clearFieldInvalid(email, 'contact-email-error');
+    clearFieldInvalid(message, 'contact-message-error', 'contact-hint');
+
+    const fields = [
+      { field: name, errorId: 'contact-name-error' },
+      { field: email, errorId: 'contact-email-error' },
+      { field: message, errorId: 'contact-message-error', describedBy: 'contact-hint' },
+    ];
+
+    const invalid = fields.filter(({ field }) => !field.checkValidity());
+    if (invalid.length > 0) {
+      for (const item of invalid) {
+        setFieldInvalid(item.field, item.errorId, item.describedBy);
+      }
+      invalid[0]?.field.focus();
+      return;
+    }
+
+    const submitLabel = submit instanceof HTMLButtonElement ? submit.textContent : 'Send message';
+    form.setAttribute('aria-busy', 'true');
+    if (submit instanceof HTMLButtonElement) {
+      submit.disabled = true;
+      submit.textContent = 'Sending…';
+    }
 
     try {
       const response = await fetch(form.action, {
@@ -144,13 +275,33 @@ import { site } from '../../config/site';
         body: new FormData(form),
         headers: { Accept: 'application/json' },
       });
-      if (!response.ok) throw new Error(String(response.status));
-      status.textContent = 'Sent. Thank you — I will reply within 24 hours.';
+
+      let body = null;
+      const contentType = response.headers.get('content-type') ?? '';
+      if (contentType.includes('application/json')) {
+        try {
+          body = await response.json();
+        } catch {
+          body = null;
+        }
+      }
+
+      if (!response.ok || isFailurePayload(body)) {
+        throw new Error(formspreeErrorMessage(body, fallback));
+      }
+
       form.reset();
-    } catch {
-      status.textContent = 'Could not send. Please email omjhamvar29@gmail.com instead.';
+      status.textContent = 'Sent. Thank you — I will reply within 24 hours.';
+      status.focus();
+    } catch (error) {
+      status.textContent = error instanceof Error && error.message ? error.message : fallback;
+      status.focus();
     } finally {
-      if (submit) submit.disabled = false;
+      form.removeAttribute('aria-busy');
+      if (submit instanceof HTMLButtonElement) {
+        submit.disabled = false;
+        submit.textContent = submitLabel || 'Send message';
+      }
     }
   });
 </script>

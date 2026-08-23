@@ -23,13 +23,8 @@ import { site } from '../config/site';
       />
 
       <div class="contact-layout">
-        <section aria-labelledby="contact-form-heading">
-          <h2 id="contact-form-heading" class="contact-heading">Send a message</h2>
-          <ContactForm />
-        </section>
-
         <section aria-labelledby="contact-direct-heading">
-          <h2 id="contact-direct-heading" class="contact-heading">Or reach me directly</h2>
+          <h2 id="contact-direct-heading" class="contact-heading">Reach me directly</h2>
           <dl class="contact-direct">
             <div>
               <dt>Email</dt>
@@ -40,14 +35,41 @@ import { site } from '../config/site';
                 <div>
                   <dt>{social.label}</dt>
                   <dd>
-                    <a href={social.href} class="link-external" rel="noopener noreferrer">
+                    <a
+                      href={social.href}
+                      class="link-external"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
                       {social.href.replace(/^https:\/\/(www\.)?/, '')}
                     </a>
                   </dd>
                 </div>
               ))
             }
+            {
+              site.secondaryNav.map((item) => (
+                <div>
+                  <dt>{item.label}</dt>
+                  <dd>
+                    <a
+                      href={item.href}
+                      class="link-external"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {item.label}
+                    </a>
+                  </dd>
+                </div>
+              ))
+            }
           </dl>
+        </section>
+
+        <section aria-labelledby="contact-form-heading">
+          <h2 id="contact-form-heading" class="contact-heading">Send a message</h2>
+          <ContactForm />
         </section>
       </div>
     </div>
@@ -64,7 +86,7 @@ import { site } from '../config/site';
 
   @media (min-width: 1024px) {
     .contact-layout {
-      grid-template-columns: 7fr 4fr;
+      grid-template-columns: 4fr 7fr;
       gap: var(--space-9);
     }
   }

@@ -3,9 +3,10 @@ import type { NowEntry } from '../../schemas/now';
 
 interface Props {
   entry: NowEntry;
+  projectHref?: string;
 }
 
-const { entry } = Astro.props;
+const { entry, projectHref } = Astro.props;
 
 const updatedISO = entry.updated.toISOString().slice(0, 10);
 const updatedLabel = entry.updated.toLocaleDateString('en-GB', {
@@ -30,6 +31,16 @@ const updatedLabel = entry.updated.toLocaleDateString('en-GB', {
           </li>
         ))}
       </ul>
+    )
+  }
+
+  {
+    projectHref && (
+      <p class="now-band__related">
+        <a class="link-ui" href={projectHref}>
+          Related project
+        </a>
+      </p>
     )
   }
 
@@ -98,6 +109,16 @@ const updatedLabel = entry.updated.toLocaleDateString('en-GB', {
     margin: 0;
     max-width: var(--measure-prose);
     color: var(--text-secondary);
+  }
+
+  .now-band__related {
+    margin: 0;
+  }
+
+  .now-band__related a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
   }
 
   .now-band__stamp {

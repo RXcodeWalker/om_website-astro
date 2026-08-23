@@ -4,7 +4,9 @@
 
 - id: current
 
-  updated: 2026-08-19
+  updated: 2026-08-23
+
+  project: french-coach
 
   focus: >-
     Building French Coach — an AI speaking coach for IGCSE French learners — while reading

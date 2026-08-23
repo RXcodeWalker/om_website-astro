@@ -9,9 +9,10 @@ import NowBand from '../components/patterns/NowBand.astro';
 import PostRow from '../components/patterns/PostRow.astro';
 import { site } from '../config/site';
 import { publishedProjects } from '../utils/projects';
-import { sortAchievementsNewestFirst } from '../utils/achievements';
+import { relatedProjectHref, sortAchievementsNewestFirst } from '../utils/achievements';
 
 const projects = publishedProjects(await getCollection('projects'));
+const publishedIds = projects.map((project) => project.id);
 
 const nowEntries = await getCollection('now');
 const now = nowEntries[0]?.data;
@@ -90,7 +91,7 @@ const highlights = sortAchievementsNewestFirst(
     {/* ── 4. Currently ────────────────────────────────────────── */}
     {now && (
       <Section kicker="Currently" heading="What I am working on" id="now" headingLevel="h2">
-        <NowBand entry={now} />
+        <NowBand entry={now} projectHref={relatedProjectHref(now.project, publishedIds)} />
       </Section>
     )}
 

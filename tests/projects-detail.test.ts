@@ -72,6 +72,17 @@ describe('TOC helper', () => {
   });
 });
 
+describe('CaseStudyLayout rail', () => {
+  const layout = read('../src/layouts/CaseStudyLayout.astro');
+
+  it('merges relatedPost into explore links next to live and repo', () => {
+    expect(layout).toContain('data.relatedPost');
+    expect(layout).toContain('data.relatedPost.title');
+    expect(layout).toContain('data.relatedPost.url');
+    expect(layout).toContain('rel="noopener noreferrer"');
+  });
+});
+
 describe('[slug].astro source', () => {
   const page = read('../src/pages/projects/[slug].astro');
 

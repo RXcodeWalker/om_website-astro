@@ -18,6 +18,12 @@ const { project, headings, next } = Astro.props;
 const { data } = project;
 const hero = data.hero ?? data.thumbnail;
 const toc = tocH2s(headings);
+const explore = [
+  ...data.links,
+  ...(data.relatedPost
+    ? [{ label: data.relatedPost.title, href: data.relatedPost.url }]
+    : []),
+];
 ---
 
 <div class="container">
@@ -53,11 +59,11 @@ const toc = tocH2s(headings);
       <ChipList items={[...data.stack]} max={8} />
 
       {
-        data.links.length > 0 ? (
+        explore.length > 0 ? (
           <ul class="case-study__links" aria-label={`Explore ${data.title}`}>
-            {data.links.map((item) => (
+            {explore.map((item) => (
               <li>
-                <a class="link-ui link-external" href={item.href}>
+                <a class="link-ui link-external" href={item.href} rel="noopener noreferrer">
                   {item.label}
                 </a>
               </li>

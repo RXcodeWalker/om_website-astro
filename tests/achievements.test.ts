@@ -59,7 +59,7 @@ describe('achievement inventory', () => {
 
   it('attaches public evidence only where a real URL exists', () => {
     expect(yamlBlock('lodha-genius-2025')).toContain(
-      'https://www.ashoka.edu.in/lodha-genius-programme/',
+      'https://www.ashoka.edu.in/academic-programme/lodha-genius-ashoka-university-programme/',
     );
     expect(yamlBlock('lodha-genius-2025')).toContain(
       'https://blog.beyondthebasics.me/article/my-summer-at-ashoka-university',
@@ -178,8 +178,8 @@ describe('AchievementItem evidence and related links', () => {
   it('renders evidence links only when the list is non-empty', () => {
     expect(item).toContain('evidence.length > 0 || relatedHref');
     expect(item).toContain('link-ui link-external');
-    expect(item).toContain('rel="noopener"');
-    expect(item).not.toContain('target="_blank"');
+    expect(item).toContain('rel="noopener noreferrer"');
+    expect(item).toContain('target="_blank"');
   });
 
   it('renders a related project link only when relatedHref is passed', () => {

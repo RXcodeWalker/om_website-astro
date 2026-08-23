@@ -92,7 +92,7 @@ const chipMax = variant === 'compact' ? 3 : 5;
       <ul class="project-entry__actions" aria-label={`Explore ${data.title}`}>
         {explore.map((item) => (
           <li>
-            <a class="link-ui link-external" href={item.href} rel="noopener">
+            <a class="link-ui link-external" href={item.href} rel="noopener noreferrer">
               {item.label}
             </a>
           </li>

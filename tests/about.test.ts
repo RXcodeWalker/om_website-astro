@@ -13,6 +13,7 @@ describe('about page source', () => {
     expect(page).toContain("getCollection('projects')");
     expect(page).toContain('publishedProjects');
     expect(page).toContain('NowBand');
+    expect(page).toContain('relatedProjectHref(now.project, publishedIds)');
     expect(page).toContain('variant="compact"');
     expect(page).not.toContain('French Coach');
     expect(page).not.toContain('Line-Follower');
@@ -40,5 +41,18 @@ describe('about page source', () => {
     expect(page).toContain(
       'https://blog.beyondthebasics.me/article/my-summer-at-ashoka-university',
     );
+  });
+});
+
+describe('now band wiring', () => {
+  const nowYaml = read('../src/data/now.yaml');
+  const nowBand = read('../src/components/patterns/NowBand.astro');
+
+  it('names french-coach from YAML and only links when projectHref is passed', () => {
+    expect(nowYaml).toMatch(/^  project: french-coach$/m);
+    expect(nowBand).toContain('projectHref?: string');
+    expect(nowBand).toContain('projectHref &&');
+    expect(nowBand).toContain('Related project');
+    expect(nowBand).not.toContain('french-coach');
   });
 });
