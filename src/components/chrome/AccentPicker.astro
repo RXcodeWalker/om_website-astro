@@ -1,0 +1,107 @@
+---
+---
+
+<details class="accent-picker">
+  <summary class="accent-picker__summary">Accent</summary>
+  <div class="accent-picker__options" role="group" aria-label="Accent colour">
+    <button type="button" class="accent-picker__btn" data-accent="ink">Ink</button>
+    <button type="button" class="accent-picker__btn" data-accent="oxblood">Oxblood</button>
+    <button type="button" class="accent-picker__btn" data-accent="ivy">Ivy</button>
+  </div>
+</details>
+
+<style>
+  .accent-picker {
+    position: relative;
+  }
+
+  .accent-picker__summary {
+    list-style: none;
+    cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+  }
+
+  .accent-picker__summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .accent-picker__options {
+    position: absolute;
+    right: 0;
+    top: calc(100% + var(--space-2));
+    display: grid;
+    gap: var(--space-1);
+    min-width: 8rem;
+    padding: var(--space-2);
+    background: var(--surface-raised);
+    border: 1px solid var(--border-strong);
+    box-shadow: var(--shadow-overlay);
+    z-index: var(--z-menu);
+  }
+
+  .accent-picker__btn {
+    padding: var(--space-2) var(--space-3);
+    text-align: left;
+    font-size: var(--step--1);
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    cursor: pointer;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .accent-picker__btn:hover,
+    .accent-picker__btn:focus-visible {
+      background: var(--surface-sunken);
+    }
+  }
+
+  .accent-picker__btn[aria-pressed='true'] {
+    color: var(--accent);
+    outline: 1px solid var(--accent);
+  }
+
+  @media (pointer: coarse) {
+    .accent-picker__summary,
+    .accent-picker__btn {
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+    }
+
+    .accent-picker__options {
+      gap: var(--space-2);
+    }
+  }
+</style>
+
+<script>
+  // All theme, accent and theme-color writes go through window.__theme,
+  // defined by the blocking init script in BaseLayout.
+  const accentButtons = document.querySelectorAll<HTMLButtonElement>('[data-accent]');
+
+  const syncAccentButtons = (active: string) => {
+    accentButtons.forEach((button) => {
+      button.setAttribute('aria-pressed', String(button.dataset.accent === active));
+    });
+  };
+
+  accentButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+      const accent = button.dataset.accent;
+      if (!accent) return;
+      window.__theme.set(window.__theme.theme, accent);
+      syncAccentButtons(accent);
+    });
+  });
+
+  syncAccentButtons(window.__theme.accent);
+</script>

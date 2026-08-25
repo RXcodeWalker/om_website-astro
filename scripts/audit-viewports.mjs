@@ -473,7 +473,7 @@ async function runMobileMenuPass(browser, base) {
       await settle(page);
 
       const toggle = page.locator('#menu-toggle');
-      const nav = page.locator('#site-nav');
+      const nav = page.locator('#site-menu');
 
       const accessibleName = await toggle.evaluate((el) => el.textContent?.trim() ?? '');
       record(
@@ -541,7 +541,7 @@ async function runMobileMenuPass(browser, base) {
       }
 
       const focusInsidePanel = await page.evaluate(() => {
-        const nav = document.getElementById('site-nav');
+        const nav = document.getElementById('site-menu');
         return nav ? nav.contains(document.activeElement) : false;
       });
       record(
@@ -568,7 +568,11 @@ async function runMobileMenuPass(browser, base) {
 
       await toggle.click();
       await page.waitForTimeout(50);
-      await page.mouse.click(width - 5, 5);
+      // Genuinely outside .site-header (not just outside the panel) per the
+      // contract: "pointerdown outside the header closes it". A point near
+      // the header bar itself can land on header chrome (e.g. ThemeControls)
+      // and must not close the menu, so this clicks well below the header.
+      await page.mouse.click(width - 5, 700);
       await page.waitForTimeout(50);
       const expandedAfterOutside = await toggle.getAttribute('aria-expanded');
       record(
@@ -594,7 +598,7 @@ async function runMobileMenuPass(browser, base) {
     const expandedAtDesktop = await resizePage
       .locator('#menu-toggle')
       .getAttribute('aria-expanded');
-    const navVisible = await resizePage.locator('#site-nav').isVisible();
+    const navVisible = await resizePage.locator('#site-menu').isVisible();
     record(
       'Menu',
       'resize 375->1024 while open leaves usable desktop nav',
@@ -625,8 +629,8 @@ async function runReducedMotionPass(browser, base) {
     const openedUnderReduced = (await toggle.getAttribute('aria-expanded')) === 'true';
 
     const durations = await page.evaluate(() => {
-      const nav = document.getElementById('site-nav');
-      const panel = document.querySelector('.site-nav, #site-nav');
+      const nav = document.getElementById('site-menu');
+      const panel = document.querySelector('.site-menu, #site-menu');
       const els = [nav, panel].filter(Boolean);
       return els.map((el) => {
         const style = getComputedStyle(el);
@@ -754,7 +758,7 @@ async function runReconfirmationChecks(browser, base) {
       await page.goto(`${base}/`);
       await settle(page);
       const writingLinkText = await page.evaluate(() => {
-        const links = Array.from(document.querySelectorAll('#site-nav a'));
+        const links = Array.from(document.querySelectorAll('#site-menu a'));
         const writing = links.find((a) => a.textContent?.includes('Writing'));
         return writing ? writing.textContent.trim() : null;
       });

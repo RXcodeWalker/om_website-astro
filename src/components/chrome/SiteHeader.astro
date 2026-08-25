@@ -2,6 +2,7 @@
 import { site } from '../../config/site';
 import PrimaryNav from './PrimaryNav.astro';
 import ThemeControls from './ThemeControls.astro';
+import AccentPicker from './AccentPicker.astro';
 
 interface Props {
   currentPath?: string;
@@ -26,7 +27,7 @@ const { currentPath = Astro.url.pathname } = Astro.props;
         class="menu-toggle"
         id="menu-toggle"
         aria-expanded="false"
-        aria-controls="site-nav"
+        aria-controls="site-menu"
       >
         <span class="visually-hidden">Menu</span>
         <span class="menu-toggle__bar" aria-hidden="true"></span>
@@ -35,9 +36,14 @@ const { currentPath = Astro.url.pathname } = Astro.props;
       </button>
     </div>
 
-    <nav class="site-nav" id="site-nav" aria-label="Primary">
-      <PrimaryNav {currentPath} />
-    </nav>
+    <div class="site-menu" id="site-menu" data-open="false">
+      <nav class="site-menu__nav" aria-label="Primary">
+        <PrimaryNav {currentPath} />
+      </nav>
+      <div class="site-menu__prefs">
+        <AccentPicker />
+      </div>
+    </div>
   </div>
 </header>
 
@@ -51,6 +57,7 @@ const { currentPath = Astro.url.pathname } = Astro.props;
   }
 
   .site-header__inner {
+    position: relative;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -64,7 +71,6 @@ const { currentPath = Astro.url.pathname } = Astro.props;
     font-size: var(--step-1);
     font-weight: 500;
     text-decoration: none;
-    white-space: nowrap;
   }
 
   .site-header__actions {
@@ -74,11 +80,32 @@ const { currentPath = Astro.url.pathname } = Astro.props;
     order: 2;
   }
 
-  /* Mobile: nav occupies its own full-width row beneath the bar. */
-  .site-nav {
+  /* Mobile: nav + prefs panel overlays the page below the bar instead of
+     displacing it. */
+  .site-menu {
     order: 3;
     flex-basis: 100%;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    max-height: calc(100svh - var(--header-h));
+    overflow-y: auto;
+    background: var(--surface-raised);
+    box-shadow: var(--shadow-overlay);
+    z-index: var(--z-menu);
     border-top: 1px solid var(--border-subtle);
+  }
+
+  .site-menu__prefs {
+    display: flex;
+  }
+
+  @media (max-width: 767px) {
+    .site-menu__prefs {
+      padding: var(--space-3);
+      border-top: 1px solid var(--border-subtle);
+    }
   }
 
   /* The toggle only exists as an enhancement. */
@@ -100,8 +127,10 @@ const { currentPath = Astro.url.pathname } = Astro.props;
     display: flex;
   }
 
-  :global(html.js) .site-nav[data-open='false'] {
-    display: none;
+  @media (max-width: 767px) {
+    :global(html.js) .site-menu[data-open='false'] {
+      display: none;
+    }
   }
 
   .menu-toggle__bar {
@@ -119,32 +148,43 @@ const { currentPath = Astro.url.pathname } = Astro.props;
 
     .site-header__brand {
       margin-right: 0;
+      white-space: nowrap;
     }
 
-    .site-nav {
+    /* display: contents unwraps the panel so nav and prefs become direct
+       flex children again — the desktop bar is byte-for-byte what it was
+       before the panel wrapper existed. */
+    .site-menu {
       order: 2;
       flex-basis: auto;
       margin-left: auto;
-      border-top: 0;
+      display: contents;
+    }
+
+    .site-menu__nav {
+      order: 2;
+    }
+
+    .site-menu__prefs {
+      order: 3;
     }
 
     .site-header__actions {
-      order: 3;
+      order: 4;
     }
 
     :global(html.js) .menu-toggle {
       display: none;
-    }
-
-    :global(html.js) .site-nav[data-open='false'] {
-      display: block;
     }
   }
 </style>
 
 <script>
   const toggle = document.getElementById('menu-toggle');
-  const nav = document.getElementById('site-nav');
+  const nav = document.getElementById('site-menu');
+  const header = document.querySelector('.site-header');
+  const main = document.getElementById('main') as HTMLElement | null;
+  const footer = document.querySelector<HTMLElement>('.site-footer');
 
   if (toggle && nav) {
     const desktop = window.matchMedia('(min-width: 768px)');
@@ -154,13 +194,26 @@ const { currentPath = Astro.url.pathname } = Astro.props;
     nav.setAttribute('data-open', 'false');
 
     const focusables = () =>
-      Array.from(nav.querySelectorAll<HTMLAnchorElement>('a[href]')).filter(
-        (el) => el.offsetParent !== null,
-      );
+      Array.from(
+        nav.querySelectorAll<HTMLElement>('a[href], button, summary, [tabindex]'),
+      ).filter((el) => el.offsetParent !== null);
+
+    // inert on the rest of the page delivers focus trapping, click-through
+    // prevention and AT-hiding in one attribute — no backdrop, no manual Tab
+    // interception (which previously couldn't reach the toggle since it sits
+    // outside #site-menu in DOM order).
+    const setInert = (value: boolean) => {
+      if (main) main.inert = value;
+      if (footer) footer.inert = value;
+    };
 
     const setOpen = (open: boolean, restoreFocus = true) => {
       nav.setAttribute('data-open', String(open));
       toggle.setAttribute('aria-expanded', String(open));
+      if (!desktop.matches) {
+        setInert(open);
+        document.documentElement.classList.toggle('menu-open', open);
+      }
       if (open) {
         focusables()[0]?.focus();
       } else if (restoreFocus) {
@@ -174,33 +227,26 @@ const { currentPath = Astro.url.pathname } = Astro.props;
 
     document.addEventListener('keydown', (event) => {
       if (!isOpen() || desktop.matches) return;
-
       if (event.key === 'Escape') {
         event.preventDefault();
         setOpen(false);
-        return;
-      }
-
-      if (event.key !== 'Tab') return;
-
-      // Trap focus between the toggle and the last link while the menu is open.
-      const items = [toggle, ...focusables()];
-      const first = items[0];
-      const last = items[items.length - 1];
-      const active = document.activeElement;
-
-      if (event.shiftKey && active === first) {
-        event.preventDefault();
-        last.focus();
-      } else if (!event.shiftKey && active === last) {
-        event.preventDefault();
-        first.focus();
       }
     });
 
-    // Leaving the mobile breakpoint must not strand a collapsed nav.
+    // Outside pointerdown closes the menu.
+    document.addEventListener('pointerdown', (event) => {
+      if (!isOpen() || desktop.matches) return;
+      if (header?.contains(event.target as Node)) return;
+      setOpen(false, false);
+    });
+
+    // Leaving the mobile breakpoint must not strand a collapsed nav or inert content.
     desktop.addEventListener('change', (event) => {
-      if (event.matches) setOpen(false, false);
+      if (event.matches) {
+        setInert(false);
+        document.documentElement.classList.remove('menu-open');
+        setOpen(false, false);
+      }
     });
   }
 </script>

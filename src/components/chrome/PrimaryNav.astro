@@ -41,7 +41,6 @@ function isActive(href: string, external?: boolean): boolean {
           rel="noopener noreferrer"
         >
           {item.label}
-          <span class="external-icon" aria-hidden="true">↗</span>
         </a>
       </li>
     ))
@@ -68,12 +67,6 @@ function isActive(href: string, external?: boolean): boolean {
   .primary-nav__link[aria-current='page'] {
     color: var(--accent);
     font-weight: 600;
-  }
-
-  .external-icon {
-    display: inline-block;
-    margin-left: 0.2em;
-    font-size: 0.8em;
   }
 
   @media (min-width: 768px) {
