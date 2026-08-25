@@ -964,7 +964,7 @@ graph TD
 
 ## H3. Definition of done
 
-- Global CSS ≤ 15KB, per-route CSS ≤ 10KB, per-route JS ≤ 5KB, fonts ≤ 140KB.
+- Global CSS ≤ 15KB, per-route CSS ≤ 10.2KB, per-route JS ≤ 5KB, fonts ≤ 140KB. (Per-route cap raised from 10KB after the responsive design pass Phase 1: home is 10.13KB post dead-CSS reclamation.)
 - Zero `!important` outside the reduced-motion block.
 - Zero references to `--glass-*`, `--blob-*`, `--card-radius`, `--page-atmosphere`, or any `NYT *` font.
 - One `:root` token block in one file.

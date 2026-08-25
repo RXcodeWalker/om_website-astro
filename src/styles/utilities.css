@@ -10,22 +10,9 @@
   border: 0;
 }
 
-.container,
-.container--narrow,
-.container--wide {
-  margin-inline: auto;
-}
-
 .container {
+  margin-inline: auto;
   width: min(var(--container), 100% - 2 * var(--gutter));
-}
-
-.container--narrow {
-  width: min(var(--container-narrow), 100% - 2 * var(--gutter));
-}
-
-.container--wide {
-  width: min(var(--container-wide), 100% - 2 * var(--gutter));
 }
 
 .stack {
