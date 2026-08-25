@@ -12,9 +12,11 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "verify": "node scripts/verify-build.mjs",
+    "audit": "node scripts/audit-viewports.mjs",
     "fonts:sync": "node scripts/sync-fonts.mjs",
     "og": "node scripts/generate-og.mjs",
-    "check": "npm run typecheck && npm run lint && npm run test && npm run build && npm run verify"
+    "check": "npm run typecheck && npm run lint && npm run test && npm run build && npm run verify",
+    "verify:all": "npm run check && npm run audit"
   },
   "dependencies": {
     "@astrojs/mdx": "^4.3.14",
@@ -27,6 +29,7 @@
     "@fontsource-variable/inter": "^5.3.0",
     "@fontsource-variable/newsreader": "^5.3.0",
     "@fontsource/jetbrains-mono": "^5.3.0",
+    "playwright": "^1.62.1",
     "typescript": "^5.9.3",
     "vitest": "^4.1.10"
   }

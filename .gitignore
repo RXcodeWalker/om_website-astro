@@ -6,6 +6,9 @@ dist/
 build/
 .out/
 
+# Responsive audit failure screenshots
+.audit/
+
 # Astro generated types and collection schemas
 .astro/
 
