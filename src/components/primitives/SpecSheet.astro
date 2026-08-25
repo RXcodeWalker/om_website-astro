@@ -44,15 +44,24 @@ if (!empty) {
 
   .spec-sheet__row {
     display: grid;
-    grid-template-columns: minmax(8ch, 1fr) 2fr;
-    gap: var(--space-4);
+    grid-template-columns: 1fr;
+    gap: var(--space-1);
     margin: 0;
     padding-bottom: var(--space-3);
     border-bottom: 1px solid var(--border-subtle);
   }
 
+  @media (min-width: 480px) {
+    .spec-sheet__row {
+      grid-template-columns: minmax(8ch, 1fr) 2fr;
+      gap: var(--space-4);
+    }
+  }
+
   .spec-sheet__label {
     margin: 0;
+    min-width: 0;
+    overflow-wrap: anywhere;
     font-family: var(--font-mono);
     font-size: var(--step--2);
     letter-spacing: var(--tracking-mono);
@@ -62,6 +71,8 @@ if (!empty) {
 
   .spec-sheet__value {
     margin: 0;
+    min-width: 0;
+    overflow-wrap: anywhere;
     color: var(--text-primary);
   }
 </style>

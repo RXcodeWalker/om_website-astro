@@ -135,4 +135,12 @@ const target = external ? '_blank' : undefined;
     opacity: 0.4;
     cursor: not-allowed;
   }
+
+  @media (pointer: coarse) {
+    .btn--sm,
+    .btn--md,
+    .btn--quiet {
+      min-height: 44px;
+    }
+  }
 </style>

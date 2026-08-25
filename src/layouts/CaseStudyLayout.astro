@@ -80,7 +80,7 @@ const explore = [
             <ol>
               {toc.map((item) => (
                 <li>
-                  <a href={`#${item.slug}`}>{item.text}</a>
+                  <a class="tap-target" href={`#${item.slug}`}>{item.text}</a>
                 </li>
               ))}
             </ol>
@@ -104,7 +104,7 @@ const explore = [
         )
       }
       <p class="case-study__index">
-        <a class="link-ui" href="/projects">All projects</a>
+        <a class="link-ui tap-target" href="/projects">All projects</a>
       </p>
     </footer>
   </article>
@@ -152,6 +152,7 @@ const explore = [
     display: grid;
     gap: var(--space-4);
     align-content: start;
+    min-width: 0;
     padding-block: var(--space-5);
     border-top: 1px solid var(--border-subtle);
     border-bottom: 1px solid var(--border-subtle);
@@ -193,8 +194,28 @@ const explore = [
   }
 
   .case-study__toc a {
+    overflow-wrap: anywhere;
     color: var(--text-secondary);
     text-decoration: none;
+  }
+
+  @media (min-width: 768px) and (max-width: 1023px) {
+    .case-study__rail {
+      grid-template-columns: 1fr 1fr;
+      column-gap: var(--space-6);
+    }
+
+    .case-study__rail :global(.status-badge),
+    .case-study__rail :global(.meta-row),
+    .case-study__rail :global(.chip-list) {
+      grid-column: 1;
+    }
+
+    .case-study__links,
+    .case-study__note,
+    .case-study__toc {
+      grid-column: 2;
+    }
   }
 
   @media (hover: hover) and (pointer: fine) {
@@ -235,6 +256,14 @@ const explore = [
     .case-study__next a:focus-visible {
       text-decoration: underline;
       text-underline-offset: 0.15em;
+    }
+  }
+
+  @media (pointer: coarse) {
+    .case-study__next a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
     }
   }
 

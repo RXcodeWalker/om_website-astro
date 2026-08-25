@@ -28,7 +28,7 @@ import { site } from '../config/site';
           <dl class="contact-direct">
             <div>
               <dt>Email</dt>
-              <dd><a href={`mailto:${site.email}`}>{site.email}</a></dd>
+              <dd><a class="tap-target" href={`mailto:${site.email}`}>{site.email}</a></dd>
             </div>
             {
               site.socials.map((social) => (
@@ -37,7 +37,7 @@ import { site } from '../config/site';
                   <dd>
                     <a
                       href={social.href}
-                      class="link-external"
+                      class="link-external tap-target"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
@@ -54,7 +54,7 @@ import { site } from '../config/site';
                   <dd>
                     <a
                       href={item.href}
-                      class="link-external"
+                      class="link-external tap-target"
                       target="_blank"
                       rel="noopener noreferrer"
                     >

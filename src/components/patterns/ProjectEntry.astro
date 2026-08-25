@@ -54,11 +54,9 @@ const chipMax = variant === 'compact' ? 3 : 5;
         ratio="16:10"
         eager={variant === 'featured'}
         sizes={
-          variant === 'featured'
-            ? '(min-width: 1120px) 1120px, 100vw'
-            : variant === 'row'
-              ? '(min-width: 1024px) 440px, 100vw'
-              : '(min-width: 1024px) 320px, 100vw'
+          variant === 'row'
+            ? '(min-width: 1024px) 440px, 100vw'
+            : '(min-width: 1120px) 1120px, 100vw'
         }
       />
     </div>

@@ -88,12 +88,12 @@ const globalBytes = [...sharedHrefs].reduce((sum, href) => {
   return sum + (existsSync(asset) ? statSync(asset).size : 0);
 }, 0);
 
-// Raised from 15 KB to 15.4 KB: the overlay mobile menu (Phase 2 — position,
-// max-height/overflow, inert-friendly layout) plus the extracted AccentPicker
-// component push the shared header CSS to 15.34 KB. This lives in the global
-// bundle because SiteHeader is shared by every route. See responsive design
-// pass Phase 2 / docs/design-system.md §H3.
-record('CSS', 'global CSS <= 15.4 KB', globalBytes <= 15.4 * 1024, kb(globalBytes), '15.4 KB');
+// Raised from 15.4 KB to 15.8 KB: Phase 3's coarse-pointer touch-target
+// overrides (.tap-target utility, Button/PrimaryNav/SiteHeader local rules)
+// push the shared header/footer CSS to 15.75 KB. This lives in the global
+// bundle because SiteHeader and SiteFooter are shared by every route. See
+// responsive design pass Phase 3 / docs/design-system.md §H3.
+record('CSS', 'global CSS <= 15.8 KB', globalBytes <= 15.8 * 1024, kb(globalBytes), '15.8 KB');
 
 // Route CSS is what a route adds on top of the global bundle: its own inline
 // scoped styles plus any stylesheet not shared by every route.
@@ -108,16 +108,15 @@ for (const route of routeCss) {
 }
 
 const worstRoute = routeCss.reduce((a, b) => (a.own > b.own ? a : b), routeCss[0]);
-// Raised from 10 KB to 10.2 KB: home is 10.13 KB after Phase 1 dead-CSS
-// reclamation (tokens.css/utilities.css savings land in the shared global
-// bundle, not route-specific inline CSS, so they don't move this number).
-// See responsive design pass Phase 1 / docs/design-system.md §H3.
+// Raised from 10.2 KB to 10.3 KB: Phase 4's case-study rail 768px band and
+// SpecSheet/Metrics responsive rules push home's own inline CSS to 10.29 KB.
+// See responsive design pass Phase 4 / docs/design-system.md §H3.
 record(
   'CSS',
-  'per-route CSS <= 10.2 KB',
-  routeCss.every((route) => route.own <= 10.2 * 1024),
+  'per-route CSS <= 10.3 KB',
+  routeCss.every((route) => route.own <= 10.3 * 1024),
   `${worstRoute.name} ${kb(worstRoute.own)}`,
-  '10.2 KB',
+  '10.3 KB',
 );
 
 const countIn = (haystack, pattern) => (haystack.match(pattern) ?? []).length;

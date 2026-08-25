@@ -73,6 +73,14 @@ const { currentPath = Astro.url.pathname } = Astro.props;
     text-decoration: none;
   }
 
+  @media (pointer: coarse) {
+    .site-header__brand {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+    }
+  }
+
   .site-header__actions {
     display: flex;
     align-items: center;
