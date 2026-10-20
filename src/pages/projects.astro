@@ -4,6 +4,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import PageIntro from '../components/patterns/PageIntro.astro';
 import ProjectEntry from '../components/patterns/ProjectEntry.astro';
 import EmptyState from '../components/patterns/EmptyState.astro';
+import CtaCard from '../components/patterns/CtaCard.astro';
 import Button from '../components/primitives/Button.astro';
 import { site } from '../config/site';
 import { projectIndexSections, publishedProjects } from '../utils/projects';
@@ -22,16 +23,17 @@ const { featured, remaining } = projectIndexSections(published);
   ]}
 >
   <main id="main">
-    <div class="container">
-      <PageIntro
-        kicker="What I have built"
-        title="Projects"
-        lede="A short list, on purpose. Each entry says what it is, why it exists, and where you can look at it — a live site, a repository, a write-up, or a note when nothing is public yet."
-      />
+    <PageIntro
+      kicker={`Projects · ${published.length} published`}
+      title="Work I can"
+      titleAccent="point at."
+      lede="A short list, on purpose. Each entry says what it is, why it exists, and where you can look at it — a live site, a repository, a write-up, or a note when nothing is public yet."
+    />
 
+    <div class="container project-list">
       {
         published.length > 0 ? (
-          <div class="project-list">
+          <>
             {featured.map((project) => (
               <ProjectEntry
                 project={project}
@@ -48,7 +50,7 @@ const { featured, remaining } = projectIndexSections(published);
                 href={`/projects/${project.id}`}
               />
             ))}
-          </div>
+          </>
         ) : (
           <EmptyState title="Nothing published yet">
             <p>
@@ -62,15 +64,76 @@ const { featured, remaining } = projectIndexSections(published);
         )
       }
     </div>
+
+    <div class="projects-cta">
+      <CtaCard
+        id="projects-cta"
+        kicker="Next"
+        heading="Want the longer"
+        accent="story?"
+        text="The decisions, the dead ends, and what I would change are written up on the blog as the work happens."
+        href={site.blogUrl}
+        label="Read the writing"
+        external
+      />
+    </div>
   </main>
 </BaseLayout>
 
-<style>
+<style is:global>
   .project-list {
-    margin-top: var(--space-6);
+    display: grid;
+    gap: var(--space-6);
+    padding-top: var(--space-6);
+  }
+
+  .projects-cta {
+    padding-top: var(--section-gap);
   }
 
   .empty-actions {
     margin-top: var(--space-4);
+  }
+
+  /* ProjectEntry's row and featured layouts; only this route renders them. */
+  .project-entry--featured .project-entry__title {
+    font-size: var(--step-4);
+  }
+
+  @media (min-width: 768px) {
+    .project-entry--row {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .project-entry--row > .project-entry__stage {
+      display: grid;
+      place-items: center;
+    }
+
+    .project-entry--row > .project-entry__body {
+      align-content: center;
+      padding: var(--space-6);
+    }
+
+    .project-entry--row:nth-of-type(even) > .project-entry__stage {
+      order: 2;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .project-entry--featured {
+      grid-template-columns: 7fr 5fr;
+      min-height: 520px;
+    }
+
+    .project-entry--featured > .project-entry__stage {
+      display: grid;
+      place-items: center;
+    }
+
+    .project-entry--featured > .project-entry__body {
+      align-content: center;
+      padding: var(--space-8) var(--space-7);
+    }
   }
 </style>

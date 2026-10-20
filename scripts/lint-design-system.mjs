@@ -63,12 +63,9 @@ const rel = (file) => relative(root, file).replace(/\\/g, '/');
 }
 
 for (const [rule, pattern] of [
-  ['zero --glass-* references', /--glass-[\w-]*/g],
-  ['zero --blob-* references', /--blob-[\w-]*/g],
   ['zero --card-radius references', /--card-radius/g],
   ['zero --page-atmosphere references', /--page-atmosphere/g],
   ['zero NYT font declarations', /NYT\s/g],
-  ['zero backdrop-filter usage', /backdrop-filter/g],
   ['zero Google Fonts requests', /fonts\.(googleapis|gstatic)\.com/g],
   ['zero legacy accent tokens (--accent-1/2/3)', /--accent-[123]\b/g],
 ]) {
@@ -100,6 +97,25 @@ for (const [rule, pattern] of [
     }
   }
   offenders.length > 0 ? fail(rule, offenders.join(', ')) : pass(rule);
+}
+
+{
+  const rule = 'backdrop-filter only in utilities.css (.glass) and SiteHeader.astro';
+  const offenders = allSource.filter(
+    (file) =>
+      /backdrop-filter/.test(read(file)) &&
+      !file.endsWith('utilities.css') &&
+      !file.endsWith('SiteHeader.astro'),
+  );
+  offenders.length === 0 ? pass(rule) : fail(rule, offenders.map(rel).join(', '));
+}
+
+{
+  const rule = 'every infinite animation is reduced-motion safe';
+  const base = readFileSync(join(root, 'src', 'styles', 'base.css'), 'utf8');
+  /animation-iteration-count:\s*1\s*!important/.test(base)
+    ? pass(rule)
+    : fail(rule, 'base.css lost the reduced-motion animation-iteration-count override');
 }
 
 /* ------------------------------------------------------------- cascade */

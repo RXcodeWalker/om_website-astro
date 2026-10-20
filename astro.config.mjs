@@ -6,5 +6,6 @@ import { nowStalenessIntegration } from './src/integrations/nowStaleness.mjs';
 
 export default defineConfig({
   site: 'https://beyondthebasics.me',
+  scopedStyleStrategy: 'class',
   integrations: [mdx(), sitemap(), nowStalenessIntegration()],
 });

@@ -21,9 +21,7 @@ const { caption, class: className = '' } = Astro.props;
 
   .gallery__grid {
     display: grid;
-    gap: 1px;
-    background: var(--border-subtle);
-    border: 1px solid var(--border-subtle);
+    gap: var(--space-4);
   }
 
   @media (min-width: 768px) {
@@ -38,6 +36,7 @@ const { caption, class: className = '' } = Astro.props;
     display: block;
     width: 100%;
     height: auto;
+    border-radius: var(--radius-lg);
   }
 
   .gallery__caption {

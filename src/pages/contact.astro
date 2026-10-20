@@ -2,7 +2,17 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PageIntro from '../components/patterns/PageIntro.astro';
 import ContactForm from '../components/patterns/ContactForm.astro';
+import Icon from '../components/primitives/Icon.astro';
 import { site } from '../config/site';
+
+const iconFor = (label: string) =>
+  label === 'Email'
+    ? 'email'
+    : label === 'GitHub'
+      ? 'github'
+      : label === 'LinkedIn'
+        ? 'linkedin'
+        : 'external';
 ---
 
 <BaseLayout
@@ -15,80 +25,124 @@ import { site } from '../config/site';
   ]}
 >
   <main id="main">
-    <div class="container">
-      <PageIntro
-        kicker="Say hello"
-        title="Get in touch"
-        lede="A question, a collaboration, or an argument about football tactics — all welcome. I reply within a day or so."
-      />
+    <PageIntro
+      kicker="Contact"
+      title="Let's"
+      titleAccent="talk."
+      lede="A question, a collaboration, or an argument about football tactics — all welcome. I reply within a day or so."
+    >
+      <p slot="meta" class="contact-local">
+        <Icon name="clock" />
+        <span>
+          Local time in {site.location.split(',')[0]}:{' '}
+          <span data-clock={site.timezone}>IST, UTC+5:30</span>
+        </span>
+      </p>
+    </PageIntro>
 
-      <div class="contact-layout">
-        <section aria-labelledby="contact-direct-heading">
-          <h2 id="contact-direct-heading" class="contact-heading">Reach me directly</h2>
-          <dl class="contact-direct">
-            <div>
-              <dt>Email</dt>
-              <dd><a class="tap-target" href={`mailto:${site.email}`}>{site.email}</a></dd>
-            </div>
-            {
-              site.socials.map((social) => (
-                <div>
-                  <dt>{social.label}</dt>
-                  <dd>
-                    <a
-                      href={social.href}
-                      class="link-external tap-target"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {social.href.replace(/^https:\/\/(www\.)?/, '')}
-                    </a>
-                  </dd>
-                </div>
-              ))
-            }
-            {
-              site.secondaryNav.map((item) => (
-                <div>
-                  <dt>{item.label}</dt>
-                  <dd>
-                    <a
-                      href={item.href}
-                      class="link-external tap-target"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {item.label}
-                    </a>
-                  </dd>
-                </div>
-              ))
-            }
-          </dl>
-        </section>
+    <div class="container contact-layout">
+      <section aria-labelledby="contact-direct-heading">
+        <h2 id="contact-direct-heading" class="contact-heading">Reach me directly</h2>
+        <dl class="contact-direct">
+          <div class="channel surface-card">
+            <dt>
+              <span class="channel__icon" aria-hidden="true"><Icon name={iconFor('Email')} /></span>
+              Email
+            </dt>
+            <dd class="channel__email">
+              <a class="tap-target" href={`mailto:${site.email}`}>{site.email}</a>
+              <button
+                type="button"
+                class="copy-btn"
+                data-copy={site.email}
+                aria-label="Copy email address"
+              >
+                <Icon name="copy" />
+                <span class="copy-btn__label">Copy</span>
+              </button>
+              <span class="visually-hidden" role="status" data-copy-status></span>
+            </dd>
+          </div>
+          {
+            site.socials.map((social) => (
+              <div class="channel surface-card">
+                <dt>
+                  <span class="channel__icon" aria-hidden="true">
+                    <Icon name={iconFor(social.label)} />
+                  </span>
+                  {social.label}
+                </dt>
+                <dd>
+                  <a
+                    href={social.href}
+                    class="link-external tap-target"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {social.href.replace(/^https:\/\/(www\.)?/, '')}
+                  </a>
+                </dd>
+              </div>
+            ))
+          }
+          {
+            site.secondaryNav.map((item) => (
+              <div class="channel surface-card">
+                <dt>
+                  <span class="channel__icon" aria-hidden="true">
+                    <Icon name={iconFor(item.label)} />
+                  </span>
+                  {item.label}
+                </dt>
+                <dd>
+                  <a
+                    href={item.href}
+                    class="link-external tap-target"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {item.label}
+                  </a>
+                </dd>
+              </div>
+            ))
+          }
+        </dl>
+        <p class="contact-note">
+          <span class="pulse-dot" aria-hidden="true"></span>Usually replies within 24 hours
+        </p>
+      </section>
 
-        <section aria-labelledby="contact-form-heading">
-          <h2 id="contact-form-heading" class="contact-heading">Send a message</h2>
-          <ContactForm />
-        </section>
-      </div>
+      <section class="contact-form-card glass" aria-labelledby="contact-form-heading">
+        <h2 id="contact-form-heading" class="contact-heading">Send a message</h2>
+        <ContactForm />
+      </section>
     </div>
   </main>
 </BaseLayout>
 
 <style>
+  .contact-local {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+    color: var(--text-secondary);
+  }
+
+  .contact-local :global(.icon) {
+    color: var(--accent);
+  }
+
   .contact-layout {
     display: grid;
     gap: var(--space-8);
-    margin-top: var(--space-7);
-    padding-bottom: var(--space-8);
-  }
-
-  @media (min-width: 1024px) {
-    .contact-layout {
-      grid-template-columns: 4fr 7fr;
-      gap: var(--space-9);
-    }
+    padding-top: var(--space-6);
+    padding-bottom: var(--space-9);
   }
 
   .contact-heading {
@@ -98,33 +152,97 @@ import { site } from '../config/site';
 
   .contact-direct {
     display: grid;
-    gap: var(--space-4);
+    gap: var(--space-3);
     margin: 0;
   }
 
-  .contact-direct div {
+  .channel {
     display: grid;
-    gap: var(--space-1);
-    padding-top: var(--space-4);
-    border-top: 1px solid var(--border-subtle);
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    column-gap: var(--space-4);
+    row-gap: var(--space-1);
+    padding: var(--space-4) var(--space-5);
+    border-radius: var(--radius-xl);
+    border-top: 0;
+    min-width: 0;
   }
 
-  .contact-direct dt {
+  .channel dt {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    grid-column: 1;
     font-family: var(--font-mono);
     font-size: var(--step--2);
     letter-spacing: var(--tracking-mono);
     text-transform: uppercase;
-    color: var(--text-muted);
+    color: var(--text-secondary);
   }
 
-  .contact-direct dd {
+  .channel__icon {
+    display: inline-grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-full);
+    background: var(--wash);
+    color: var(--accent);
+  }
+
+  .channel dd {
+    grid-column: 1;
+    min-width: 0;
     margin: 0;
+    padding-left: calc(36px + var(--space-3));
     overflow-wrap: anywhere;
   }
 
+  .channel dd.channel__email {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
   .contact-direct a {
-    color: var(--accent);
+    color: var(--text-primary);
     text-decoration: underline;
-    text-underline-offset: 0.15em;
+    text-decoration-color: color-mix(in srgb, var(--accent) 50%, transparent);
+    text-underline-offset: 0.2em;
+    transition: color var(--dur-base);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .contact-direct a:hover {
+      color: var(--accent);
+    }
+  }
+
+  .contact-note {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin: var(--space-5) 0 0;
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+    color: var(--text-secondary);
+  }
+
+  .contact-form-card {
+    border-radius: var(--radius-2xl);
+    padding: clamp(var(--space-5), 4vw, var(--space-7));
+    min-width: 0;
+  }
+
+  @media (min-width: 1024px) {
+    .contact-layout {
+      grid-template-columns: 5fr 7fr;
+      gap: var(--space-8);
+      align-items: start;
+    }
   }
 </style>

@@ -4,7 +4,7 @@
  *
  * Fontsource ships no per-subset CSS entry point, so importing the package
  * entry pulls cyrillic, greek and vietnamese as well. The design system caps
- * total shipped fonts at 140KB and mandates latin only, so the faces are
+ * total shipped fonts at 200KB and mandates latin only, so the faces are
  * vendored explicitly and declared by hand in src/styles/fonts.css.
  */
 import { copyFileSync, mkdirSync, statSync } from 'node:fs';
@@ -18,6 +18,10 @@ const FACES = [
   {
     from: '@fontsource-variable/newsreader/files/newsreader-latin-wght-normal.woff2',
     to: 'newsreader-latin-wght-normal.woff2',
+  },
+  {
+    from: '@fontsource-variable/newsreader/files/newsreader-latin-wght-italic.woff2',
+    to: 'newsreader-latin-wght-italic.woff2',
   },
   {
     from: '@fontsource-variable/inter/files/inter-latin-wght-normal.woff2',
@@ -43,7 +47,7 @@ for (const face of FACES) {
 
 console.log(`${'total'.padEnd(44)} ${(total / 1024).toFixed(1)} KB`);
 
-if (total > 140 * 1024) {
-  console.error(`Font budget exceeded: ${(total / 1024).toFixed(1)} KB > 140 KB`);
+if (total > 200 * 1024) {
+  console.error(`Font budget exceeded: ${(total / 1024).toFixed(1)} KB > 200 KB`);
   process.exit(1);
 }

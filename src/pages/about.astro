@@ -5,8 +5,10 @@ import PageIntro from '../components/patterns/PageIntro.astro';
 import Section from '../components/primitives/Section.astro';
 import Prose from '../components/primitives/Prose.astro';
 import Button from '../components/primitives/Button.astro';
+import Aurora from '../components/primitives/Aurora.astro';
 import NowBand from '../components/patterns/NowBand.astro';
 import ProjectEntry from '../components/patterns/ProjectEntry.astro';
+import CtaCard from '../components/patterns/CtaCard.astro';
 import { site } from '../config/site';
 import { publishedProjects } from '../utils/projects';
 import { relatedProjectHref } from '../utils/achievements';
@@ -14,6 +16,29 @@ import { relatedProjectHref } from '../utils/achievements';
 const projects = publishedProjects(await getCollection('projects'));
 const publishedIds = projects.map((project) => project.id);
 const now = (await getCollection('now'))[0]?.data;
+
+const glance = [
+  { label: 'Based in', value: site.location },
+  { label: 'Grade', value: site.grade },
+  { label: 'Building', value: now?.strands[0]?.title ?? 'Something new' },
+  { label: 'Instruments', value: 'Guitar · Piano · Voice' },
+  { label: 'Follows', value: 'Football · F1 · Tennis · Cricket · NFL' },
+];
+
+const principles = [
+  {
+    title: 'Make it real',
+    text: "Turn what I'm studying into something I can point at — a project, a system, or a piece of writing.",
+  },
+  {
+    title: 'Explain the decisions',
+    text: 'If I cannot say why a choice survived contact with execution, I did not understand it yet.',
+  },
+  {
+    title: 'Practise daily',
+    text: 'Music taught me what patience actually costs — a more useful lesson than it sounds.',
+  },
+];
 ---
 
 <BaseLayout
@@ -26,16 +51,36 @@ const now = (await getCollection('now'))[0]?.data;
   ]}
 >
   <main id="main">
-    <div class="container">
-      <PageIntro
-        kicker="The person"
-        title="About me"
-        lede="I am Om Jhamvar, an 11th grade student in Mumbai. I learn best by building things, writing about them, and doing both in public."
-      />
-    </div>
+    <PageIntro
+      kicker="About"
+      title="I learn by"
+      titleAccent="building things."
+      lede="I am Om Jhamvar, an 11th grade student in Mumbai. I learn best by building things, writing about them, and doing both in public."
+    >
+      <aside slot="aside" class="glance glass" aria-labelledby="glance-title">
+        <p id="glance-title" class="eyebrow">At a glance</p>
+        <dl class="glance__list">
+          {
+            glance.map((row) => (
+              <div class="glance__row">
+                <dt>{row.label}</dt>
+                <dd>{row.value}</dd>
+              </div>
+            ))
+          }
+        </dl>
+      </aside>
+    </PageIntro>
 
-    <Section kicker="How I work" heading="Make it real, then explain it" id="how-i-work" headingLevel="h2">
-      <Prose>
+    <Section
+      index="01"
+      kicker="How I work"
+      heading="Make it real,"
+      accent="then explain it."
+      id="how-i-work"
+      layout="split"
+    >
+      <Prose dropcap>
         <p>
           I started this site so learning would have somewhere to go. Instead of stopping at a
           tutorial or a class, I try to turn what I am studying into something I can point at — a
@@ -73,15 +118,45 @@ const now = (await getCollection('now'))[0]?.data;
       </Prose>
     </Section>
 
+    <Section
+      index="02"
+      kicker="Principles"
+      heading="Three habits I"
+      accent="keep coming back to."
+      id="principles"
+    >
+      <ol class="principles">
+        {
+          principles.map((item, i) => (
+            <li class="principle surface-card reveal" style={`--i: ${i + 1}`}>
+              <span class="principle__index accent-text" aria-hidden="true">
+                {String(i + 1).padStart(2, '0')}
+              </span>
+              <h3>{item.title}</h3>
+              <p>{item.text}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </Section>
+
     {
       now && (
-        <Section kicker="Currently" heading="What has my attention" id="now" headingLevel="h2">
+        <Section
+          index="03"
+          kicker="Currently"
+          heading="What has my"
+          accent="attention."
+          id="now"
+          headingLevel="h2"
+        >
           <NowBand entry={now} projectHref={relatedProjectHref(now.project, publishedIds)} />
         </Section>
       )
     }
 
-    <Section kicker="What I build" heading="Tools I wish I had" id="build" headingLevel="h2">
+    <Section index="04" kicker="What I build" heading="Tools I" accent="wish I had." id="build">
+      <Button slot="action" href="/projects" variant="quiet" size="md">All projects →</Button>
       <Prose>
         <p>
           The work on this site is narrow on purpose: software that gives a learner more useful
@@ -91,7 +166,7 @@ const now = (await getCollection('now'))[0]?.data;
       </Prose>
       {
         projects.length > 0 && (
-          <div class="stack">
+          <div class="bento build-grid">
             {projects.map((project) => (
               <ProjectEntry
                 project={project}
@@ -102,45 +177,173 @@ const now = (await getCollection('now'))[0]?.data;
           </div>
         )
       }
-      <p class="band-action">
-        <Button href="/projects" variant="quiet" size="md">All projects →</Button>
-      </p>
     </Section>
 
-    <Section kicker="Direction" heading="A record, not a pitch" id="direction" headingLevel="h2">
-      <Prose>
-        <p>
+    <section class="direction has-aurora" aria-labelledby="direction">
+      <Aurora intensity="soft" />
+      <div class="container">
+        <p class="eyebrow"><span class="eyebrow__index">05</span>Direction</p>
+        <h2 id="direction" class="direction__heading">
+          A record, <em class="accent-text">not a pitch.</em>
+        </h2>
+        <blockquote class="direction__quote">
+          <p>The first reader is me in six months.</p>
+        </blockquote>
+        <p class="direction__text">
           I am not using this site as a campaign. I am trying to keep an honest public record of
           how I think and what I can actually do — the projects, the writing, and the few
           credentials that have an issuing body. If that is useful to someone else later, good.
-          The first reader is me in six months.
         </p>
-      </Prose>
-      <p class="band-action">
-        <Button href="/achievements" variant="quiet" size="md">Achievements →</Button>
-      </p>
-    </Section>
+        <p class="direction__action">
+          <Button href="/achievements" variant="quiet">Achievements →</Button>
+        </p>
+      </div>
+    </section>
 
-    <Section kicker="Contact" heading="If you want to talk" id="connect" headingLevel="h2">
-      <p class="band-text">
-        A question about a project, a collaboration, or an argument about football tactics — the
-        contact page is the right door. I reply within a day or so.
-      </p>
-      <p class="band-action">
-        <Button href="/contact" variant="primary">Get in touch</Button>
-      </p>
-    </Section>
+    <div class="about-cta">
+      <CtaCard
+        id="connect"
+        kicker="Contact"
+        heading="If you want"
+        accent="to talk."
+        text="A question about a project, a collaboration, or an argument about football tactics — the contact page is the right door. I reply within a day or so."
+        href="/contact"
+        label="Get in touch"
+      />
+    </div>
   </main>
 </BaseLayout>
 
 <style>
-  .band-text {
+  .glance {
+    border-radius: var(--radius-xl);
+    padding: var(--space-5);
+  }
+
+  .glance .eyebrow {
+    margin: 0 0 var(--space-3);
+  }
+
+  .glance__list {
+    margin: 0;
+  }
+
+  .glance__row {
+    display: grid;
+    gap: var(--space-1);
+    padding-block: var(--space-3);
+    border-top: 1px solid var(--glass-border);
+  }
+
+  .glance__row:first-child {
+    border-top: 0;
+  }
+
+  .glance__row dt {
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+    color: var(--text-secondary);
+  }
+
+  .glance__row dd {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--step-0);
+    color: var(--text-primary);
+  }
+
+  .principles {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  .principle {
+    display: grid;
+    gap: var(--space-3);
+    align-content: start;
+    padding: var(--space-6);
+    border-radius: var(--radius-2xl);
+  }
+
+  .principle__index {
+    font-family: var(--font-display);
+    font-size: var(--step-5);
+    line-height: 1;
+  }
+
+  .principle h3 {
+    margin: var(--space-3) 0 0;
+    font-size: var(--step-2);
+  }
+
+  .principle p {
+    margin: 0;
+    color: var(--text-secondary);
+  }
+
+  .build-grid {
+    margin-top: var(--space-6);
+  }
+
+  .direction {
+    padding-block: var(--section-gap);
+  }
+
+  .direction .eyebrow {
+    margin: 0 0 var(--space-4);
+  }
+
+  .direction__heading {
+    margin: 0;
+    font-size: var(--step-4);
+  }
+
+  .direction__quote {
+    margin: var(--space-6) 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .direction__quote p {
+    margin: 0;
+    max-width: 18ch;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: var(--step-5);
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-display);
+  }
+
+  .direction__text {
     margin: 0;
     max-width: var(--measure-prose);
     color: var(--text-secondary);
   }
 
-  .band-action {
+  .direction__action {
     margin: var(--space-5) 0 0;
+  }
+
+  .about-cta {
+    padding-top: var(--space-6);
+  }
+
+  @media (min-width: 480px) {
+    .glance__row {
+      grid-template-columns: 9rem 1fr;
+      align-items: baseline;
+      gap: var(--space-3);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .principles {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
   }
 </style>

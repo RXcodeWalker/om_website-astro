@@ -14,44 +14,45 @@ const labels: Record<Status, string> = {
   experiment: 'Experiment',
   archived: 'Archived',
 };
-
-const dotClass: Record<Status, string> = {
-  shipped: 'status-badge__dot--shipped',
-  'in-progress': 'status-badge__dot--progress',
-  experiment: 'status-badge__dot--quiet',
-  archived: 'status-badge__dot--quiet',
-};
 ---
 
-<span class:list={['status-badge', className]}>
-  <span class:list={['status-badge__dot', dotClass[status]]} aria-hidden="true"></span>
+<span class:list={['status-badge', `status-badge--${status}`, className]}>
+  <span class:list={['status-badge__dot', status === 'in-progress' && 'pulse-dot']} aria-hidden="true"></span>
   <span class="status-badge__label">{labels[status]}</span>
 </span>
 
-<style>
+<style is:global>
   .status-badge {
+    --badge: var(--status-quiet);
     display: inline-flex;
     align-items: center;
     gap: var(--space-2);
+    padding: 4px 10px 4px 8px;
     font-family: var(--font-mono);
     font-size: var(--step--2);
     letter-spacing: var(--tracking-mono);
     text-transform: uppercase;
+    white-space: nowrap;
     color: var(--text-secondary);
+    border-radius: var(--radius-full);
+    border: 1px solid color-mix(in srgb, var(--badge) 35%, transparent);
+    background: color-mix(in srgb, var(--badge) 10%, transparent);
+  }
+
+  .status-badge--shipped {
+    --badge: var(--status-shipped);
+  }
+
+  .status-badge--in-progress {
+    --badge: var(--status-progress);
   }
 
   .status-badge__dot {
+    position: relative;
     width: 6px;
     height: 6px;
     border-radius: var(--radius-full);
-    background: var(--status-quiet);
-  }
-
-  .status-badge__dot--shipped {
-    background: var(--status-shipped);
-  }
-
-  .status-badge__dot--progress {
-    background: var(--status-progress);
+    --pulse: var(--badge);
+    background: var(--badge);
   }
 </style>

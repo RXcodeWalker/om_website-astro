@@ -16,99 +16,63 @@ const updatedLabel = entry.updated.toLocaleDateString('en-GB', {
 ---
 
 <div class="now-band">
-  <p class="now-band__focus">{entry.focus}</p>
+  <div class="now-band__lead">
+    <p class="now-band__focus">{entry.focus}</p>
+
+    {
+      projectHref && (
+        <p class="now-band__related">
+          <a class="link-ui link-arrow tap-target" href={projectHref}>
+            Related project <span class="link-arrow__icon" aria-hidden="true">→</span>
+          </a>
+        </p>
+      )
+    }
+
+    {/* The stamp is the honesty mechanism, not decoration. */}
+    <p class="now-band__stamp tabular-nums">
+      <span class="pulse-dot" aria-hidden="true"></span>
+      Updated <time datetime={updatedISO}>{updatedLabel}</time>
+    </p>
+  </div>
 
   {
     entry.strands.length > 0 && (
       <ul class="now-band__strands">
-        {entry.strands.map((strand) => (
-          <li class="now-strand">
-            <p class="now-strand__label">{strand.label}</p>
-            <div class="now-strand__body">
-              <p class="now-strand__title">{strand.title}</p>
-              <p class="now-strand__detail">{strand.detail}</p>
-            </div>
+        {entry.strands.map((strand, i) => (
+          <li class="now-strand surface-card reveal" style={`--i: ${i}`}>
+            <p class="now-strand__index tabular-nums" aria-hidden="true">
+              {String(i + 1).padStart(2, '0')}
+            </p>
+            <p class="now-strand__label eyebrow">{strand.label}</p>
+            <p class="now-strand__title">{strand.title}</p>
+            <p class="now-strand__detail">{strand.detail}</p>
           </li>
         ))}
       </ul>
     )
   }
-
-  {
-    projectHref && (
-      <p class="now-band__related">
-        <a class="link-ui" href={projectHref}>
-          Related project
-        </a>
-      </p>
-    )
-  }
-
-  {/* The stamp is the honesty mechanism, not decoration. */}
-  <p class="now-band__stamp tabular-nums">
-    Updated <time datetime={updatedISO}>{updatedLabel}</time>
-  </p>
 </div>
 
 <style>
   .now-band {
     display: grid;
+    gap: var(--space-7);
+  }
+
+  .now-band__lead {
+    display: grid;
     gap: var(--space-5);
+    align-content: start;
   }
 
   .now-band__focus {
     margin: 0;
     max-width: var(--measure-prose);
-    font-size: var(--step-1);
-    line-height: var(--leading-prose);
-  }
-
-  .now-band__strands {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-
-  .now-strand {
-    display: grid;
-    gap: var(--space-2);
-    padding-block: var(--space-5);
-    border-top: 1px solid var(--border-subtle);
-  }
-
-  @media (min-width: 768px) {
-    .now-strand {
-      grid-template-columns: 1fr 3fr;
-      gap: var(--space-5);
-    }
-  }
-
-  .now-strand__label {
-    margin: 0;
-    font-family: var(--font-mono);
-    font-size: var(--step--2);
-    letter-spacing: var(--tracking-mono);
-    text-transform: uppercase;
-    color: var(--text-muted);
-    padding-top: var(--space-1);
-  }
-
-  .now-strand__body {
-    display: grid;
-    gap: var(--space-2);
-  }
-
-  .now-strand__title {
-    margin: 0;
     font-family: var(--font-display);
-    font-size: var(--step-1);
-    font-weight: 500;
-  }
-
-  .now-strand__detail {
-    margin: 0;
-    max-width: var(--measure-prose);
-    color: var(--text-secondary);
+    font-size: var(--step-2);
+    line-height: var(--leading-snug);
+    color: var(--text-primary);
   }
 
   .now-band__related {
@@ -119,12 +83,65 @@ const updatedLabel = entry.updated.toLocaleDateString('en-GB', {
     display: inline-flex;
     align-items: center;
     min-height: 44px;
+    font-weight: 500;
+    color: var(--accent);
   }
 
   .now-band__stamp {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
     margin: 0;
     font-family: var(--font-mono);
     font-size: var(--step--2);
     color: var(--text-muted);
+  }
+
+  .now-band__strands {
+    display: grid;
+    gap: var(--space-4);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .now-strand {
+    display: grid;
+    gap: var(--space-3);
+    padding: var(--space-5) var(--space-6);
+    border-radius: var(--radius-xl);
+  }
+
+  .now-strand__index {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    color: var(--accent);
+  }
+
+  .now-strand__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--step-2);
+    line-height: var(--leading-snug);
+  }
+
+  .now-strand__detail {
+    margin: 0;
+    max-width: var(--measure-prose);
+    color: var(--text-secondary);
+  }
+
+  @media (min-width: 1024px) {
+    .now-band {
+      grid-template-columns: 5fr 7fr;
+      gap: var(--space-8);
+      align-items: start;
+    }
+
+    .now-band__lead {
+      position: sticky;
+      top: calc(var(--header-h) + var(--space-6));
+    }
   }
 </style>

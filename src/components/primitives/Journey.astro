@@ -41,17 +41,58 @@ if (!empty) {
 
 <style>
   .journey {
+    position: relative;
     margin: var(--space-6) 0;
-    padding: 0;
+    padding: 0 0 0 var(--space-6);
     list-style: none;
     display: grid;
     gap: var(--space-5);
   }
 
+  .journey::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 7px;
+    width: 2px;
+    background: linear-gradient(var(--accent), var(--highlight-soft));
+    transform-origin: top;
+  }
+
   .journey__item {
+    position: relative;
     margin: 0;
     display: grid;
     gap: var(--space-1);
+  }
+
+  .journey__item::before {
+    content: '';
+    position: absolute;
+    top: 0.2em;
+    left: calc(-1 * var(--space-6) + 2px);
+    width: 12px;
+    height: 12px;
+    border-radius: var(--radius-full);
+    border: 2px solid var(--accent);
+    background: var(--surface-page);
+  }
+
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .journey::before {
+        animation: journey-draw linear both;
+        animation-timeline: view();
+        animation-range: entry 10% cover 60%;
+      }
+    }
+  }
+
+  @keyframes journey-draw {
+    from {
+      transform: scaleY(0);
+    }
   }
 
   .journey__date {

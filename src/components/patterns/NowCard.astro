@@ -1,0 +1,117 @@
+---
+import type { NowEntry } from '../../schemas/now';
+
+interface Props {
+  entry: NowEntry;
+  projectHref?: string;
+}
+
+const { entry, projectHref } = Astro.props;
+
+const updatedISO = entry.updated.toISOString().slice(0, 10);
+const updatedLabel = entry.updated.toLocaleDateString('en-GB', {
+  month: 'short',
+  year: 'numeric',
+});
+---
+
+<aside class="now-card glass reveal reveal--scale" style="--i: 6" aria-labelledby="now-card-title">
+  <div class="now-card__head">
+    <p class="now-card__live">
+      <span class="pulse-dot" aria-hidden="true"></span>
+      <span id="now-card-title">Currently</span>
+    </p>
+    <p class="now-card__stamp tabular-nums">
+      Updated <time datetime={updatedISO}>{updatedLabel}</time>
+    </p>
+  </div>
+  {
+    entry.strands.length > 0 && (
+      <ul class="now-card__list">
+        {entry.strands.map((strand) => (
+          <li class="now-card__item">
+            <span class="now-card__label">{strand.label}</span>
+            <span class="now-card__title">{strand.title}</span>
+          </li>
+        ))}
+      </ul>
+    )
+  }
+  {
+    projectHref && (
+      <a class="link-arrow link-ui tap-target now-card__link" href={projectHref}>
+        Related project <span class="link-arrow__icon" aria-hidden="true">→</span>
+      </a>
+    )
+  }
+</aside>
+
+<style is:global>
+  .now-card {
+    display: grid;
+    gap: var(--space-3);
+    width: 100%;
+    max-width: 380px;
+    padding: var(--space-5);
+    border-radius: var(--radius-xl);
+  }
+
+  .now-card__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+  }
+
+  .now-card__live {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    letter-spacing: var(--tracking-eyebrow);
+    text-transform: uppercase;
+    color: var(--text-primary);
+  }
+
+  .now-card__stamp {
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    color: var(--text-secondary);
+  }
+
+  .now-card__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .now-card__item {
+    display: grid;
+    gap: 2px;
+    padding-block: var(--space-3);
+    border-top: 1px solid var(--glass-border);
+  }
+
+  .now-card__label {
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+    color: var(--text-secondary);
+  }
+
+  .now-card__title {
+    font-family: var(--font-display);
+    font-size: var(--step-1);
+    line-height: var(--leading-snug);
+  }
+
+  .now-card__link {
+    justify-self: start;
+    font-size: var(--step--1);
+    font-weight: 500;
+    color: var(--accent);
+  }
+</style>

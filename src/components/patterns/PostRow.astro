@@ -1,4 +1,6 @@
 ---
+import Icon from '../primitives/Icon.astro';
+
 interface Props {
   href: string;
   title: string;
@@ -7,9 +9,10 @@ interface Props {
   excerpt?: string;
   readingTime?: number;
   external?: boolean;
+  index?: number;
 }
 
-const { href, title, category, date, excerpt, readingTime, external = false } = Astro.props;
+const { href, title, category, date, excerpt, readingTime, external = false, index } = Astro.props;
 
 const parsed = new Date(date);
 const valid = !Number.isNaN(parsed.getTime());
@@ -19,53 +22,82 @@ const dateLabel = valid
   : date;
 ---
 
-<article class="post-row">
-  <h3 class="post-row__title">
-    {/* One real link per row, stretched over the block: one tab stop, meaningful name. */}
-    <a
-      href={href}
-      class="post-row__link"
-      target={external ? '_blank' : undefined}
-      rel={external ? 'noopener noreferrer' : undefined}
-    >
-      {title}{external && <span class="post-row__external" aria-hidden="true"> ↗</span>}
-    </a>
-  </h3>
+<article class:list={['post-row', 'reveal', external && 'post-row--external']}>
+  {
+    index !== undefined && (
+      <span class="post-row__index tabular-nums" aria-hidden="true">
+        {String(index).padStart(2, '0')}
+      </span>
+    )
+  }
 
-  <p class="post-row__meta tabular-nums">
-    {category && (
-      <>
-        <span>{category}</span>
-        <span aria-hidden="true">·</span>
-      </>
-    )}
-    <time datetime={dateISO}>{dateLabel}</time>
-    {readingTime && (
-      <>
-        <span aria-hidden="true">·</span>
-        <span>{readingTime} min read</span>
-      </>
-    )}
-  </p>
+  <div class="post-row__main">
+    <h3 class="post-row__title">
+      {/* One real link per row, stretched over the block: one tab stop, meaningful name. */}
+      <a
+        href={href}
+        class="post-row__link"
+        target={external ? '_blank' : undefined}
+        rel={external ? 'noopener noreferrer' : undefined}
+      >
+        {title}{external && <span class="visually-hidden"> (opens the blog)</span>}
+      </a>
+    </h3>
 
-  {excerpt && <p class="post-row__excerpt">{excerpt}</p>}
+    <p class="post-row__meta tabular-nums">
+      {category && (
+        <>
+          <span>{category}</span>
+          <span aria-hidden="true">·</span>
+        </>
+      )}
+      <time datetime={dateISO}>{dateLabel}</time>
+      {readingTime && (
+        <>
+          <span aria-hidden="true">·</span>
+          <span>{readingTime} min read</span>
+        </>
+      )}
+    </p>
+
+    {excerpt && <p class="post-row__excerpt">{excerpt}</p>}
+  </div>
+
+  <span class="post-row__arrow" aria-hidden="true">
+    <Icon name={external ? 'arrow-up-right' : 'arrow-right'} />
+  </span>
 </article>
 
-<style>
+<style is:global>
   .post-row {
     position: relative;
     display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--space-2) var(--space-4);
+    padding: var(--space-5) var(--space-4);
+    border-radius: var(--radius-lg);
+    box-shadow: inset 0 1px 0 var(--glass-border);
+    transition: background-color var(--dur-base);
+  }
+
+  .post-row__index {
+    grid-column: 1 / -1;
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    color: var(--text-muted);
+  }
+
+  .post-row__main {
+    display: grid;
     gap: var(--space-2);
-    padding-block: var(--space-5);
-    border-top: 1px solid var(--border-subtle);
-    transition:
-      background-color var(--dur-fast) var(--ease-out),
-      border-color var(--dur-fast) var(--ease-out);
+    min-width: 0;
   }
 
   .post-row__title {
     margin: 0;
-    font-size: var(--step-2);
+    font-size: var(--step-3);
+    font-weight: 400;
+    transition: color var(--dur-base);
   }
 
   .post-row__link {
@@ -73,14 +105,19 @@ const dateLabel = valid
     text-decoration: none;
   }
 
-  .post-row__external {
-    font-size: 0.85em;
-  }
-
   .post-row__link::after {
     content: '';
     position: absolute;
     inset: 0;
+  }
+
+  .post-row__link:focus-visible {
+    outline: none;
+  }
+
+  .post-row:has(:focus-visible) {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
   }
 
   .post-row__meta {
@@ -101,18 +138,56 @@ const dateLabel = valid
     color: var(--text-secondary);
   }
 
-  @media (hover: hover) and (pointer: fine) {
-    .post-row:hover {
-      border-color: var(--border-strong);
+  .post-row__arrow {
+    align-self: start;
+    display: inline-grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--glass-border);
+    color: var(--text-primary);
+    transform: translateX(var(--nudge, 0));
+    transition: var(--dur-base) var(--ease-spring);
+    transition-property: transform, background-color, color, border-color;
+  }
+
+  @media (min-width: 768px) {
+    .post-row {
+      grid-template-columns: 4rem minmax(0, 1fr) auto;
+      column-gap: var(--space-6);
+      align-items: baseline;
     }
 
-    .post-row:hover .post-row__link {
-      text-decoration: underline;
-      text-underline-offset: 0.15em;
+    .post-row__index {
+      grid-column: 1;
+    }
+
+    .post-row__main {
+      grid-column: 2;
+    }
+
+    .post-row__arrow {
+      grid-column: 3;
+      grid-row: 1;
     }
   }
 
-  .post-row:has(:focus-visible) {
-    border-color: var(--border-strong);
+  @media (hover: hover) and (pointer: fine) {
+    .post-row:is(:hover, :has(:focus-visible)) {
+      --nudge: 4px;
+      background: var(--wash);
+      color: var(--accent);
+    }
+
+    .post-row:is(:hover, :has(:focus-visible)) .post-row__arrow {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--text-on-accent);
+    }
+  }
+
+  .post-row--external .post-row__arrow {
+    transform: translate(var(--nudge, 0), calc(var(--nudge, 0) * -1));
   }
 </style>

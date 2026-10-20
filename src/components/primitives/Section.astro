@@ -4,6 +4,9 @@ interface Props {
   heading?: string;
   headingLevel?: 'h1' | 'h2' | 'h3';
   id?: string;
+  index?: string;
+  accent?: string;
+  layout?: 'stack' | 'split';
   class?: string;
 }
 
@@ -12,52 +15,103 @@ const {
   heading,
   headingLevel = 'h2',
   id,
+  index,
+  accent,
+  layout = 'stack',
   class: className = '',
 } = Astro.props;
 
 const HeadingTag = headingLevel;
 ---
 
-<section class:list={['section-band', className]} aria-labelledby={heading ? id : undefined}>
+<section
+  class:list={['section-band', `section-band--${layout}`, className]}
+  aria-labelledby={heading ? id : undefined}
+>
   <div class="container section-band__inner">
-    {kicker && <p class="section-band__kicker">{kicker}</p>}
-    {heading && (
-      <HeadingTag id={id} class="section-band__heading">
-        {heading}
-      </HeadingTag>
-    )}
+    <header class="section-band__head reveal">
+      <div class="section-band__titles">
+        {
+          (index || kicker) && (
+            <p class="eyebrow">
+              {index && <span class="eyebrow__index">{index}</span>}
+              {kicker}
+            </p>
+          )
+        }
+        {
+          heading && (
+            <HeadingTag id={id} class="section-band__heading">
+              {heading}
+              {accent && (
+                <>
+                  {' '}
+                  <em class="accent-text">{accent}</em>
+                </>
+              )}
+            </HeadingTag>
+          )
+        }
+      </div>
+      {
+        Astro.slots.has('action') && (
+          <div class="section-band__action">
+            <slot name="action" />
+          </div>
+        )
+      }
+    </header>
     <div class="section-band__content">
       <slot />
     </div>
   </div>
 </section>
 
-<style>
+<style is:global>
   .section-band {
     padding-block: var(--section-gap);
-    border-top: 1px solid var(--border-subtle);
   }
 
   .section-band__inner {
     display: grid;
+    gap: var(--space-7);
+  }
+
+  .section-band__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
     gap: var(--space-4);
   }
 
-  .section-band__kicker {
-    margin: 0;
-    font-family: var(--font-mono);
-    font-size: var(--step--2);
-    letter-spacing: var(--tracking-mono);
-    text-transform: uppercase;
-    color: var(--text-muted);
+  .section-band__titles {
+    display: grid;
+    gap: var(--space-4);
   }
 
   .section-band__heading {
     margin: 0;
-    max-width: var(--measure-wide);
+    font-size: var(--step-4);
+    max-width: 22ch;
   }
 
   .section-band__content {
-    max-width: var(--measure-wide);
+    min-width: 0;
+  }
+
+  @media (min-width: 1024px) {
+    .section-band--split .section-band__inner {
+      grid-template-columns: 4fr 8fr;
+      column-gap: var(--space-8);
+      align-items: start;
+    }
+
+    .section-band--split .section-band__head {
+      position: sticky;
+      top: calc(var(--header-h) + var(--space-6));
+      flex-direction: column;
+      align-items: start;
+    }
   }
 </style>

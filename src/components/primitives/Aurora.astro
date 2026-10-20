@@ -1,0 +1,129 @@
+---
+/*
+  Decorative layered background. The parent must carry `has-aurora`
+  (utilities.css), which clips the blobs and creates the stacking context
+  this layer sits behind.
+*/
+interface Props {
+  intensity?: 'hero' | 'soft';
+  grid?: boolean;
+  spotlight?: boolean;
+}
+
+const { intensity = 'soft', grid = false, spotlight = false } = Astro.props;
+---
+
+<div class="aurora" data-intensity={intensity} aria-hidden="true">
+  <span class="aurora__blob aurora__blob--a"></span>
+  <span class="aurora__blob aurora__blob--b"></span>
+  <span class="aurora__blob aurora__blob--c"></span>
+  {grid && <span class="aurora__grid"></span>}
+  <span class="aurora__grain"></span>
+  {spotlight && <span class="aurora__spotlight"></span>}
+</div>
+
+<style>
+  .aurora {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    overflow: clip;
+    pointer-events: none;
+  }
+
+  .aurora__blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(64px);
+    will-change: transform;
+  }
+
+  .aurora__blob--a {
+    width: 58vmax;
+    height: 58vmax;
+    top: -28vmax;
+    right: -14vmax;
+    background: radial-gradient(circle, var(--aurora-a), transparent 66%);
+    animation: aurora-a 26s var(--ease-in-out) infinite alternate;
+  }
+
+  .aurora__blob--b {
+    width: 46vmax;
+    height: 46vmax;
+    bottom: -24vmax;
+    left: -12vmax;
+    background: radial-gradient(circle, var(--aurora-b), transparent 66%);
+    animation: aurora-b 32s var(--ease-in-out) infinite alternate;
+  }
+
+  .aurora__blob--c {
+    width: 36vmax;
+    height: 36vmax;
+    top: 30%;
+    right: 18%;
+    background: radial-gradient(circle, var(--aurora-c), transparent 66%);
+    animation: aurora-c 38s var(--ease-in-out) infinite alternate;
+  }
+
+  @keyframes aurora-a {
+    to {
+      transform: translate3d(-8%, 6%, 0) scale(1.12);
+    }
+  }
+
+  @keyframes aurora-b {
+    to {
+      transform: translate3d(10%, -6%, 0) scale(1.18);
+    }
+  }
+
+  @keyframes aurora-c {
+    to {
+      transform: translate3d(-12%, 10%, 0) scale(0.9);
+    }
+  }
+
+  [data-intensity='soft'] .aurora__blob {
+    opacity: 0.6;
+  }
+
+  @media (max-width: 767px) {
+    .aurora__blob {
+      filter: blur(44px);
+    }
+
+    .aurora__blob--c {
+      display: none;
+    }
+  }
+
+  .aurora__grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+    background-size: 64px 64px;
+    -webkit-mask-image: radial-gradient(ellipse 75% 60% at 50% 35%, #000 25%, transparent 75%);
+    mask-image: radial-gradient(ellipse 75% 60% at 50% 35%, #000 25%, transparent 75%);
+  }
+
+  .aurora__grain {
+    position: absolute;
+    inset: 0;
+    background-image: var(--noise);
+    opacity: var(--noise-opacity);
+    mix-blend-mode: overlay;
+  }
+
+  .aurora__spotlight {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      520px circle at var(--mx, 72%) var(--my, 28%),
+      color-mix(in srgb, var(--accent) 13%, transparent),
+      transparent 62%
+    );
+    transition: background-position var(--dur-base);
+  }
+</style>

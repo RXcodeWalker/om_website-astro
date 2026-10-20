@@ -28,7 +28,9 @@ const {
 ---
 
 <figure class:list={['figure', className]}>
-  <Media {src} {alt} {ratio} {eager} sizes={sizes} />
+  <div class="figure__frame">
+    <Media {src} {alt} {ratio} {eager} sizes={sizes} />
+  </div>
   {
     caption && (
       <figcaption class="figure__caption">
@@ -44,15 +46,23 @@ const {
     margin: 0;
   }
 
+  .figure__frame {
+    border-radius: var(--radius-xl);
+    overflow: clip;
+    box-shadow: var(--shadow-2);
+  }
+
   .figure__caption {
-    margin-top: var(--space-2);
+    margin-top: var(--space-3);
     font-family: var(--font-mono);
-    font-size: var(--step--1);
+    font-size: var(--step--2);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
     color: var(--text-muted);
     text-align: left;
   }
 
   .figure__prefix {
-    color: var(--text-muted);
+    color: var(--accent);
   }
 </style>

@@ -1,6 +1,6 @@
 # Beyond The Basics — Content Architecture & Design System
 
-Status: specification, not yet implemented. Written after the repository audit and the approved information architecture.
+Status: implemented — cinematic revision (Oct 2026)
 Scope: the implementation-level content model, visual design system, and component architecture for the redesigned site.
 
 This document is the single source of truth for tokens, type, spacing, and component contracts. When it disagrees with code, the code is wrong.
@@ -21,10 +21,11 @@ Three files currently declare overlapping design tokens. On implementation, all 
 ## Non-negotiables
 
 1. **The site must be excellent with animations disabled.** Motion is additive only. Every layout, hierarchy, and affordance must read correctly with `prefers-reduced-motion: reduce`, with JavaScript off, and with all transitions stripped.
-2. **Content is visible without JavaScript.** This inverts the current `.reveal { opacity: 0 }` in `spectacular.css` line 283, which today makes every page header, card, bio, form, and footer invisible until `public/js/scroll.js` runs.
+2. **Content is visible without JavaScript.** No element is `opacity: 0` by default; entrance hiding happens only under `html.js` combined with `prefers-reduced-motion: no-preference`.
 3. **Presentation is independent of content.** Adding a project means adding one file. No page UI changes, no new component, no edit to the index or the homepage.
 4. **One name per value.** No aliases, no second token file, no duplicate `:root`. The audit's core finding was "two of everything"; the design system's job is to choose one of each.
-5. **Accent is scarce.** Three accents times two themes is six combinations to verify. That is only affordable because accent appears in a small, fixed set of roles.
+5. **Depth is layered, not loud.** At most three glass (`backdrop-filter`) surfaces may be visible in one viewport. Aurora sits behind text only at the specified alphas. Text over aurora uses `--text-primary` or `--text-secondary`, never `--text-muted`.
+6. **Motion is CSS-first.** Scroll effects use `animation-timeline` inside `@supports`. Page changes use native `@view-transition`. JavaScript is used only for pointer effects, gated on `(hover: hover) and (pointer: fine)` and on reduced-motion.
 
 ---
 
@@ -471,7 +472,19 @@ Where accent is permitted, exhaustively: prose link colour, link underline on ho
 }
 ```
 
-Deleted outright: `--glass-*` (24 tokens), `--blob-*`, `--page-atmosphere`, `--page-texture`, `--grain-map`, `--paper-map`, `--scanline-map`, `--card-hover-glow`, `--card-hover-ring`, `--card-hover-filter`, `--btn-primary-shadow`, `--motion-shadow`, `--motion-pulse-animation`, `--motion-flicker-animation`, `--category-reflection`, `--glass-prism-*`.
+### Cinematic tokens (Oct 2026)
+
+The cinematic revision adds a second, warm register and a depth layer. All live in the one `:root` block of `tokens.css` with dark overrides in `html[data-theme='dark']`.
+
+- **Highlight** — `--highlight` (`#8a6418` light, `#e3c27a` dark) is a warm gold that echoes blog.beyondthebasics.me. It is contrast-tested at 4.5:1 on the page surface in both themes and is used for drop caps, blockquote rules, and the second stop of `.accent-text`. `--highlight-soft` is decorative only (gradients, separators, sensor dots).
+- **Glass** — `--glass-bg`, `--glass-bg-strong` (fallback without `backdrop-filter`), `--glass-border`, `--glass-highlight` (an inset top light), `--glass-blur`. Consumed only by `.glass` in `utilities.css` and by the header pill.
+- **Cards and washes** — `--card-bg` (translucent raised surface, no blur), `--wash` (hover row tint, chips), `--grid-line` (aurora grid and ProjectArt grids).
+- **Aurora** — `--aurora-a/b/c` mix the accent, highlight, and accent-hover into transparent at fixed alphas, so they recolour with `data-accent`. `--noise` is an SVG turbulence data URI applied at `--noise-opacity`.
+- **Shadows** — `--shadow-1` (rest), `--shadow-2` (glass, hover), `--shadow-3` (lifted cards), `--shadow-glow` (accent ring on primary buttons and featured cards).
+
+The cinematic revision restores `--glass-*` and `--blob-*` as permitted names; the old ban below records the original audit only.
+
+Deleted outright (original audit): `--glass-*` (24 tokens), `--blob-*`, `--page-atmosphere`, `--page-texture`, `--grain-map`, `--paper-map`, `--scanline-map`, `--card-hover-glow`, `--card-hover-ring`, `--card-hover-filter`, `--btn-primary-shadow`, `--motion-shadow`, `--motion-pulse-animation`, `--motion-flicker-animation`, `--category-reflection`, `--glass-prism-*`.
 
 ## B2. Light theme — "Paper"
 
@@ -539,20 +552,23 @@ Rules: vertical rhythm between bands comes only from `--section-gap`; everything
 
 ## B5. Radius and border philosophy
 
-> **Radius communicates interactivity, not decoration.**
+> **Radius scales with the size of the surface.** Small controls are near-square; large layered surfaces are soft.
 
 ```css
 :root {
-  --radius-0:    0;       /* media, figures, sections, bands — the default */
-  --radius-sm:   2px;     /* buttons, inputs, chips, status badges */
-  --radius-md:   4px;     /* blockquote and code block edges */
-  --radius-full: 999px;   /* avatar and the theme toggle dot only */
+  --radius-0:    0;       /* full-bleed bands, prose blockquote rules */
+  --radius-sm:   2px;     /* focus-adjacent details, inline code */
+  --radius-md:   4px;     /* small inline surfaces */
+  --radius-lg:   12px;    /* media inside cards, code blocks, prose images, inputs */
+  --radius-xl:   20px;    /* side cards (NowCard, case-study rail), browser frames */
+  --radius-2xl:  28px;    /* section-scale cards: project cards, CTA, contact form */
+  --radius-full: 999px;   /* buttons, chips, status badges, the header pill, avatars */
 }
 ```
 
-Zero is the default. `--card-radius: 20px` and `--radius-pill: 100px` are retired: 20px boxes plus translucency plus shadow is the generic AI-landing-page look the brief rules out, and pill tags are the single clearest template tell.
+The scale ascends and is locked by `tests/design-system.test.ts`. Pick the step by the surface's size, not by taste: a control is `full`, a nested surface is `lg`, a standalone card is `xl` or `2xl`. Never nest a larger radius inside a smaller one.
 
-Hairlines carry structure. A `1px solid var(--border-subtle)` rule spanning the container, with a mono section label in the left margin, is the primary sectioning device — replacing the current pattern of wrapping every content group in a `.glass-card`. `backdrop-filter` is used nowhere; the sticky header is a solid surface with a bottom hairline.
+`--card-radius` stays retired; use the scale. `backdrop-filter` is allowed only through `.glass` in `utilities.css` and the floating header in `SiteHeader.astro` (lint-enforced), and at most three glass surfaces may be visible in one viewport.
 
 ---
 
@@ -687,11 +703,13 @@ Page files (`src/pages/*.astro`) are composition only: query collections, pass d
 
 Three variants, three sizes, no more.
 
-- **Primary** — `--accent` fill, `--text-on-accent` text, `--radius-sm`, no shadow, no gradient. Hover shifts fill to `--accent-hover`. **At most one primary per viewport band.**
-- **Secondary** — transparent, 1px `--border-interactive`, `--text-primary`. Hover: background `--surface-sunken`, border `--text-primary`.
-- **Quiet** — reads as a link with a trailing arrow ("View all writing →"). No box.
+All buttons are pills (`--radius-full`), weight 500, and carry `transform: translate(var(--tx), var(--ty))` so the magnetic effect can move them.
 
-Sizes 32 / 40 / 48px via padding and `--step--1` / `--step-0`; minimum 44px touch target on pointer-coarse devices. Buttons never scale on hover, never glow, never translate. Disabled state is 40% opacity plus `aria-disabled`, and disabled buttons stay focusable so their state is discoverable. Icon-only buttons require `aria-label`.
+- **Primary** — `--accent` fill, `--text-on-accent` text, `--shadow-1`. A diagonal sheen (`::before`) sweeps across on hover or focus, the fill shifts to `--accent-hover`, and the shadow becomes `--shadow-glow`. **At most one primary per viewport band.**
+- **Secondary** — `--glass-bg-strong` with a 1px `--glass-border` and the inset `--glass-highlight`. Hover: `--surface-raised` with a `--border-strong` edge.
+- **Quiet** — reads as a link in `--accent` with a gradient underline that grows from 0 to 100% on hover. Under a coarse pointer the underline is always visible and the target is 44px tall.
+
+Props: `arrow` appends an arrow icon (`arrow-right`, or `arrow-up-right` when `external`) that nudges on hover; `magnetic` adds `data-magnetic` so `motion.ts` pulls the button up to 6px toward the pointer. Sizes: `sm` 36px, `md` 44px, `lg` 52px. Disabled state is 40% opacity plus `aria-disabled`, and disabled buttons stay focusable so their state is discoverable. Icon-only buttons require `aria-label`.
 
 ### Links
 
@@ -709,7 +727,7 @@ The mono layer. `--font-mono`, `--step--2` or `--step--1`, `--text-muted`, `tabu
 Two kinds, deliberately distinct:
 
 - **Stack chips** are facts, not filters: mono `--step--2`, 1px `--border-subtle`, `--radius-sm`, `2px 8px` padding, `--text-secondary`, no fill, non-interactive. Maximum five visible with a `+N` overflow. With three projects, filtering UI would only advertise how few there are.
-- **Status badges** are one per project: mono uppercase label plus a 6px dot in `--status-*`. The label is always present, so the dot is redundant by design.
+- **Status badges** are one per project: a pill tinted 10% with a 35% border in its `--badge` colour (`--status-shipped`, `--status-progress`, or `--status-quiet`), a mono uppercase label, and a dot. `in-progress` dots pulse with a ring; others are static. The label is always present, so the dot is redundant by design.
 
 Achievement domains are **not** chips — they are group headings in the grouped layout. Chip soup is what makes a page look generated.
 
@@ -717,11 +735,11 @@ Achievement domains are **not** chips — they are group headings in the grouped
 
 > **If a thing does not need a boundary to be understood, it does not get one.**
 
-- **Default is not a card.** Achievements, writing picks, and experiments are hairline-separated list rows: a top 1px rule, generous padding, serif title, mono metadata line, one-line significance or excerpt. Hover tints the row `--surface-sunken` and underlines the title.
-- **Projects get the only card-like treatment,** and even then as a full-width horizontal row on desktop: media 5 columns, text 7 columns, in reading order. Three projects rendered as a 3-up grid of boxes look thin; three full-width editorial rows look substantial and give each real estate for outcome, stack, and status.
-- Homepage uses the same component at `variant="compact"` — no second implementation.
-- Removed from the current card: glass background, `backdrop-filter`, box shadow, 20px radius, `.card-shine` radial mouse-follow, the 3D tilt, the SVG-in-gradient-square icon tile, and the hover glow and saturate filters.
-- Hover on a project row: the thumbnail scales to 1.02 inside a fixed `overflow: hidden` frame, the title underlines, the hairline darkens to `--border-strong`. The row itself does not move.
+- **Rows stay rows.** Writing picks and non-featured achievements are list rows: an inset 1px `--glass-border` top line, `--radius-lg`, serif title, mono metadata. Hover tints the row `--wash`; writing rows add a numbered index and an arrow circle that fills with the accent.
+- **Surface cards** (`.surface-card`: `--card-bg`, `--glass-border`, `--radius-2xl`, inset highlight, `--shadow-1`, no blur) carry projects, featured achievements, Now strands, principles, channels, and the CTA.
+- **Project cards** have a stage (aurora-tinted `--surface-sunken` with a grid overlay) holding either a browser frame (chrome bar, host URL, screenshot) or `ProjectArt` generative SVG. Variants: `compact` (bento grid on home and about), `featured` (7/5 split at 1024px), `row` (alternating 1/1 split at 768px). One stretched title link per card; explore links are pills above it.
+- **Hover on a project card** (fine pointer, or `:has(:focus-visible)`): `--shadow-3`, an accent-tinted border, the frame lifts 6px, the image scales to 1.03, the title underlines, and `motion.ts` tilts the card up to 6°/8° with a following glare. Focus draws a 2px ring around the whole card.
+- The bento grid (`.bento`) runs 1 column, then 2 at 768px, then a 12-column 7/5/5/7 rhythm at 1024px; an odd last card spans the row.
 
 ### Project media
 
@@ -744,13 +762,13 @@ Achievement domains are **not** chips — they are group headings in the grouped
 
 ### Hover states
 
-Hover is a hint, never a performance.
+Hover rewards attention; it never hides information.
 
-- Permitted: colour, background to `--surface-sunken`, border colour, underline thickness, media scale up to 1.02, translate up to 2px on small controls only.
-- Every hover affordance shares its rule with `:focus-visible`, so keyboard users see the same feedback.
-- Wrapped in `@media (hover: hover) and (pointer: fine)` so touch devices never get stuck hover states.
-- Transition only named properties — `color`, `background-color`, `border-color`, `text-decoration-thickness`, `opacity`, `transform`. Never `transition: all`. `public/js/theme.js` line 61 currently sets `html.style.transition = 'all 0.4s ease'` and never removes it, leaving every property on `<html>` transitioning for the rest of the session.
-- Removed: the five duplicated 3D tilt implementations, the `.card-shine` cursor-following radial, glow rings, and `saturate()` / `contrast()` filters on hover.
+- Permitted: colour, `--wash` backgrounds, border colour, underline growth, shadow steps, media scale up to 1.03, card lift up to 6px, arrow nudges up to 6px, the primary-button sheen, and the pointer effects in `motion.ts` (tilt, glare, spotlight, magnetic pull, nav indicator).
+- Every hover affordance shares its rule with `:focus-visible` (or `:has(:focus-visible)` for cards), so keyboard users see the same feedback.
+- Wrapped in `@media (hover: hover) and (pointer: fine)` so touch devices never get stuck hover states. Pointer scripts check the same query.
+- Transition only named properties. Never `transition: all`.
+- Still excluded: `saturate()` / `contrast()` filters on hover, custom cursors.
 
 ## D3. Components retired
 
@@ -763,13 +781,21 @@ The global layer is three files, imported once by `BaseLayout.astro`:
 ```
 src/styles/
   tokens.css       # ramps + semantic tokens + theme + accent blocks   (target <= 6KB)
-  base.css         # reset, element defaults, focus, prose scope        (target <= 6KB)
+  base.css         # reset, element defaults, focus, reveal, reduced motion (target <= 6KB)
   utilities.css    # container, stack, grid, bleed, visually-hidden     (target <= 3KB)
 ```
 
 Everything else is a component `<style>` block, which Astro scopes and splits per route. **No page-specific CSS may enter the global chain.** This is the direct fix for the current architecture, where `global.css` imports eight stylesheets and every one of the 35 built pages loads the same 127KB bundle — including `blog-post.css` at 64KB on the contact page.
 
-Budgets, enforced as acceptance criteria: global CSS ≤ 15KB uncompressed, per-route CSS ≤ 10KB, per-route JavaScript ≤ 5KB, fonts ≤ 140KB total.
+Budgets, enforced as acceptance criteria: global CSS ≤ 32KB uncompressed, per-route CSS ≤ 20KB, per-route JavaScript ≤ 12KB, fonts ≤ 200KB total.
+
+How the cinematic revision fits inside those budgets:
+
+- `astro.config.mjs` sets `scopedStyleStrategy: 'class'`. Scoped selectors carry an `.astro-xxxxxxxx` class instead of a `[data-astro-cid-*]` attribute, which is shorter and has the same specificity.
+- Components rendered on many routes use `<style is:global>`: `Button`, `StatusBadge`, `Section`, `Prose`, `ProjectArt`, `ProofMarquee`, `NowCard`, `CtaCard`, `ProjectEntry`, `AchievementItem`, `PostRow`, and the home and projects pages. Their CSS is still split per route; only the hash suffixes are dropped. Every selector in them is namespaced by its block class, so unscoping leaks nothing.
+- The `.prose` rules live in `Prose.astro`, not `base.css`, so they ship only on routes that render prose.
+- A pattern's variant layouts live in the one page that renders them: `ProjectEntry`'s `row` and `featured` layouts are in `projects.astro`, and `AchievementItem`'s `row` and `featured` typography is in `achievements.astro`. The home page uses `AchievementItem variant="card"`.
+- With global CSS at 31.8KB and home at 19.7KB, both budgets have under 0.3KB of headroom. New global rules need a matching trim.
 
 ---
 
@@ -777,25 +803,31 @@ Budgets, enforced as acceptance criteria: global CSS ≤ 15KB uncompressed, per-
 
 ## E1. Principles
 
-Motion orients; it does not entertain. Three sanctioned categories, and nothing else:
+Motion is cinematic but never required. Everything below is additive: the page is complete at first paint, without JavaScript, and under reduced motion.
 
-1. **State feedback** — 140-220ms on interactive elements: colour, background, border, underline thickness.
-2. **Entrance** — one 320ms fade-and-rise (opacity 0 → 1, `translateY(8px)` → 0) per section, staggering at most three items at 60ms. Never on the hero, which must be correct at first paint.
-3. **Disclosure** — 240ms for the mobile menu and any expanding block.
+1. **State feedback** — 140-220ms on interactive elements: colour, background, border, underline growth, arrow nudges, the primary sheen (700ms).
+2. **Entrance** — `.reveal` fade-and-rise (24px, `--dur-slower` opacity, `--dur-cinematic` transform, `--ease-spring`), staggered by `--i` at 80ms. Modifiers: `.reveal--scale` (adds 0.97 scale) and `.reveal--blur` (8px blur). The homepage hero uses pure-CSS line rises (`line-rise`) and `hero-in` fades that run without JS.
+3. **Ambient** — aurora blobs drift over 26-38s, the proof marquee loops in 48s, `pulse-dot` rings breathe every 2.2s, `ProjectArt` drives the robot along its track. All are `infinite` and are stopped by the reduced-motion block.
+4. **Scroll-driven** (CSS `animation-timeline`, inside `@supports` and the no-preference media query) — the header progress bar (`scroll(root)`), the hero exit fade, the case-study media settle, the case-study reading progress (`view-timeline: --cs-prose`), and the Journey line draw.
+5. **Page transitions** — native cross-document `@view-transition { navigation: auto }` with a 200ms out / 360ms in cross-fade. Project titles and media morph from card to case study through `view-transition-name: project-title-{id}` / `project-media-{id}`; the header persists as `site-header`. The theme toggle plays a circle reveal from the button through `document.startViewTransition`.
+6. **Pointer** (`src/scripts/motion.ts`, only when `(hover: hover) and (pointer: fine)` and motion is allowed) — `[data-tilt]` cards tilt with glare, `[data-spotlight]` hosts follow the pointer, `[data-magnetic]` buttons pull up to 6px, and the desktop nav indicator slides between links. Every handler is rAF-throttled; nothing runs while idle.
 
 ```css
 :root {
-  --dur-instant: 80ms;
-  --dur-fast:    140ms;
-  --dur-base:    220ms;
-  --dur-slow:    360ms;
+  --dur-instant:   80ms;
+  --dur-fast:      140ms;
+  --dur-base:      220ms;
+  --dur-slow:      360ms;
+  --dur-slower:    600ms;
+  --dur-cinematic: 900ms;
 
-  --ease-out:    cubic-bezier(0.2, 0, 0, 1);
-  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out:      cubic-bezier(0.2, 0, 0, 1);
+  --ease-spring:   cubic-bezier(0.22, 1, 0.36, 1);   /* a soft overshoot-free spring */
+  --ease-in-out:   cubic-bezier(0.65, 0, 0.35, 1);
 }
 ```
 
-Two curves, down from the eight in `tokens.css`. The spring and overshoot curves (`--curve-haptic-overshoot`, `--ease-spring`, `--ease-in-back`) are dropped: bounce reads playful, and the brief asks for premium.
+`motion.ts` also owns the always-on, non-motion behaviours: the header `data-scrolled` state, case-study TOC tracking (`aria-current="location"`), copy-to-clipboard (`[data-copy]` with a `role="status"` announcement), and the IST clock (`[data-clock]`, paused while the tab is hidden).
 
 ## E2. The reveal inversion
 
@@ -809,15 +841,17 @@ The single most important change in this document, and the one that must land be
 @media (prefers-reduced-motion: no-preference) {
   html.js .reveal {
     opacity: 0;
-    transform: translateY(8px);
-    transition: opacity var(--dur-slow) var(--ease-out),
-                transform var(--dur-slow) var(--ease-out);
+    transform: translateY(24px);
+    transition:
+      opacity var(--dur-slower) var(--ease-spring),
+      transform var(--dur-cinematic) var(--ease-spring);
+    transition-delay: calc(var(--i, 0) * 80ms);
   }
-  html.js .reveal.is-visible { opacity: 1; transform: none; }
+  html.js .reveal.is-visible { opacity: 1; transform: none; filter: none; }
 }
 ```
 
-`html.js` is set by the same inline `<head>` script that applies the theme. Three failure modes now degrade to visible content: JavaScript disabled, JavaScript erroring before the observer attaches, and reduced-motion preference. Today `spectacular.css` line 283 sets `.reveal { opacity: 0 }` and only `public/js/scroll.js` line 87 restores it, so any of those three produces a blank page.
+`html.js` is set by the same inline `<head>` script that applies the theme. Three failure modes degrade to visible content: JavaScript disabled, JavaScript erroring before the observer attaches, and reduced-motion preference.
 
 Verify by disabling JavaScript in the browser and loading all six routes.
 
@@ -834,13 +868,15 @@ Verify by disabling JavaScript in the browser and loading all six routes.
 }
 ```
 
-This is the only sanctioned use of `!important` in the codebase. JavaScript must check `matchMedia('(prefers-reduced-motion: reduce)')` before starting any observer or loop, and every `requestAnimationFrame` loop needs both a terminating condition and a visibility guard — the current `drawSkills()` redraws a static constellation every frame forever with neither.
+This is the only sanctioned use of `!important` in the codebase, and the lint fails if the `animation-iteration-count` line disappears, because every infinite animation (aurora, marquee, pulse, robot) depends on it. Components add their own reduced-motion fallbacks where a stopped animation would read wrong: the marquee hides its duplicate track and wraps; the robot sits at `offset-distance: 46%`. JavaScript checks `matchMedia('(prefers-reduced-motion: reduce)')` before attaching any observer or pointer handler.
 
 ## E4. Excluded outright
 
-Parallax, scroll-jacking, page-transition overlays, loading screens, marquees, typewriter effects, counting-up numbers, canvas backgrounds, cursor-following anything, 3D tilt, custom cursors, and the reticle "signal system". Astro `<ClientRouter>` view transitions are deferred; if adopted later, a ≤200ms fade only, disabled under reduced motion.
+Now allowed (cinematic revision): marquees, 3D tilt, cursor-following spotlight, view transitions, and animated backgrounds.
 
-Performance rules: animate `transform` and `opacity` only; never animate `backdrop-filter`, `box-shadow`, `width`, `height`, or `top`; `will-change` set only during an interaction and removed after.
+Still excluded: custom cursors, sound, canvas or WebGL backgrounds, scroll-jacking, loading screens, typewriter effects, counting-up numbers, and the reticle "signal system".
+
+Performance rules: animate `transform`, `opacity`, `filter`, `clip-path`, and `offset-distance` only; never animate `backdrop-filter`, `width` (except the nav indicator), `height`, or `top`; `will-change` only on aurora blobs.
 
 ---
 
@@ -850,12 +886,14 @@ Performance rules: animate `transform` and `opacity` only; never animate `backdr
 
 ```css
 :root {
-  --container:        1120px;   /* default */
+  --container:        1200px;   /* default */
   --container-narrow: 720px;    /* prose, forms, single-column bands */
-  --container-wide:   1320px;   /* galleries, full-bleed media */
-  --header-h:         64px;
+  --container-wide:   1360px;   /* case-study hero media (.container-wide) */
+  --header-h:         72px;     /* 56px floating pill + 16px inset */
 }
 ```
+
+Cinematic revision: the case study puts prose in columns 1-8 with a sticky glass rail in 9-12; project cards use the bento grid on home and about, and featured/row splits on the Projects index.
 
 Twelve columns at ≥1024px, six at 768-1023px, one below. Column gap `--space-5` rising to `--space-6` on desktop. Containers are centred with `padding-inline: var(--gutter)`.
 
@@ -964,9 +1002,23 @@ graph TD
 
 ## H3. Definition of done
 
-- Global CSS ≤ 15.8KB, per-route CSS ≤ 10.3KB, per-route JS ≤ 5KB, fonts ≤ 140KB. (Per-route cap raised from 10KB after the responsive design pass Phase 1: home is 10.13KB post dead-CSS reclamation. Global cap raised from 15KB after Phase 2: the overlay mobile menu and extracted AccentPicker push the shared header CSS to 15.34KB. Global cap raised again to 15.8KB after Phase 3: coarse-pointer touch-target overrides push it to 15.75KB. Per-route cap raised again to 10.3KB after Phase 4: the case-study rail 768px band and SpecSheet/Metrics responsive rules push home's own CSS to 10.29KB. The pre-existing per-route JS overrun — contact at 6.0KB vs the 5KB cap — is unrelated to this work and is not addressed here.)
+- Global CSS ≤ 32KB, per-route CSS ≤ 20KB, per-route JS ≤ 12KB, fonts ≤ 200KB. (Cinematic revision, Oct 2026: glass, aurora, the floating header, the footer sign-off, and the shared motion module replace the restrained budgets of 15.8 / 10.3 / 5 / 140KB. Fonts grow by the Newsreader italic face.)
+  - Measured at completion (Oct 2026), uncompressed:
+
+    | Bundle | Size |
+    | --- | --- |
+    | Global CSS | 31.8KB |
+    | Home CSS | 19.7KB |
+    | About CSS | 17.6KB |
+    | Case study CSS | 17.2KB |
+    | Projects CSS | 12.1KB |
+    | Achievements CSS | 7.9KB |
+    | Contact CSS | 7.3KB |
+    | 404 CSS | 3.1KB |
+    | Largest route JS (contact) | 11.0KB |
+    | Fonts | 187.5KB |
 - Zero `!important` outside the reduced-motion block.
-- Zero references to `--glass-*`, `--blob-*`, `--card-radius`, `--page-atmosphere`, or any `NYT *` font.
+- Zero references to `--card-radius`, `--page-atmosphere`, or any `NYT *` font. `backdrop-filter` appears only in `utilities.css` (`.glass`) and `SiteHeader.astro`.
 - One `:root` token block in one file.
 - Every route renders correctly with JavaScript disabled, with transitions disabled, and under `prefers-reduced-motion`.
 - All six theme-and-accent combinations verified on every pattern.

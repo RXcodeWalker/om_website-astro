@@ -4,6 +4,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import PageIntro from '../components/patterns/PageIntro.astro';
 import AchievementItem from '../components/patterns/AchievementItem.astro';
 import EmptyState from '../components/patterns/EmptyState.astro';
+import CtaCard from '../components/patterns/CtaCard.astro';
 import { site } from '../config/site';
 import { achievementGroups, relatedProjectHref } from '../utils/achievements';
 import { publishedProjects } from '../utils/projects';
@@ -12,6 +13,12 @@ const publishedIds = publishedProjects(await getCollection('projects')).map((ent
 const entries = await getCollection('achievements');
 const achievements = entries.map((entry) => entry.data);
 const groups = achievementGroups(achievements);
+const issuerCount = new Set(achievements.map((a) => a.issuer)).size;
+const stats = [
+  { value: String(achievements.length), label: 'Credentials' },
+  { value: String(groups.length), label: 'Areas' },
+  { value: String(issuerCount), label: 'Issuing bodies' },
+];
 ---
 
 <BaseLayout
@@ -24,13 +31,25 @@ const groups = achievementGroups(achievements);
   ]}
 >
   <main id="main">
-    <div class="container">
-      <PageIntro
-        kicker="Evidence"
-        title="Achievements"
-        lede="A short list of things that were awarded, not claimed. Each one names who issued it and what the standard actually is."
-      />
+    <PageIntro
+      kicker="Achievements"
+      title="Awarded,"
+      titleAccent="not claimed."
+      lede="A short list of things that were awarded, not claimed. Each one names who issued it and what the standard actually is."
+    >
+      <dl slot="meta" class="intro-stats">
+        {
+          stats.map((s) => (
+            <div>
+              <dt>{s.label}</dt>
+              <dd class="tabular-nums accent-text">{s.value}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </PageIntro>
 
+    <div class="container">
       {
         achievements.length === 0 ? (
           <EmptyState title="Inventory in progress">
@@ -40,47 +59,157 @@ const groups = achievementGroups(achievements);
             </p>
           </EmptyState>
         ) : (
-          groups.map((group) => (
+          groups.map((group, gi) => (
             <section class="group" aria-labelledby={`group-${group.domain}`}>
-              <h2 id={`group-${group.domain}`} class="group__heading">
-                {group.label}
-              </h2>
-              {group.items.map((achievement) => (
-                <AchievementItem
-                  achievement={achievement}
-                  variant={achievement.highlight ? 'featured' : 'row'}
-                  relatedHref={relatedProjectHref(achievement.project, publishedIds)}
-                />
-              ))}
+              <div class="group__label">
+                <p class="eyebrow">
+                  <span class="eyebrow__index">{String(gi + 1).padStart(2, '0')}</span>
+                  {group.items.length} {group.items.length === 1 ? 'entry' : 'entries'}
+                </p>
+                <h2 id={`group-${group.domain}`} class="group__heading">
+                  {group.label}
+                </h2>
+              </div>
+              <div class="group__items">
+                {group.items.map((achievement) => (
+                  <AchievementItem
+                    achievement={achievement}
+                    variant={achievement.highlight ? 'featured' : 'row'}
+                    relatedHref={relatedProjectHref(achievement.project, publishedIds)}
+                  />
+                ))}
+              </div>
             </section>
           ))
         )
       }
     </div>
+
+    <div class="achievements-cta">
+      <CtaCard
+        id="achievements-cta"
+        kicker="Context"
+        heading="The story behind"
+        accent="the paper."
+        text="Most of these came with a lesson worth more than the grade. The longer versions are on the blog."
+        href={site.blogUrl}
+        label="Read the writing"
+        external
+      />
+    </div>
   </main>
 </BaseLayout>
 
 <style>
+  .intro-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-7);
+    margin: 0;
+  }
+
+  .intro-stats > div {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: var(--space-1);
+  }
+
+  .intro-stats dt {
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+    color: var(--text-secondary);
+  }
+
+  .intro-stats dd {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--step-4);
+    line-height: 1;
+  }
+
   .group {
-    margin-top: var(--space-8);
+    padding-block: var(--space-8);
+    border-top: 1px solid var(--glass-border);
+  }
+
+  .group:first-child {
+    border-top: 0;
+  }
+
+  .group__label .eyebrow {
+    margin: 0 0 var(--space-3);
   }
 
   .group__heading {
-    margin: 0 0 var(--space-2);
+    margin: 0 0 var(--space-5);
     font-size: var(--step-3);
   }
 
-  /* Featured weight is page-specific so homepage rows do not ship it. */
-  .group :global(.achievement--featured) {
-    padding-block: var(--space-7);
+  .group__items {
+    display: grid;
+    gap: var(--space-4);
   }
 
-  .group :global(.achievement--featured .achievement__title) {
+  .achievements-cta {
+    padding-top: var(--space-6);
+  }
+
+  /* AchievementItem's row and featured variants; only this route renders them. */
+  :global(.achievement--row) {
+    padding: var(--space-5) var(--space-4);
+    border-radius: var(--radius-lg);
+    box-shadow: inset 0 1px 0 var(--glass-border);
+  }
+
+  :global(.achievement--row .achievement__stat) {
+    display: none;
+  }
+
+  :global(.achievement--featured .achievement__title) {
     font-size: var(--step-3);
   }
 
-  .group :global(.achievement--featured .achievement__significance) {
+  :global(.achievement--featured .achievement__significance) {
     font-size: var(--step-1);
     line-height: var(--leading-prose);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    :global(.achievement--row:hover) {
+      background: var(--wash);
+    }
+  }
+
+  @media (min-width: 768px) {
+    :global(.achievement--row .achievement__head) {
+      grid-template-columns: 1fr auto;
+      align-items: baseline;
+      column-gap: var(--space-5);
+    }
+
+    :global(.achievement--row .achievement__meta) {
+      justify-content: flex-end;
+      text-align: right;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .group {
+      display: grid;
+      grid-template-columns: 4fr 8fr;
+      gap: var(--space-8);
+      align-items: start;
+    }
+
+    .group__label {
+      position: sticky;
+      top: calc(var(--header-h) + var(--space-6));
+    }
+
+    .group__heading {
+      margin-bottom: 0;
+    }
   }
 </style>

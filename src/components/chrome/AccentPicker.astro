@@ -1,12 +1,30 @@
 ---
+import Icon from '../primitives/Icon.astro';
+
+const accents = [
+  { id: 'ink', label: 'Ink' },
+  { id: 'oxblood', label: 'Oxblood' },
+  { id: 'ivy', label: 'Ivy' },
+];
 ---
 
 <details class="accent-picker">
-  <summary class="accent-picker__summary">Accent</summary>
-  <div class="accent-picker__options" role="group" aria-label="Accent colour">
-    <button type="button" class="accent-picker__btn" data-accent="ink">Ink</button>
-    <button type="button" class="accent-picker__btn" data-accent="oxblood">Oxblood</button>
-    <button type="button" class="accent-picker__btn" data-accent="ivy">Ivy</button>
+  <summary class="accent-picker__summary">
+    <Icon name="palette" />
+    <span class="visually-hidden">Accent colour</span>
+  </summary>
+  <div class="accent-picker__options glass" role="group" aria-label="Accent colour">
+    {
+      accents.map((accent) => (
+        <button type="button" class="accent-picker__btn" data-accent={accent.id}>
+          <span class="accent-picker__swatch" aria-hidden="true" data-swatch={accent.id} />
+          <span class="accent-picker__label">{accent.label}</span>
+          <span class="accent-picker__check" aria-hidden="true">
+            <Icon name="check" />
+          </span>
+        </button>
+      ))
+    }
   </div>
 </details>
 
@@ -16,38 +34,47 @@
   }
 
   .accent-picker__summary {
+    display: inline-grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
     list-style: none;
     cursor: pointer;
-    font-family: var(--font-mono);
-    font-size: var(--step--2);
-    letter-spacing: var(--tracking-mono);
-    text-transform: uppercase;
-    color: var(--text-muted);
-    padding: var(--space-2) var(--space-3);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-sm);
+    font-size: 18px;
+    color: var(--text-primary);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-full);
+    background: transparent;
+    transition: background-color var(--dur-base);
   }
 
   .accent-picker__summary::-webkit-details-marker {
     display: none;
   }
 
+  .accent-picker[open] .accent-picker__summary {
+    background: var(--wash);
+  }
+
   .accent-picker__options {
     position: absolute;
     right: 0;
-    top: calc(100% + var(--space-2));
-    display: grid;
-    gap: var(--space-1);
-    min-width: 8rem;
-    padding: var(--space-2);
-    background: var(--surface-raised);
-    border: 1px solid var(--border-strong);
-    box-shadow: var(--shadow-overlay);
+    top: calc(100% + 12px);
     z-index: var(--z-menu);
+    display: grid;
+    gap: 2px;
+    min-width: 11rem;
+    padding: var(--space-2);
+    border-radius: var(--radius-lg);
+    background: var(--glass-bg-strong);
   }
 
   .accent-picker__btn {
-    padding: var(--space-2) var(--space-3);
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    min-height: 40px;
+    padding-inline: var(--space-3);
     text-align: left;
     font-size: var(--step--1);
     background: transparent;
@@ -57,28 +84,111 @@
     cursor: pointer;
   }
 
-  @media (hover: hover) and (pointer: fine) {
-    .accent-picker__btn:hover,
-    .accent-picker__btn:focus-visible {
-      background: var(--surface-sunken);
-    }
+  .accent-picker__label {
+    flex: 1;
+  }
+
+  .accent-picker__swatch {
+    flex-shrink: 0;
+    width: 14px;
+    height: 14px;
+    border-radius: var(--radius-full);
+    box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.15);
+  }
+
+  .accent-picker__swatch[data-swatch='ink'] {
+    background: #1b3fa0;
+  }
+
+  .accent-picker__swatch[data-swatch='oxblood'] {
+    background: #8c2f39;
+  }
+
+  .accent-picker__swatch[data-swatch='ivy'] {
+    background: #265d45;
+  }
+
+  :global(html[data-theme='dark']) .accent-picker__swatch[data-swatch='ink'] {
+    background: #9fc0ff;
+  }
+
+  :global(html[data-theme='dark']) .accent-picker__swatch[data-swatch='oxblood'] {
+    background: #e8969c;
+  }
+
+  :global(html[data-theme='dark']) .accent-picker__swatch[data-swatch='ivy'] {
+    background: #86c7a5;
+  }
+
+  .accent-picker__check {
+    display: inline-flex;
+    color: var(--accent);
+    visibility: hidden;
   }
 
   .accent-picker__btn[aria-pressed='true'] {
-    color: var(--accent);
-    outline: 1px solid var(--accent);
+    background: var(--wash);
+  }
+
+  .accent-picker__btn[aria-pressed='true'] .accent-picker__check {
+    visibility: visible;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .accent-picker__summary:hover,
+    .accent-picker__btn:hover,
+    .accent-picker__btn:focus-visible {
+      background: var(--wash);
+    }
   }
 
   @media (pointer: coarse) {
-    .accent-picker__summary,
-    .accent-picker__btn {
-      min-height: 44px;
-      display: flex;
-      align-items: center;
+    .accent-picker__summary {
+      width: 44px;
+      height: 44px;
     }
 
-    .accent-picker__options {
+    .accent-picker__btn {
+      min-height: 44px;
+    }
+  }
+
+  /* Inside the mobile sheet the options are always shown as a row of pills. */
+  @media (max-width: 767px) {
+    .accent-picker__summary {
+      display: none;
+    }
+
+    .accent-picker::details-content {
+      content-visibility: visible;
+    }
+
+    .accent-picker__options,
+    .accent-picker:not([open]) > .accent-picker__options {
+      position: static;
+      display: flex;
+      flex-wrap: wrap;
       gap: var(--space-2);
+      min-width: 0;
+      padding: 0;
+      background: none;
+      border: 0;
+      box-shadow: none;
+    }
+
+    .accent-picker__btn {
+      min-height: 44px;
+      padding-inline: 14px;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--glass-border);
+    }
+
+    .accent-picker__check {
+      display: none;
+    }
+
+    .accent-picker__btn[aria-pressed='true'] {
+      border-color: var(--accent);
     }
   }
 </style>
@@ -87,6 +197,7 @@
   // All theme, accent and theme-color writes go through window.__theme,
   // defined by the blocking init script in BaseLayout.
   const accentButtons = document.querySelectorAll<HTMLButtonElement>('[data-accent]');
+  const picker = document.querySelector<HTMLDetailsElement>('.accent-picker');
 
   const syncAccentButtons = (active: string) => {
     accentButtons.forEach((button) => {
@@ -104,4 +215,15 @@
   });
 
   syncAccentButtons(window.__theme.accent);
+
+  if (picker) {
+    document.addEventListener('pointerdown', (event) => {
+      if (picker.open && !picker.contains(event.target as Node)) picker.open = false;
+    });
+    picker.addEventListener('keydown', (event) => {
+      if (event.key !== 'Escape' || !picker.open) return;
+      picker.open = false;
+      picker.querySelector('summary')?.focus();
+    });
+  }
 </script>

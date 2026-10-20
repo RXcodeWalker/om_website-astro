@@ -1,44 +1,122 @@
 ---
+import Aurora from '../primitives/Aurora.astro';
+
 interface Props {
   kicker?: string;
   title: string;
+  titleAccent?: string;
+  index?: string;
   lede?: string;
 }
 
-const { kicker, title, lede } = Astro.props;
+const { kicker, title, titleAccent, index, lede } = Astro.props;
+const hasAside = Astro.slots.has('aside');
 ---
 
-<header class="page-intro">
-  {kicker && <p class="page-intro__kicker">{kicker}</p>}
-  <h1 class="page-intro__title">{title}</h1>
-  {lede && <p class="page-intro__lede">{lede}</p>}
+<header class:list={['page-intro', 'has-aurora', hasAside && 'page-intro--aside']} data-spotlight>
+  <Aurora intensity="soft" grid spotlight />
+  <div class="container page-intro__inner">
+    <div class="page-intro__main">
+      {
+        kicker && (
+          <p class="eyebrow reveal">
+            {index && <span class="eyebrow__index">{index}</span>}
+            {kicker}
+          </p>
+        )
+      }
+      <h1 class="page-intro__title reveal reveal--blur" style="--i: 1">
+        {title}
+        {
+          titleAccent && (
+            <>
+              {' '}
+              <em class="accent-text">{titleAccent}</em>
+            </>
+          )
+        }
+      </h1>
+      {
+        lede && (
+          <p class="page-intro__lede reveal" style="--i: 2">
+            {lede}
+          </p>
+        )
+      }
+      {
+        Astro.slots.has('meta') && (
+          <div class="page-intro__meta reveal" style="--i: 3">
+            <slot name="meta" />
+          </div>
+        )
+      }
+    </div>
+    {
+      hasAside && (
+        <div class="page-intro__aside reveal reveal--scale" style="--i: 3">
+          <slot name="aside" />
+        </div>
+      )
+    }
+  </div>
 </header>
 
 <style>
   .page-intro {
-    padding-block: var(--space-8) var(--space-7);
-    border-bottom: 1px solid var(--border-subtle);
+    display: grid;
+    align-items: end;
+    min-height: min(72svh, 680px);
+    padding-block: calc(var(--header-h) + var(--space-9)) var(--space-8);
   }
 
-  .page-intro__kicker {
-    margin: 0 0 var(--space-3);
-    font-family: var(--font-mono);
-    font-size: var(--step--2);
-    letter-spacing: var(--tracking-mono);
-    text-transform: uppercase;
-    color: var(--text-muted);
+  .page-intro::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 0 0;
+    z-index: -1;
+    height: 30%;
+    background: linear-gradient(to bottom, transparent, var(--surface-page));
+    pointer-events: none;
+  }
+
+  .page-intro__main {
+    min-width: 0;
   }
 
   .page-intro__title {
-    margin: 0;
-    max-width: var(--measure-wide);
+    margin: var(--space-4) 0 0;
+    max-width: 18ch;
+    font-size: var(--step-5);
+    letter-spacing: var(--tracking-display);
   }
 
   .page-intro__lede {
-    margin: var(--space-4) 0 0;
+    margin-top: var(--space-5);
     max-width: var(--measure-narrow);
     font-size: var(--step-1);
     line-height: var(--leading-prose);
     color: var(--text-secondary);
+  }
+
+  .page-intro__meta {
+    margin-top: var(--space-7);
+  }
+
+  .page-intro__aside {
+    margin-top: var(--space-7);
+    min-width: 0;
+  }
+
+  @media (min-width: 1024px) {
+    .page-intro--aside .page-intro__inner {
+      display: grid;
+      grid-template-columns: 7fr 5fr;
+      gap: var(--space-8);
+      align-items: end;
+    }
+
+    .page-intro__aside {
+      margin-top: 0;
+    }
   }
 </style>

@@ -28,36 +28,45 @@ import Icon from '../primitives/Icon.astro';
   }
 
   .theme-controls__btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 44px;
-    height: 44px;
+    display: inline-grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
     padding: 0;
     background: transparent;
-    border: 1px solid var(--border-interactive);
-    border-radius: var(--radius-sm);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-full);
     color: var(--text-primary);
     cursor: pointer;
+    transition: background-color var(--dur-base);
   }
 
   .theme-controls__icon {
+    grid-area: 1 / 1;
     display: inline-flex;
     font-size: 18px;
+    transition:
+      opacity var(--dur-slower) var(--ease-spring),
+      transform var(--dur-slower) var(--ease-spring);
   }
 
-  :global(html[data-theme='dark']) .theme-controls__icon--light {
-    display: none;
-  }
-
+  :global(html[data-theme='dark']) .theme-controls__icon--light,
   :global(html:not([data-theme='dark'])) .theme-controls__icon--dark {
-    display: none;
+    opacity: 0;
+    transform: rotate(-90deg) scale(0.6);
+  }
+
+  @media (pointer: coarse) {
+    .theme-controls__btn {
+      width: 44px;
+      height: 44px;
+    }
   }
 
   @media (hover: hover) and (pointer: fine) {
     .theme-controls__btn:hover,
     .theme-controls__btn:focus-visible {
-      background: var(--surface-sunken);
+      background: var(--wash);
     }
   }
 </style>
@@ -68,6 +77,16 @@ import Icon from '../primitives/Icon.astro';
   const themeToggle = document.getElementById('theme-toggle');
 
   themeToggle?.addEventListener('click', () => {
-    window.__theme.set(window.__theme.theme === 'dark' ? 'light' : 'dark');
+    const next = window.__theme.theme === 'dark' ? 'light' : 'dark';
+    const go = () => window.__theme.set(next);
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!('startViewTransition' in document) || reduce) return go();
+    const r = themeToggle.getBoundingClientRect();
+    const root = document.documentElement;
+    root.style.setProperty('--vt-x', `${r.left + r.width / 2}px`);
+    root.style.setProperty('--vt-y', `${r.top + r.height / 2}px`);
+    root.classList.add('theme-switching');
+    const t = document.startViewTransition(go);
+    t.finished.finally(() => root.classList.remove('theme-switching'));
   });
 </script>

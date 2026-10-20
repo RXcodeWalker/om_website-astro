@@ -1,5 +1,6 @@
 ---
 import { site } from '../../config/site';
+import Icon from '../primitives/Icon.astro';
 ---
 
 <form
@@ -61,13 +62,16 @@ import { site } from '../../config/site';
     tabindex="-1"
   ></p>
 
-  <button type="submit" class="contact-form__submit">Send message</button>
+  <button type="submit" class="contact-form__submit" data-magnetic>
+    <span class="contact-form__submit-label">Send message</span>
+    <Icon name="arrow-right" />
+  </button>
 </form>
 
 <style>
   .contact-form {
     display: grid;
-    gap: var(--space-4);
+    gap: var(--space-5);
     max-width: var(--container-narrow);
   }
 
@@ -90,20 +94,37 @@ import { site } from '../../config/site';
   .contact-form__field label {
     font-family: var(--font-mono);
     font-size: var(--step--2);
-    letter-spacing: var(--tracking-mono);
+    letter-spacing: var(--tracking-eyebrow);
     text-transform: uppercase;
-    color: var(--text-muted);
+    color: var(--text-secondary);
   }
 
   .contact-form__field input,
   .contact-form__field textarea {
     width: 100%;
-    min-height: 44px;
-    padding: var(--space-3);
+    min-height: 52px;
+    padding: 14px 16px;
     color: var(--text-primary);
-    background: var(--surface-raised);
+    background: var(--glass-bg-strong);
     border: 1px solid var(--border-interactive);
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--glass-highlight);
+    transition:
+      border-color var(--dur-base),
+      box-shadow var(--dur-base),
+      background-color var(--dur-base);
+  }
+
+  .contact-form__field textarea {
+    min-height: 180px;
+    resize: vertical;
+  }
+
+  .contact-form__field input:focus-visible,
+  .contact-form__field textarea:focus-visible {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent);
   }
 
   .contact-form__field input:user-invalid,
@@ -111,6 +132,7 @@ import { site } from '../../config/site';
   .contact-form__field input[aria-invalid='true'],
   .contact-form__field textarea[aria-invalid='true'] {
     border-color: var(--status-error);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--status-error) 16%, transparent);
   }
 
   .contact-form__hint,
@@ -132,20 +154,65 @@ import { site } from '../../config/site';
 
   .contact-form__status {
     margin: 0;
+    padding: var(--space-4);
     font-size: var(--step--1);
     color: var(--text-secondary);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--glass-border);
+    background: var(--glass-bg-strong);
+  }
+
+  .contact-form__status[data-state='success'] {
+    border-color: var(--status-shipped);
+    box-shadow: inset 3px 0 0 var(--status-shipped);
+  }
+
+  .contact-form__status[data-state='error'] {
+    border-color: var(--status-error);
+    box-shadow: inset 3px 0 0 var(--status-error);
   }
 
   .contact-form__submit {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
     justify-self: start;
-    min-height: 44px;
-    padding: var(--space-3) var(--space-5);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: 52px;
+    padding-inline: 28px;
     font-weight: 500;
     color: var(--text-on-accent);
     background: var(--accent);
-    border: 1px solid var(--accent);
-    border-radius: var(--radius-sm);
+    border: 0;
+    border-radius: var(--radius-full);
+    box-shadow: var(--shadow-1);
     cursor: pointer;
+    transform: translate(var(--tx, 0), var(--ty, 0));
+    transition:
+      transform var(--dur-base) var(--ease-spring),
+      background-color var(--dur-base) var(--ease-spring),
+      box-shadow var(--dur-base) var(--ease-spring);
+  }
+
+  .contact-form__submit::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(
+      115deg,
+      transparent 30%,
+      rgb(255 255 255 / 0.28) 50%,
+      transparent 70%
+    );
+    transform: translateX(-120%);
+    transition: transform 700ms var(--ease-spring);
+  }
+
+  .contact-form__submit :global(svg) {
+    transition: transform var(--dur-base) var(--ease-spring);
   }
 
   .contact-form__submit:disabled {
@@ -153,11 +220,30 @@ import { site } from '../../config/site';
     opacity: 0.7;
   }
 
+  .contact-form[aria-busy='true'] .contact-form__submit :global(svg) {
+    animation: spin 0.9s linear infinite;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
   @media (hover: hover) and (pointer: fine) {
     .contact-form__submit:hover:not(:disabled),
     .contact-form__submit:focus-visible {
       background: var(--accent-hover);
-      border-color: var(--accent-hover);
+      box-shadow: var(--shadow-glow);
+    }
+
+    .contact-form__submit:hover:not(:disabled)::before,
+    .contact-form__submit:focus-visible::before {
+      transform: translateX(120%);
+    }
+
+    .contact-form__submit:hover:not(:disabled) :global(svg) {
+      transform: translateX(3px);
     }
   }
 </style>
@@ -262,11 +348,13 @@ import { site } from '../../config/site';
       return;
     }
 
-    const submitLabel = submit instanceof HTMLButtonElement ? submit.textContent : 'Send message';
+    const label = submit?.querySelector('.contact-form__submit-label');
+    const submitLabel = label ? label.textContent : 'Send message';
+    delete status.dataset.state;
     form.setAttribute('aria-busy', 'true');
     if (submit instanceof HTMLButtonElement) {
       submit.disabled = true;
-      submit.textContent = 'Sending…';
+      if (label) label.textContent = 'Sending…';
     }
 
     try {
@@ -292,15 +380,17 @@ import { site } from '../../config/site';
 
       form.reset();
       status.textContent = 'Sent. Thank you — I will reply within 24 hours.';
+      status.dataset.state = 'success';
       status.focus();
     } catch (error) {
       status.textContent = error instanceof Error && error.message ? error.message : fallback;
+      status.dataset.state = 'error';
       status.focus();
     } finally {
       form.removeAttribute('aria-busy');
       if (submit instanceof HTMLButtonElement) {
         submit.disabled = false;
-        submit.textContent = submitLabel || 'Send message';
+        if (label) label.textContent = submitLabel || 'Send message';
       }
     }
   });

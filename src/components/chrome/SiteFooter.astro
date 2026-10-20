@@ -1,17 +1,37 @@
 ---
 import { site } from '../../config/site';
+import Aurora from '../primitives/Aurora.astro';
+import Icon from '../primitives/Icon.astro';
 
 const year = new Date().getFullYear();
 ---
 
-<footer class="site-footer">
+<footer class="site-footer has-aurora">
+  <Aurora intensity="soft" />
+
+  <div class="container site-footer__signoff">
+    <p class="eyebrow"><span class="eyebrow__index">Fin</span>Say hello</p>
+    <p class="site-footer__headline">
+      Let's build something <em class="accent-text">worth keeping.</em>
+    </p>
+    <div class="site-footer__email-row">
+      <a class="site-footer__email tap-target" href={`mailto:${site.email}`}>{site.email}</a>
+      <button type="button" class="copy-btn" data-copy={site.email}>
+        <Icon name="copy" />
+        <span class="copy-btn__label">Copy</span>
+      </button>
+      <span class="visually-hidden" role="status" data-copy-status></span>
+    </div>
+  </div>
+
   <div class="container site-footer__grid">
     <section aria-labelledby="footer-identity">
       <h2 id="footer-identity" class="site-footer__heading">Identity</h2>
       <p class="site-footer__name">{site.name}</p>
       <p class="site-footer__tagline">{site.tagline}</p>
       <p class="site-footer__meta">
-        <a class="tap-target" href={`mailto:${site.email}`}>{site.email}</a>
+        <Icon name="pin" />
+        {site.location}
       </p>
     </section>
 
@@ -49,11 +69,18 @@ const year = new Date().getFullYear();
         }
       </ul>
     </section>
+
+    <div class="site-footer__top">
+      <a class="btn-top tap-target" href="#main">Back to top <Icon name="arrow-up" /></a>
+    </div>
   </div>
+
+  <p class="site-footer__wordmark" aria-hidden="true">{site.name}</p>
 
   <div class="site-footer__bar">
     <div class="container site-footer__bar-inner">
       <p>© {year} {site.author}. All rights reserved.</p>
+      <p>Built in Mumbai with Astro.</p>
     </div>
   </div>
 </footer>
@@ -61,19 +88,68 @@ const year = new Date().getFullYear();
 <style>
   .site-footer {
     margin-top: var(--section-gap);
-    border-top: 1px solid var(--border-subtle);
-    background: var(--surface-page);
+    padding-top: var(--space-9);
+    border-top: 1px solid var(--glass-border);
+  }
+
+  .site-footer__signoff {
+    display: grid;
+    justify-items: start;
+  }
+
+  .site-footer__headline {
+    margin: var(--space-4) 0 var(--space-6);
+    max-width: 14ch;
+    font-family: var(--font-display);
+    font-size: var(--step-5);
+    font-weight: 400;
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-display);
+    text-wrap: balance;
+  }
+
+  .site-footer__headline em {
+    font-weight: 380;
+  }
+
+  .site-footer__email-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-4);
+  }
+
+  .site-footer__email {
+    font-family: var(--font-display);
+    font-size: min(var(--step-3), 8vw);
+    color: var(--text-primary);
+    text-decoration: none;
+    overflow-wrap: anywhere;
+    background: linear-gradient(
+        color-mix(in srgb, currentColor 40%, transparent),
+        color-mix(in srgb, currentColor 40%, transparent)
+      )
+      0 100% / 100% 1px no-repeat;
+    transition: color var(--dur-base);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .site-footer__email:hover,
+    .site-footer__email:focus-visible {
+      color: var(--accent);
+      background-image: linear-gradient(currentColor, currentColor);
+    }
   }
 
   .site-footer__grid {
     display: grid;
     gap: var(--space-7);
-    padding-block: var(--space-8);
+    padding-block: var(--space-9) var(--space-7);
   }
 
   @media (min-width: 768px) {
     .site-footer__grid {
-      grid-template-columns: 2fr 1fr 1fr;
+      grid-template-columns: 2fr 1fr 1fr auto;
     }
   }
 
@@ -81,9 +157,9 @@ const year = new Date().getFullYear();
     margin: 0 0 var(--space-3);
     font-family: var(--font-mono);
     font-size: var(--step--2);
-    letter-spacing: var(--tracking-mono);
+    letter-spacing: var(--tracking-eyebrow);
     text-transform: uppercase;
-    color: var(--text-muted);
+    color: var(--text-secondary);
     font-weight: 400;
   }
 
@@ -98,6 +174,13 @@ const year = new Date().getFullYear();
     margin: 0;
     color: var(--text-secondary);
     font-size: var(--step--1);
+  }
+
+  .site-footer__meta {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: var(--space-3);
   }
 
   .site-footer__list {
@@ -116,20 +199,67 @@ const year = new Date().getFullYear();
 
   @media (hover: hover) and (pointer: fine) {
     .site-footer__link:hover,
-    .site-footer__link:focus-visible,
-    .site-footer__meta a:hover,
-    .site-footer__meta a:focus-visible {
+    .site-footer__link:focus-visible {
       color: var(--accent);
       text-decoration: underline;
     }
   }
 
-  .site-footer__bar {
-    border-top: 1px solid var(--border-subtle);
-    padding-block: var(--space-4);
-    color: var(--text-muted);
+  .btn-top {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
     font-family: var(--font-mono);
     font-size: var(--step--2);
+    letter-spacing: var(--tracking-eyebrow);
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    text-decoration: none;
+  }
+
+  .btn-top :global(svg) {
+    transition: transform var(--dur-base) var(--ease-spring);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .btn-top:hover,
+    .btn-top:focus-visible {
+      color: var(--accent);
+    }
+
+    .btn-top:hover :global(svg),
+    .btn-top:focus-visible :global(svg) {
+      transform: translateY(-3px);
+    }
+  }
+
+  .site-footer__wordmark {
+    margin: 0;
+    padding-inline: var(--gutter);
+    font-family: var(--font-display);
+    font-size: 11.5vw;
+    line-height: 0.85;
+    letter-spacing: -0.045em;
+    white-space: nowrap;
+    color: transparent;
+    -webkit-text-stroke: 1px var(--border-strong);
+    text-align: center;
+    user-select: none;
+  }
+
+  .site-footer__bar {
+    border-top: 1px solid var(--glass-border);
+    padding-block: var(--space-4);
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+  }
+
+  .site-footer__bar-inner {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--space-3);
   }
 
   .site-footer__bar-inner p {

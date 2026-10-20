@@ -6,6 +6,10 @@ import StatusBadge from '../components/primitives/StatusBadge.astro';
 import MetaRow from '../components/primitives/MetaRow.astro';
 import ChipList from '../components/primitives/ChipList.astro';
 import Prose from '../components/primitives/Prose.astro';
+import Aurora from '../components/primitives/Aurora.astro';
+import ProjectArt from '../components/primitives/ProjectArt.astro';
+import Button from '../components/primitives/Button.astro';
+import Icon from '../components/primitives/Icon.astro';
 import { tocH2s } from '../utils/projects';
 
 interface Props {
@@ -24,128 +28,297 @@ const explore = [
     ? [{ label: data.relatedPost.title, href: data.relatedPost.url }]
     : []),
 ];
+const live = data.links.find((l) => l.kind === 'live');
+const host = live ? new URL(live.href).host : null;
+
+const statusLabels: Record<typeof data.status, string> = {
+  shipped: 'Shipped',
+  'in-progress': 'In progress',
+  experiment: 'Experiment',
+  archived: 'Archived',
+};
 ---
+
+<header class="case-hero has-aurora" data-spotlight>
+  <Aurora intensity="soft" grid spotlight />
+  <div class="container case-hero__inner">
+    <nav class="case-hero__crumbs" aria-label="Breadcrumb">
+      <a class="link-ui tap-target" href="/projects">Projects</a>
+      <span aria-hidden="true">/</span>
+      <span aria-current="page">{data.title}</span>
+    </nav>
+    <div class="case-hero__top reveal">
+      {data.kicker && <p class="eyebrow">{data.kicker}</p>}
+      <StatusBadge status={data.status} />
+    </div>
+    <h1
+      class="case-study__title reveal reveal--blur"
+      style={`--i: 1; view-transition-name: project-title-${project.id}`}
+    >
+      {data.title}
+    </h1>
+    <p class="case-study__outcome reveal" style="--i: 2">{data.outcome}</p>
+    <div class="case-hero__actions reveal" style="--i: 3">
+      {
+        explore.map((item, i) => (
+          <Button
+            href={item.href}
+            variant={i === 0 ? 'primary' : 'secondary'}
+            size="md"
+            external
+            arrow={i === 0}
+          >
+            {item.label}
+          </Button>
+        ))
+      }
+      {explore.length === 0 && data.linksNote && <p class="case-study__note">{data.linksNote}</p>}
+    </div>
+  </div>
+</header>
+
+<div class="container-wide case-hero__media" style={`view-transition-name: project-media-${project.id}`}>
+  {
+    hero ? (
+      <div class="case-hero__frame">
+        <div class="case-hero__chrome" aria-hidden="true">
+          <span />
+          <span />
+          <span />
+          {host && <span class="case-hero__url">{host}</span>}
+        </div>
+        <Media
+          src={hero.src}
+          alt={hero.alt}
+          ratio="16:10"
+          eager
+          sizes="(min-width: 1024px) 1200px, 100vw"
+        />
+      </div>
+    ) : (
+      <div class="case-hero__art">
+        <ProjectArt category={data.category} />
+      </div>
+    )
+  }
+</div>
 
 <div class="container">
   <article class="grid grid--12 case-study">
-    <header class="case-study__header reveal">
-      {data.kicker && <p class="case-study__kicker">{data.kicker}</p>}
-      <h1 class="case-study__title">{data.title}</h1>
-      <p class="case-study__outcome">{data.outcome}</p>
-    </header>
+    <aside class="case-study__rail glass">
+      <div class="case-study__rail-main">
+        <p class="eyebrow">Project file</p>
+        <MetaRow
+          items={[
+            { label: 'Year', value: String(data.year), datetime: String(data.year) },
+            { label: 'Role', value: data.role },
+            { label: 'Status', value: statusLabels[data.status] },
+          ]}
+        />
+        <ChipList items={[...data.stack]} max={8} />
+      </div>
 
-    {
-      hero && (
-        <div class="case-study__hero">
-          <Media
-            src={hero.src}
-            alt={hero.alt}
-            ratio="16:10"
-            eager
-            sizes="(min-width: 1024px) 736px, 100vw"
-          />
-        </div>
-      )
-    }
-
-    <aside class="case-study__rail reveal">
-      <StatusBadge status={data.status} />
-      <MetaRow
-        items={[
-          { label: 'Year', value: String(data.year), datetime: String(data.year) },
-          { label: 'Role', value: data.role },
-        ]}
-      />
-      <ChipList items={[...data.stack]} max={8} />
-
-      {
-        explore.length > 0 ? (
-          <ul class="case-study__links" aria-label={`Explore ${data.title}`}>
-            {explore.map((item) => (
-              <li>
-                <a class="link-ui link-external" href={item.href} rel="noopener noreferrer">
-                  {item.label}
-                </a>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          data.linksNote && <p class="case-study__note">{data.linksNote}</p>
-        )
-      }
-
-      {
-        toc.length > 0 && (
-          <nav class="case-study__toc" aria-label="On this page">
-            <ol>
-              {toc.map((item) => (
-                <li>
-                  <a class="tap-target" href={`#${item.slug}`}>{item.text}</a>
-                </li>
-              ))}
-            </ol>
-          </nav>
-        )
-      }
+      <div class="case-study__rail-side">
+        {
+          toc.length > 0 && (
+            <nav class="case-study__toc" aria-label="On this page">
+              <ol>
+                {toc.map((item) => (
+                  <li>
+                    <a class="tap-target" href={`#${item.slug}`}>{item.text}</a>
+                  </li>
+                ))}
+              </ol>
+            </nav>
+          )
+        }
+        <div class="case-study__progress" aria-hidden="true"><span></span></div>
+        {
+          data.relatedPost && (
+            <a
+              class="case-study__related link-arrow tap-target"
+              href={data.relatedPost.url}
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              Read the story <span class="link-arrow__icon" aria-hidden="true">↗</span>
+            </a>
+          )
+        }
+      </div>
     </aside>
 
     <div class="case-study__prose reveal">
-      <Prose>
+      <Prose dropcap>
         <slot />
       </Prose>
     </div>
 
-    <footer class="case-study__footer reveal">
+    <footer class="case-study__footer">
       {
         next && (
-          <p class="case-study__next">
-            <a href={`/projects/${next.id}`}>Next project: {next.data.title}</a>
-          </p>
+          <a class="next-card surface-card has-aurora" href={`/projects/${next.id}`}>
+            <Aurora intensity="soft" />
+            <span class="eyebrow">Next project</span>
+            <span class="next-card__title">{next.data.title}</span>
+            <span class="next-card__outcome">{next.data.outcome}</span>
+            <span class="next-card__arrow" aria-hidden="true">
+              <Icon name="arrow-right" />
+            </span>
+          </a>
         )
       }
       <p class="case-study__index">
-        <a class="link-ui tap-target" href="/projects">All projects</a>
+        <a class="link-ui tap-target link-arrow" href="/projects">
+          <span aria-hidden="true">←</span> All projects
+        </a>
       </p>
     </footer>
   </article>
 </div>
 
 <style>
-  .case-study {
-    padding-block: var(--space-8) var(--space-9);
-    align-items: start;
+  .case-hero {
+    padding: calc(var(--header-h) + var(--space-8)) 0 var(--space-9);
   }
 
-  .case-study__header {
+  .case-hero__inner {
     display: grid;
-    gap: var(--space-3);
-    margin-bottom: var(--space-6);
+    gap: var(--space-5);
+    justify-items: start;
   }
 
-  .case-study__kicker {
-    margin: 0;
+  .case-hero__crumbs {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
     font-family: var(--font-mono);
     font-size: var(--step--2);
     letter-spacing: var(--tracking-mono);
     text-transform: uppercase;
-    color: var(--text-muted);
+    color: var(--text-secondary);
+  }
+
+  .case-hero__crumbs a {
+    color: var(--text-secondary);
+  }
+
+  .case-hero__crumbs [aria-current='page'] {
+    color: var(--text-primary);
+  }
+
+  .case-hero__top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .case-hero__top .eyebrow {
+    margin: 0;
   }
 
   .case-study__title {
     margin: 0;
-    max-width: var(--measure-wide);
+    max-width: 16ch;
+    font-size: var(--step-5);
+    letter-spacing: var(--tracking-display);
   }
 
   .case-study__outcome {
     margin: 0;
-    max-width: var(--measure-narrow);
-    font-size: var(--step-1);
-    line-height: var(--leading-prose);
+    max-width: 32ch;
+    font-family: var(--font-display);
+    font-size: var(--step-2);
+    line-height: var(--leading-snug);
     color: var(--text-secondary);
   }
 
-  .case-study__hero {
-    margin-bottom: var(--space-6);
+  .case-hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  /* Related-post titles can outgrow a 320px column. */
+  .case-hero__actions :global(.btn) {
+    max-width: 100%;
+    padding-block: 10px;
+    line-height: 1.25;
+    text-align: center;
+    white-space: normal;
+  }
+
+  .case-study__note {
+    margin: 0;
+    max-width: var(--measure-narrow);
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    color: var(--text-secondary);
+  }
+
+  .case-hero__media {
+    position: relative;
+    z-index: 1;
+    margin-top: calc(var(--space-9) * -0.5);
+    perspective: 1600px;
+  }
+
+  .case-hero__frame {
+    border-radius: var(--radius-2xl);
+    overflow: clip;
+    box-shadow: var(--shadow-3);
+    background: var(--surface-raised);
+    border: 1px solid var(--glass-border);
+  }
+
+  .case-hero__chrome {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 36px;
+    padding-inline: 16px;
+    border-bottom: 1px solid var(--glass-border);
+    background: var(--surface-sunken);
+  }
+
+  .case-hero__chrome > span:not(.case-hero__url) {
+    flex-shrink: 0;
+    width: 10px;
+    height: 10px;
+    border-radius: var(--radius-full);
+    background: var(--border-strong);
+  }
+
+  .case-hero__url {
+    min-width: 0;
+    margin-left: var(--space-3);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    color: var(--text-muted);
+  }
+
+  .case-hero__frame :global(.media) {
+    border-radius: 0;
+  }
+
+  .case-hero__art {
+    aspect-ratio: 16 / 9;
+    border-radius: var(--radius-2xl);
+    overflow: clip;
+    box-shadow: var(--shadow-3);
+    background: var(--surface-sunken);
+    border: 1px solid var(--glass-border);
+  }
+
+  .case-study {
+    padding-block: var(--space-9);
+    align-items: start;
   }
 
   .case-study__rail {
@@ -153,36 +326,21 @@ const explore = [
     gap: var(--space-4);
     align-content: start;
     min-width: 0;
-    padding-block: var(--space-5);
-    border-top: 1px solid var(--border-subtle);
-    border-bottom: 1px solid var(--border-subtle);
-    margin-bottom: var(--space-6);
+    padding: var(--space-5);
+    border-radius: var(--radius-xl);
+    margin-bottom: var(--space-7);
   }
 
-  .case-study__links {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-3);
-    list-style: none;
+  .case-study__rail-main,
+  .case-study__rail-side {
+    display: grid;
+    gap: var(--space-4);
+    align-content: start;
+    min-width: 0;
+  }
+
+  .case-study__rail .eyebrow {
     margin: 0;
-    padding: 0;
-  }
-
-  .case-study__links a {
-    display: inline-flex;
-    align-items: center;
-    min-height: 44px;
-  }
-
-  .case-study__note {
-    margin: 0;
-    font-family: var(--font-mono);
-    font-size: var(--step--1);
-    color: var(--text-muted);
-  }
-
-  .case-study__toc {
-    margin-top: var(--space-2);
   }
 
   .case-study__toc ol {
@@ -190,41 +348,54 @@ const explore = [
     margin: 0;
     padding: 0;
     display: grid;
-    gap: var(--space-2);
   }
 
   .case-study__toc a {
+    display: block;
+    padding: 6px 0 6px var(--space-3);
+    border-left: 2px solid var(--glass-border);
     overflow-wrap: anywhere;
     color: var(--text-secondary);
     text-decoration: none;
+    transition:
+      color var(--dur-base),
+      border-color var(--dur-base);
   }
 
-  @media (min-width: 768px) and (max-width: 1023px) {
-    .case-study__rail {
-      grid-template-columns: 1fr 1fr;
-      column-gap: var(--space-6);
-    }
-
-    .case-study__rail :global(.status-badge),
-    .case-study__rail :global(.meta-row),
-    .case-study__rail :global(.chip-list) {
-      grid-column: 1;
-    }
-
-    .case-study__links,
-    .case-study__note,
-    .case-study__toc {
-      grid-column: 2;
-    }
+  .case-study__toc a[aria-current='location'] {
+    color: var(--text-primary);
+    border-left-color: var(--accent);
   }
 
   @media (hover: hover) and (pointer: fine) {
-    .case-study__toc a:hover,
-    .case-study__toc a:focus-visible {
+    .case-study__toc a:hover {
       color: var(--accent);
-      text-decoration: underline;
-      text-underline-offset: 0.15em;
     }
+  }
+
+  .case-study__progress {
+    height: 2px;
+    border-radius: var(--radius-full);
+    overflow: clip;
+    background: var(--glass-border);
+  }
+
+  .case-study__progress span {
+    display: block;
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--highlight));
+    transform-origin: 0 50%;
+    transform: scaleX(0);
+  }
+
+  @supports not (animation-timeline: view()) {
+    .case-study__progress {
+      display: none;
+    }
+  }
+
+  .case-study__related {
+    justify-self: start;
   }
 
   .case-study__prose {
@@ -233,57 +404,129 @@ const explore = [
 
   .case-study__footer {
     display: grid;
-    gap: var(--space-4);
-    margin-top: var(--space-8);
-    padding-top: var(--space-6);
-    border-top: 1px solid var(--border-subtle);
+    gap: var(--space-5);
+    min-width: 0;
   }
 
-  .case-study__next,
+  .next-card {
+    position: relative;
+    display: grid;
+    gap: var(--space-3);
+    margin-top: var(--space-9);
+    padding: var(--space-7);
+    padding-bottom: calc(var(--space-7) + 56px);
+    border-radius: var(--radius-2xl);
+    color: inherit;
+    text-decoration: none;
+    transition: box-shadow var(--dur-base) var(--ease-out);
+  }
+
+  .next-card .eyebrow {
+    margin: 0;
+  }
+
+  .next-card__title {
+    font-family: var(--font-display);
+    font-size: var(--step-4);
+    line-height: 1.1;
+    letter-spacing: var(--tracking-display);
+  }
+
+  .next-card__outcome {
+    max-width: 48ch;
+    color: var(--text-secondary);
+  }
+
+  .next-card__arrow {
+    position: absolute;
+    right: var(--space-6);
+    bottom: var(--space-6);
+    display: inline-grid;
+    place-items: center;
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-full);
+    background: var(--accent);
+    color: var(--text-on-accent);
+    transition: transform var(--dur-base) var(--ease-spring);
+  }
+
+  .next-card:focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 4px;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .next-card:hover {
+      box-shadow: var(--shadow-3);
+    }
+
+    .next-card:hover .next-card__arrow {
+      transform: translateX(6px);
+    }
+  }
+
   .case-study__index {
     margin: 0;
   }
 
-  .case-study__next a {
-    color: var(--text-primary);
-    text-decoration: none;
-    font-family: var(--font-display);
-    font-size: var(--step-1);
-  }
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      .case-hero__frame,
+      .case-hero__art {
+        animation: media-settle linear both;
+        animation-timeline: view();
+        animation-range: entry 0% cover 35%;
+      }
 
-  @media (hover: hover) and (pointer: fine) {
-    .case-study__next a:hover,
-    .case-study__next a:focus-visible {
-      text-decoration: underline;
-      text-underline-offset: 0.15em;
+      .case-study {
+        timeline-scope: --cs-prose;
+      }
+
+      .case-study__prose {
+        view-timeline: --cs-prose block;
+      }
+
+      .case-study__progress span {
+        animation: progress-grow linear both;
+        animation-timeline: --cs-prose;
+        animation-range: contain 0% contain 100%;
+      }
     }
   }
 
-  @media (pointer: coarse) {
-    .case-study__next a {
-      display: inline-flex;
-      align-items: center;
-      min-height: 44px;
+  @keyframes media-settle {
+    from {
+      transform: rotateX(10deg) scale(0.94) translateY(32px);
+      opacity: 0.6;
+    }
+  }
+
+  @keyframes progress-grow {
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  @media (min-width: 768px) and (max-width: 1023px) {
+    .case-study__rail {
+      grid-template-columns: 1fr 1fr;
+      column-gap: var(--space-6);
     }
   }
 
   @media (min-width: 1024px) {
-    .case-study__header,
-    .case-study__hero,
     .case-study__prose,
     .case-study__footer {
-      grid-column: 2 / 10;
+      grid-column: 1 / 9;
     }
 
     .case-study__rail {
-      grid-column: 10 / 13;
-      grid-row: 1 / -1;
+      grid-column: 9 / 13;
+      grid-row: 1 / span 2;
       position: sticky;
-      top: calc(var(--header-h) + var(--space-4));
+      top: calc(var(--header-h) + var(--space-5));
       margin-bottom: 0;
-      padding-block: 0;
-      border-top: 0;
-      border-bottom: 0;
     }
   }
 </style>

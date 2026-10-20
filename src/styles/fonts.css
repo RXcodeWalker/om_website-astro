@@ -2,8 +2,8 @@
   Self-hosted faces, latin subset only. Files are vendored into public/fonts/
   by `npm run fonts:sync` from the Fontsource packages.
 
-  Budget: 124.5KB against a 140KB cap. Newsreader italic (63KB) and a second
-  mono weight (21KB) do not fit and are synthesised by the browser instead.
+  Budget: about 192KB against a 200KB cap; Newsreader italic now shipped.
+  A second mono weight (21KB) does not fit and is synthesised by the browser.
 
   No unicode-range: the files are already latin-only and there are no
   competing subsets of the same families, so the descriptors would cost bytes
@@ -16,6 +16,14 @@
   font-display: swap;
   font-weight: 200 800;
   src: url('/fonts/newsreader-latin-wght-normal.woff2') format('woff2-variations');
+}
+
+@font-face {
+  font-family: 'Newsreader Variable';
+  font-style: italic;
+  font-display: swap;
+  font-weight: 200 800;
+  src: url('/fonts/newsreader-latin-wght-italic.woff2') format('woff2-variations');
 }
 
 @font-face {

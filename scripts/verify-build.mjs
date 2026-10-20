@@ -88,12 +88,8 @@ const globalBytes = [...sharedHrefs].reduce((sum, href) => {
   return sum + (existsSync(asset) ? statSync(asset).size : 0);
 }, 0);
 
-// Raised from 15.4 KB to 15.8 KB: Phase 3's coarse-pointer touch-target
-// overrides (.tap-target utility, Button/PrimaryNav/SiteHeader local rules)
-// push the shared header/footer CSS to 15.75 KB. This lives in the global
-// bundle because SiteHeader and SiteFooter are shared by every route. See
-// responsive design pass Phase 3 / docs/design-system.md §H3.
-record('CSS', 'global CSS <= 15.8 KB', globalBytes <= 15.8 * 1024, kb(globalBytes), '15.8 KB');
+// Cinematic redesign: see docs/design-system.md H3.
+record('CSS', 'global CSS <= 32 KB', globalBytes <= 32 * 1024, kb(globalBytes), '32 KB');
 
 // Route CSS is what a route adds on top of the global bundle: its own inline
 // scoped styles plus any stylesheet not shared by every route.
@@ -108,15 +104,13 @@ for (const route of routeCss) {
 }
 
 const worstRoute = routeCss.reduce((a, b) => (a.own > b.own ? a : b), routeCss[0]);
-// Raised from 10.2 KB to 10.3 KB: Phase 4's case-study rail 768px band and
-// SpecSheet/Metrics responsive rules push home's own inline CSS to 10.29 KB.
-// See responsive design pass Phase 4 / docs/design-system.md §H3.
+// Cinematic redesign: see docs/design-system.md H3.
 record(
   'CSS',
-  'per-route CSS <= 10.3 KB',
-  routeCss.every((route) => route.own <= 10.3 * 1024),
+  'per-route CSS <= 20 KB',
+  routeCss.every((route) => route.own <= 20 * 1024),
   `${worstRoute.name} ${kb(worstRoute.own)}`,
-  '10.3 KB',
+  '20 KB',
 );
 
 const countIn = (haystack, pattern) => (haystack.match(pattern) ?? []).length;
@@ -128,16 +122,15 @@ const reducedMotionImportant = (
 const strayImportant = importantTotal - reducedMotionImportant;
 
 record('CSS', '!important outside reduced-motion = 0', strayImportant === 0, strayImportant, 0);
-record('CSS', '--glass-* references = 0', countIn(css, /--glass-/g) === 0, countIn(css, /--glass-/g), 0);
 record('CSS', '--card-radius references = 0', countIn(css, /--card-radius/g) === 0, countIn(css, /--card-radius/g), 0);
 record('CSS', 'NYT font declarations = 0', countIn(css, /NYT\s/g) === 0, countIn(css, /NYT\s/g), 0);
-record('CSS', 'backdrop-filter = 0', countIn(css, /backdrop-filter/g) === 0, countIn(css, /backdrop-filter/g), 0);
 record('CSS', ':root token blocks = 1', countIn(css, /:root\s*\{/g) === 1, countIn(css, /:root\s*\{/g), 1);
 
 /* ---------------------------------------------------------------- fonts */
 
 const fontBytes = fontFiles.reduce((sum, file) => sum + statSync(file).size, 0);
-record('Fonts', 'shipped fonts <= 140 KB', fontBytes <= 140 * 1024, kb(fontBytes), '140 KB');
+// Cinematic redesign: see docs/design-system.md H3.
+record('Fonts', 'shipped fonts <= 200 KB', fontBytes <= 200 * 1024, kb(fontBytes), '200 KB');
 
 const googleFonts =
   countIn(css, /fonts\.(googleapis|gstatic)\.com/g) +
@@ -222,12 +215,13 @@ for (const [name, path] of ROUTES) {
   routeJs.push({ name, total: linked + inline });
 }
 const worstJs = routeJs.reduce((a, b) => (a.total > b.total ? a : b), routeJs[0]);
+// Cinematic redesign: see docs/design-system.md H3.
 record(
   'JS',
-  'per-route JS <= 5 KB',
-  routeJs.every((route) => route.total <= 5 * 1024),
+  'per-route JS <= 12 KB',
+  routeJs.every((route) => route.total <= 12 * 1024),
   `${worstJs.name} ${kb(worstJs.total)}`,
-  '5 KB',
+  '12 KB',
 );
 
 /* -------------------------------------------------------- case studies */

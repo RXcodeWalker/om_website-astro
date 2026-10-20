@@ -3,10 +3,13 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Section from '../components/primitives/Section.astro';
 import Button from '../components/primitives/Button.astro';
+import Aurora from '../components/primitives/Aurora.astro';
 import ProjectEntry from '../components/patterns/ProjectEntry.astro';
 import AchievementItem from '../components/patterns/AchievementItem.astro';
-import NowBand from '../components/patterns/NowBand.astro';
 import PostRow from '../components/patterns/PostRow.astro';
+import NowCard from '../components/patterns/NowCard.astro';
+import ProofMarquee from '../components/patterns/ProofMarquee.astro';
+import CtaCard from '../components/patterns/CtaCard.astro';
 import { site } from '../config/site';
 import { publishedProjects } from '../utils/projects';
 import { relatedProjectHref, sortAchievementsNewestFirst } from '../utils/achievements';
@@ -21,10 +24,20 @@ const now = nowEntries[0]?.data;
 const picks = await getCollection('writing');
 
 // Achievements: only highlighted entries, newest first, capped at 3.
-// Variant stays the default row — featured weight belongs on /achievements.
+// Compact cards here — featured weight belongs on /achievements.
 const highlights = sortAchievementsNewestFirst(
   (await getCollection('achievements')).map((entry) => entry.data).filter((item) => item.highlight),
 ).slice(0, 3);
+
+// The marquee lists every credential, not just the highlighted ones.
+const allAchievements = sortAchievementsNewestFirst(
+  (await getCollection('achievements')).map((entry) => entry.data),
+);
+const proof = allAchievements.map((item) =>
+  item.credential
+    ? { primary: item.credential, secondary: item.title }
+    : { primary: item.title, secondary: item.issuer },
+);
 ---
 
 <BaseLayout
@@ -35,26 +48,50 @@ const highlights = sortAchievementsNewestFirst(
   <main id="main">
 
     {/* ── 1. Hero ─────────────────────────────────────────────── */}
-    <section class="hero">
+    <section class="hero has-aurora" data-spotlight aria-labelledby="hero-title">
+      <Aurora intensity="hero" grid spotlight />
       <div class="container hero__inner">
-        <p class="hero__kicker">Om Jhamvar · Mumbai</p>
-        <h1 class="hero__title">I build the tools I wish I'd had.</h1>
-        <p class="hero__lede">
-          Currently: an AI speaking coach for IGCSE French learners, and an autonomous
-          robot built at an IIT makerspace. This site keeps the work honest and in public.
+        <p class="eyebrow hero__eyebrow hero-in" style="--d: 0">
+          <span class="pulse-dot" aria-hidden="true"></span>
+          Om Jhamvar · {site.location.split(',')[0]} · {site.grade}
         </p>
-        <div class="hero__actions">
-          <Button href="/projects" variant="primary" size="lg">See the work</Button>
-          <Button href="/about" variant="secondary" size="lg">About me</Button>
-          <Button href="/contact" variant="quiet" size="lg">Get in touch</Button>
+        <h1 id="hero-title" class="hero__title">
+          <span class="hero__line"><span class="hero__line-inner" style="--d: 1">I build the tools</span></span>
+          <span class="hero__line"><span class="hero__line-inner" style="--d: 2"><em class="accent-text">I wish I'd had.</em></span></span>
+        </h1>
+        <div class="hero__row">
+          <div class="hero__copy">
+            <p class="hero__lede hero-in" style="--d: 3">
+              Currently: an AI speaking coach for IGCSE French learners, and an autonomous
+              robot built at an IIT makerspace. This site keeps the work honest and in public.
+            </p>
+            <div class="hero__actions hero-in" style="--d: 4">
+              <Button href="/projects" variant="primary" size="lg" arrow magnetic>See the work</Button>
+              <Button href="/about" variant="secondary" size="lg">About me</Button>
+            </div>
+          </div>
+          {now && <NowCard entry={now} projectHref={relatedProjectHref(now.project, publishedIds)} />}
         </div>
+        <a class="hero__scroll tap-target" href="#projects-heading">
+          <span>Scroll</span>
+          <span class="hero__scroll-line" aria-hidden="true"></span>
+        </a>
       </div>
+      {proof.length > 0 && <ProofMarquee items={proof} />}
     </section>
 
     {/* ── 2. Selected work ────────────────────────────────────── */}
-    <Section kicker="Selected work" heading="Projects" id="projects" headingLevel="h2">
+    <Section
+      index="01"
+      kicker="Selected work"
+      heading="Projects"
+      accent="built in public."
+      id="projects-heading"
+      headingLevel="h2"
+    >
+      <Button slot="action" href="/projects" variant="quiet" size="md">All projects →</Button>
       {projects.length > 0 ? (
-        <div class="stack">
+        <div class="bento">
           {projects.map((project) => (
             <ProjectEntry
               project={project}
@@ -69,56 +106,62 @@ const highlights = sortAchievementsNewestFirst(
           and the results before it earns a page here.
         </p>
       )}
-      <p class="band-action">
-        <Button href="/projects" variant="quiet" size="md">All projects →</Button>
-      </p>
     </Section>
 
     {/* ── 3. Achievements ─────────────────────────────────────── */}
     {highlights.length > 0 && (
-      <Section kicker="Evidence" heading="Achievements" id="achievements" headingLevel="h2">
-        <div>
+      <Section
+        index="02"
+        kicker="Evidence"
+        heading="Achievements"
+        accent="awarded, not claimed."
+        id="achievements"
+        headingLevel="h2"
+      >
+        <Button slot="action" href="/achievements" variant="quiet" size="md">All achievements →</Button>
+        <div class="achievement-cards">
           {highlights.map((achievement) => (
-            <AchievementItem achievement={achievement} />
+            <AchievementItem achievement={achievement} variant="card" />
           ))}
         </div>
-        <p class="band-action">
-          <Button href="/achievements" variant="quiet" size="md">All achievements →</Button>
-        </p>
       </Section>
     )}
 
-    {/* ── 4. Currently ────────────────────────────────────────── */}
-    {now && (
-      <Section kicker="Currently" heading="What I am working on" id="now" headingLevel="h2">
-        <NowBand entry={now} projectHref={relatedProjectHref(now.project, publishedIds)} />
-      </Section>
-    )}
-
-    {/* ── 5. About preview ────────────────────────────────────── */}
-    <Section kicker="The person" heading="About me" id="about" headingLevel="h2">
+    {/* ── 4. About preview ────────────────────────────────────── */}
+    <Section index="03" kicker="The person" heading="About me" id="about" headingLevel="h2">
       <div class="about-preview">
-        <p class="about-preview__text">
-          I learn by building things and writing about them. Guitar and music are the other
-          serious thread — LCM Grade 8 with High Distinction, working toward diploma level,
-          daily practice. I analyse sport the same way I analyse code: as systems where
-          structure decides outcomes.
-        </p>
-        <p class="about-preview__text">
-          This site is the long-term record of how I think and what I can do.
-        </p>
+        <blockquote class="about-preview__quote reveal reveal--blur">
+          <p>I learn by <em class="accent-text">building things</em> and writing about them.</p>
+        </blockquote>
+        <div class="about-preview__body reveal" style="--i: 1">
+          <p>
+            Guitar and music are the other serious thread — LCM Grade 8 with High Distinction,
+            working toward diploma level, daily practice. I analyse sport the same way I analyse
+            code: as systems where structure decides outcomes.
+          </p>
+          <p>This site is the long-term record of how I think and what I can do.</p>
+          <ul class="about-preview__facts">
+            <li class="chip">Guitar · LCM Grade 8</li>
+            <li class="chip">Piano</li>
+            <li class="chip">Football</li>
+            <li class="chip">Formula 1</li>
+            <li class="chip">Mumbai</li>
+          </ul>
+          <div>
+            <Button href="/about" variant="secondary" size="md" arrow>More about me</Button>
+          </div>
+        </div>
       </div>
-      <p class="band-action">
-        <Button href="/about" variant="secondary" size="md">More about me</Button>
-      </p>
     </Section>
 
-    {/* ── 6. Writing ──────────────────────────────────────────── */}
-    <Section kicker="Writing" heading="Selected essays" id="writing" headingLevel="h2">
+    {/* ── 5. Writing ──────────────────────────────────────────── */}
+    <Section index="04" kicker="Writing" heading="Selected essays" id="writing" headingLevel="h2">
+      <Button slot="action" href={site.blogUrl} variant="quiet" size="md" external>Explore all writing ↗</Button>
       {picks.length > 0 ? (
-        <div class="stack stack--tight">
-          {picks.map((pick) => (
+        <div class="post-list">
+          {picks.map((pick, i) => (
             <PostRow
+              index={i + 1}
               href={pick.data.url}
               title={pick.data.title}
               date={pick.data.date.toISOString()}
@@ -133,55 +176,68 @@ const highlights = sortAchievementsNewestFirst(
           understand properly.
         </p>
       )}
-      <p class="band-action">
-        <Button href={site.blogUrl} variant="quiet" size="md" external>Explore all writing ↗</Button>
-      </p>
     </Section>
 
-    {/* ── 7. Contact CTA ──────────────────────────────────────── */}
-    <Section kicker="Contact" heading="Let us talk" id="contact" headingLevel="h2">
-      <p class="band-text">
-        Open to collaboration, academic conversations, project discussions, and
-        opportunities. I reply to everything within a day or so.
-      </p>
-      <p class="band-action">
-        <Button href="/contact" variant="secondary" size="md">Get in touch</Button>
-      </p>
-    </Section>
+    {/* ── 6. Contact CTA ──────────────────────────────────────── */}
+    <div class="home-cta">
+      <CtaCard
+        id="contact"
+        kicker="Contact"
+        heading="Have an idea worth"
+        accent="building?"
+        text="Open to collaboration, academic conversations, project discussions, and opportunities. I reply to everything within a day or so."
+        href="/contact"
+        label="Get in touch"
+      />
+    </div>
 
   </main>
 </BaseLayout>
 
-<style>
+<style is:global>
   /* ── Hero ─────────────────────────────────────────────────────── */
   .hero {
-    padding-block: var(--space-9) var(--space-8);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: 1fr auto;
+    min-height: 100vh;
+    min-height: 100svh;
+    padding-top: calc(var(--header-h) + var(--space-8));
   }
 
   .hero__inner {
     display: grid;
-    gap: var(--space-4);
+    align-content: center;
+    gap: var(--space-6);
+    padding-block: var(--space-7);
   }
 
-  .hero__kicker {
-    margin: 0;
-    font-family: var(--font-mono);
-    font-size: var(--step--2);
-    letter-spacing: var(--tracking-mono);
-    text-transform: uppercase;
-    color: var(--text-muted);
-  }
-
-  /* The only place --step-5 is permitted. */
   .hero__title {
     margin: 0;
-    max-width: 20ch;
-    font-size: var(--step-5);
-    line-height: var(--leading-tight);
+    font-size: var(--step-6);
+    font-weight: 380;
+    line-height: 0.98;
+    letter-spacing: var(--tracking-display);
+  }
+
+  .hero__line {
+    display: block;
+    overflow-x: visible;
+    overflow-y: clip;
+    padding-block: 0.04em 0.12em;
+  }
+
+  .hero__line-inner {
+    display: block;
+  }
+
+  .hero__row {
+    display: grid;
+    gap: var(--space-7);
+    align-items: end;
   }
 
   .hero__lede {
-    margin: 0;
     max-width: var(--measure-narrow);
     font-size: var(--step-1);
     line-height: var(--leading-prose);
@@ -192,12 +248,157 @@ const highlights = sortAchievementsNewestFirst(
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-3);
-    margin-top: var(--space-3);
+    margin-top: var(--space-6);
   }
 
-  /* ── Shared band utilities ────────────────────────────────────── */
-  .stack--tight {
-    --stack-gap: 0;
+  .hero__scroll {
+    justify-self: start;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    letter-spacing: var(--tracking-eyebrow);
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    text-decoration: none;
+  }
+
+  .hero__scroll-line {
+    display: block;
+    width: 48px;
+    height: 1px;
+    background: currentColor;
+    transform-origin: left;
+    animation: scroll-cue 2.4s var(--ease-in-out) infinite;
+  }
+
+  @keyframes scroll-cue {
+    0% {
+      transform: scaleX(0);
+      transform-origin: left;
+    }
+    50% {
+      transform: scaleX(1);
+      transform-origin: left;
+    }
+    50.1% {
+      transform: scaleX(1);
+      transform-origin: right;
+    }
+    100% {
+      transform: scaleX(0);
+      transform-origin: right;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .hero__row {
+      grid-template-columns: minmax(0, 1fr) 380px;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .hero__line-inner {
+      animation: line-rise var(--dur-cinematic) var(--ease-spring) both;
+      animation-delay: calc(120ms + var(--d) * 90ms);
+    }
+
+    .hero-in {
+      animation: hero-in var(--dur-slower) var(--ease-spring) both;
+      animation-delay: calc(300ms + var(--d) * 90ms);
+    }
+  }
+
+  @keyframes line-rise {
+    from {
+      transform: translateY(105%);
+    }
+  }
+
+  @keyframes hero-in {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+  }
+
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .hero__inner {
+        animation: hero-exit linear both;
+        animation-timeline: view();
+        animation-range: exit 0% exit 80%;
+      }
+    }
+  }
+
+  @keyframes hero-exit {
+    to {
+      opacity: 0.2;
+      transform: translateY(-48px) scale(0.98);
+    }
+  }
+
+  /* ── Achievements ─────────────────────────────────────────────── */
+  .achievement-cards {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  @media (min-width: 768px) {
+    .achievement-cards {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .achievement-cards {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  /* ── About preview ────────────────────────────────────────────── */
+  .about-preview {
+    display: grid;
+    gap: var(--space-7);
+  }
+
+  .about-preview__quote {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--step-4);
+    line-height: 1.15;
+    letter-spacing: var(--tracking-tight);
+  }
+
+  .about-preview__body {
+    display: grid;
+    gap: var(--space-4);
+    justify-items: start;
+    color: var(--text-secondary);
+  }
+
+  .about-preview__facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  @media (min-width: 1024px) {
+    .about-preview {
+      grid-template-columns: 6fr 5fr;
+      gap: var(--space-8);
+      align-items: start;
+    }
+  }
+
+  /* ── Writing ──────────────────────────────────────────────────── */
+  .post-list {
+    display: grid;
   }
 
   .band-text {
@@ -206,19 +407,7 @@ const highlights = sortAchievementsNewestFirst(
     color: var(--text-secondary);
   }
 
-  .band-action {
-    margin: var(--space-5) 0 0;
-  }
-
-  /* ── About preview ────────────────────────────────────────────── */
-  .about-preview {
-    display: grid;
-    gap: var(--space-4);
-    max-width: var(--measure-prose);
-  }
-
-  .about-preview__text {
-    margin: 0;
-    color: var(--text-secondary);
+  .home-cta {
+    padding-block: var(--section-gap) 0;
   }
 </style>

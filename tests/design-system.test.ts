@@ -44,8 +44,6 @@ describe('token source integrity', () => {
   });
 
   it('carries no retired token families', () => {
-    expect(css).not.toMatch(/--glass-/);
-    expect(css).not.toMatch(/--blob-/);
     expect(css).not.toMatch(/--card-radius/);
     expect(css).not.toMatch(/--page-atmosphere/);
     expect(css).not.toMatch(/NYT /);
@@ -54,6 +52,13 @@ describe('token source integrity', () => {
   it('keeps radius 0 as the default', () => {
     expect(token('--radius-0', lightScopes)).toBe('0');
     expect(token('--radius-sm', lightScopes)).toBe('2px');
+  });
+
+  it('radius scale ascends', () => {
+    expect(token('--radius-md', lightScopes)).toBe('4px');
+    expect(token('--radius-lg', lightScopes)).toBe('12px');
+    expect(token('--radius-xl', lightScopes)).toBe('20px');
+    expect(token('--radius-2xl', lightScopes)).toBe('28px');
   });
 });
 
@@ -70,6 +75,7 @@ describe('token contrast — light theme', () => {
     ['--status-progress', 4.5],
     ['--status-error', 4.5],
     ['--border-interactive', 3],
+    ['--highlight', 4.5],
   ])('%s meets %s:1 on the page surface', (name, min) => {
     expect(contrastRatio(token(name, lightScopes), surface())).toBeGreaterThanOrEqual(min);
   });
@@ -88,6 +94,7 @@ describe('token contrast — dark theme', () => {
     ['--status-progress', 4.5],
     ['--status-error', 4.5],
     ['--border-interactive', 3],
+    ['--highlight', 4.5],
   ])('%s meets %s:1 on the page surface', (name, min) => {
     expect(contrastRatio(token(name, darkScopes), surface())).toBeGreaterThanOrEqual(min);
   });

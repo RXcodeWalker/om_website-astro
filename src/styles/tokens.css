@@ -43,17 +43,43 @@
   --accent-hover: #16307c;
   --focus-ring: #1b3fa0;
 
+  /* Highlight — warm gold, echoes the blog */
+  --highlight: #8a6418;
+  --highlight-soft: #c9a24e;
+
   /* Status */
   --status-shipped: #2f6b4f;
   --status-progress: #8a5a12;
   --status-error: #8c2f39;
   --status-quiet: var(--text-muted);
 
+  /* Glass and layered surfaces */
+  --glass-bg: color-mix(in srgb, var(--paper-0) 70%, transparent);
+  --glass-bg-strong: color-mix(in srgb, var(--paper-0) 86%, transparent);
+  --glass-border: color-mix(in srgb, var(--ink-050) 9%, transparent);
+  --glass-highlight: inset 0 1px 0 rgb(255 255 255 / 0.65);
+  --glass-blur: saturate(160%) blur(18px);
+  --card-bg: color-mix(in srgb, var(--paper-0) 80%, transparent);
+  --wash: color-mix(in srgb, var(--ink-050) 5%, transparent);
+  --grid-line: color-mix(in srgb, var(--ink-050) 7%, transparent);
+
+  /* Aurora */
+  --aurora-a: color-mix(in srgb, var(--accent) 26%, transparent);
+  --aurora-b: color-mix(in srgb, var(--highlight-soft) 30%, transparent);
+  --aurora-c: color-mix(in srgb, var(--accent-hover) 16%, transparent);
+  --noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --noise-opacity: 0.05;
+
   /* Elevation */
   --shadow-header: 0 1px 0 var(--border-subtle);
   --shadow-overlay: 0 24px 48px -24px rgb(0 0 0 / 0.35);
+  --shadow-1: 0 1px 2px rgb(23 21 18 / 0.05), 0 2px 8px -2px rgb(23 21 18 / 0.08);
+  --shadow-2: 0 2px 4px rgb(23 21 18 / 0.04), 0 12px 32px -8px rgb(23 21 18 / 0.14);
+  --shadow-3: 0 4px 8px rgb(23 21 18 / 0.05), 0 32px 64px -16px rgb(23 21 18 / 0.24);
+  --shadow-glow: 0 0 0 1px color-mix(in srgb, var(--accent) 28%, transparent), 0 16px 40px -12px color-mix(in srgb, var(--accent) 45%, transparent);
 
   /* Stacking */
+  --z-scrim: 90;
   --z-header: 100;
   --z-menu: 200;
   --z-overlay: 300;
@@ -69,13 +95,16 @@
   --space-8: 4rem;
   --space-9: 6rem;
   --gutter: clamp(1.25rem, 4vw, 2.5rem);
-  --section-gap: clamp(4rem, 9vw, 8rem);
+  --section-gap: clamp(5rem, 10vw, 9rem);
   --block-gap: var(--space-6);
 
   /* Radius */
   --radius-0: 0;
   --radius-sm: 2px;
   --radius-md: 4px;
+  --radius-lg: 12px;
+  --radius-xl: 20px;
+  --radius-2xl: 28px;
   --radius-full: 999px;
 
   /* Typography families */
@@ -93,6 +122,7 @@
   --step-3: clamp(1.75rem, 1.6rem + 0.7vw, 2.25rem);
   --step-4: clamp(2.25rem, 1.95rem + 1.4vw, 3rem);
   --step-5: clamp(2.75rem, 2.2rem + 2.6vw, 4rem);
+  --step-6: clamp(3rem, 1.4rem + 6.2vw, 6.5rem);
 
   --leading-tight: 1.1;
   --leading-snug: 1.25;
@@ -101,22 +131,28 @@
 
   --tracking-tight: -0.02em;
   --tracking-mono: 0.08em;
+  --tracking-display: -0.035em;
+  --tracking-eyebrow: 0.14em;
 
   --measure-narrow: 46ch;
   --measure-prose: 62ch;
   --measure-wide: 78ch;
 
   /* Layout */
-  --container: 1120px;
+  --container: 1200px;
   --container-narrow: 720px;
-  --container-wide: 1320px;
-  --header-h: 64px;
+  --container-wide: 1360px;
+  --header-h: 72px;
 
   /* Motion */
   --dur-fast: 140ms;
   --dur-base: 220ms;
   --dur-slow: 360ms;
+  --dur-slower: 600ms;
+  --dur-cinematic: 900ms;
   --ease-out: cubic-bezier(0.2, 0, 0, 1);
+  --ease-spring: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
 }
 
 /* Dark theme */
@@ -140,6 +176,22 @@ html[data-theme='dark'] {
   --status-progress: #e3b267;
   --status-error: #e8969c;
   --shadow-header: 0 1px 0 var(--border-subtle);
+  --highlight: #e3c27a;
+  --highlight-soft: #b8924a;
+  --glass-bg: color-mix(in srgb, var(--ink-700) 62%, transparent);
+  --glass-bg-strong: color-mix(in srgb, var(--ink-700) 84%, transparent);
+  --glass-border: rgb(255 255 255 / 0.08);
+  --glass-highlight: inset 0 1px 0 rgb(255 255 255 / 0.06);
+  --card-bg: color-mix(in srgb, var(--ink-700) 78%, transparent);
+  --wash: rgb(255 255 255 / 0.04);
+  --grid-line: rgb(255 255 255 / 0.05);
+  --aurora-a: color-mix(in srgb, var(--accent) 22%, transparent);
+  --aurora-b: color-mix(in srgb, var(--highlight-soft) 14%, transparent);
+  --aurora-c: color-mix(in srgb, var(--accent-hover) 16%, transparent);
+  --noise-opacity: 0.07;
+  --shadow-1: 0 1px 2px rgb(0 0 0 / 0.4), 0 2px 8px -2px rgb(0 0 0 / 0.5);
+  --shadow-2: 0 2px 4px rgb(0 0 0 / 0.3), 0 12px 32px -8px rgb(0 0 0 / 0.6);
+  --shadow-3: 0 4px 8px rgb(0 0 0 / 0.3), 0 32px 64px -16px rgb(0 0 0 / 0.7);
 }
 
 /* Accent: ink (default) — values set in :root above */

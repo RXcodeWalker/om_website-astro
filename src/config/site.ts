@@ -9,6 +9,9 @@ export const site = {
     'Projects, achievements, and writing by Om Jhamvar — building in public across web, AI, and hardware.',
   ogImage: '/og/default.png',
   formspreeId: 'xzdajdnn',
+  location: 'Mumbai, India',
+  timezone: 'Asia/Kolkata',
+  grade: '11th grade',
   socials: [
     {
       label: 'GitHub',

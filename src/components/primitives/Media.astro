@@ -62,18 +62,20 @@ const aspectRatios: Record<Exclude<Ratio, 'free'>, string> = {
   .media--framed {
     aspect-ratio: var(--media-ratio);
     overflow: hidden;
-    border: 1px solid var(--border-subtle);
+    border-radius: inherit;
+    border: 0;
   }
 
-  .media__picture :global(img) {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  .media:not(.media--framed) .media__picture :global(img) {
+  /* Picture forwards the class to the <img> itself, not the <picture>. */
+  .media__picture {
+    display: block;
     width: 100%;
     height: auto;
     object-fit: contain;
+  }
+
+  .media--framed .media__picture {
+    height: 100%;
+    object-fit: cover;
   }
 </style>

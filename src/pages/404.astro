@@ -1,19 +1,22 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Button from '../components/primitives/Button.astro';
+import Aurora from '../components/primitives/Aurora.astro';
 ---
 
 <BaseLayout title="Page not found" noindex>
-  <main id="main">
-    <div class="container not-found">
-      <p class="not-found__kicker">404</p>
-      <h1 class="not-found__title">Page not found</h1>
+  <main id="main" class="not-found has-aurora" data-spotlight>
+    <Aurora intensity="hero" grid spotlight />
+    <div class="container not-found__inner">
+      <p class="not-found__code" aria-hidden="true">404</p>
+      <p class="eyebrow">Error 404</p>
+      <h1 class="not-found__title">This page <em class="accent-text">wandered off.</em></h1>
       <p class="not-found__lede">
         The page you are looking for does not exist, or has been moved.
       </p>
       <div class="not-found__actions">
-        <Button href="/" variant="primary">Go home</Button>
-        <Button href="/projects" variant="secondary">See projects</Button>
+        <Button href="/" variant="primary" size="lg" arrow magnetic>Go home</Button>
+        <Button href="/projects" variant="secondary" size="lg">See projects</Button>
       </div>
     </div>
   </main>
@@ -21,22 +24,45 @@ import Button from '../components/primitives/Button.astro';
 
 <style>
   .not-found {
-    padding-block: var(--space-9);
+    min-height: 100vh;
+    min-height: 100svh;
     display: grid;
-    gap: var(--space-4);
+    align-items: center;
+    padding-top: var(--header-h);
   }
 
-  .not-found__kicker {
+  .not-found__inner {
+    display: grid;
+    gap: var(--space-4);
+    justify-items: start;
+    padding-block: var(--space-8);
+  }
+
+  .not-found__code {
     margin: 0;
-    font-family: var(--font-mono);
-    font-size: var(--step--1);
-    letter-spacing: var(--tracking-mono);
-    color: var(--text-muted);
+    font-family: var(--font-display);
+    font-size: clamp(7rem, 30vw, 20rem);
+    line-height: 0.8;
+    letter-spacing: -0.05em;
+    color: transparent;
+    -webkit-text-stroke: 1.5px var(--border-strong);
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--accent) 18%, transparent),
+      transparent 80%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    user-select: none;
+  }
+
+  .not-found .eyebrow {
+    margin: 0;
   }
 
   .not-found__title {
     margin: 0;
-    font-size: var(--step-4);
+    font-size: var(--step-5);
   }
 
   .not-found__lede {

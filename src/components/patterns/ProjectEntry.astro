@@ -3,6 +3,8 @@ import type { CollectionEntry } from 'astro:content';
 import Media from '../primitives/Media.astro';
 import ChipList from '../primitives/ChipList.astro';
 import StatusBadge from '../primitives/StatusBadge.astro';
+import ProjectArt from '../primitives/ProjectArt.astro';
+import Icon from '../primitives/Icon.astro';
 
 interface Props {
   project: CollectionEntry<'projects'>;
@@ -36,36 +38,64 @@ const explore = [
     : []),
 ];
 const chipMax = variant === 'compact' ? 3 : 5;
+
+const live = data.links.find((link) => link.kind === 'live');
+const host = live ? new URL(live.href).host : `beyondthebasics.me/projects/${project.id}`;
+const vtTitle = `project-title-${project.id}`;
+const vtMedia = `project-media-${project.id}`;
 ---
 
 <article
   id={project.id}
   class:list={[
     'project-entry',
+    'surface-card',
+    'reveal',
+    'reveal--scale',
     `project-entry--${variant}`,
-    !data.thumbnail && 'project-entry--text-only',
+    !data.thumbnail && 'project-entry--art',
   ]}
+  data-tilt={linked ? '' : undefined}
 >
-  {data.thumbnail && (
-    <div class="project-entry__media">
-      <Media
-        src={data.thumbnail.src}
-        alt={data.thumbnail.alt}
-        ratio="16:10"
-        eager={variant === 'featured'}
-        sizes={
-          variant === 'row'
-            ? '(min-width: 1024px) 440px, 100vw'
-            : '(min-width: 1120px) 1120px, 100vw'
-        }
-      />
-    </div>
-  )}
+  <span class="project-entry__glare" aria-hidden="true"></span>
+
+  <div class="project-entry__stage" style={`view-transition-name: ${vtMedia}`}>
+    {
+      data.thumbnail ? (
+        <div class="project-entry__frame">
+          <div class="project-entry__chrome" aria-hidden="true">
+            <span />
+            <span />
+            <span />
+            <span class="project-entry__url">{host}</span>
+          </div>
+          <Media
+            src={data.thumbnail.src}
+            alt={data.thumbnail.alt}
+            ratio="16:10"
+            eager={variant === 'featured'}
+            sizes={
+              variant === 'row'
+                ? '(min-width: 1024px) 440px, 100vw'
+                : '(min-width: 1120px) 1120px, 100vw'
+            }
+          />
+        </div>
+      ) : (
+        <div class="project-entry__art">
+          <ProjectArt category={data.category} />
+        </div>
+      )
+    }
+  </div>
 
   <div class="project-entry__body">
-    {data.kicker && <p class="project-entry__kicker">{data.kicker}</p>}
+    <div class="project-entry__top">
+      {data.kicker && <p class="eyebrow">{data.kicker}</p>}
+      <StatusBadge status={data.status} />
+    </div>
 
-    <Heading class="project-entry__title">
+    <Heading class="project-entry__title" style={`view-transition-name: ${vtTitle}`}>
       {linked ? (
         <a href={linkHref} class="project-entry__link">{data.title}</a>
       ) : (
@@ -78,19 +108,17 @@ const chipMax = variant === 'compact' ? 3 : 5;
     {showSummary && <p class="project-entry__summary">{data.summary}</p>}
 
     <div class="project-entry__meta">
-      <StatusBadge status={data.status} />
       <time class="project-entry__year tabular-nums" datetime={String(data.year)}>
         {data.year}
       </time>
+      <ChipList items={[...data.stack]} max={chipMax} />
     </div>
-
-    <ChipList items={[...data.stack]} max={chipMax} />
 
     {showExplore && explore.length > 0 && (
       <ul class="project-entry__actions" aria-label={`Explore ${data.title}`}>
         {explore.map((item) => (
           <li>
-            <a class="link-ui link-external" href={item.href} rel="noopener noreferrer">
+            <a class="project-entry__pill link-external" href={item.href} rel="noopener noreferrer">
               {item.label}
             </a>
           </li>
@@ -101,67 +129,175 @@ const chipMax = variant === 'compact' ? 3 : 5;
     {showExplore && explore.length === 0 && data.linksNote && (
       <p class="project-entry__note">{data.linksNote}</p>
     )}
+
+    {linked && (
+      <span class="project-entry__cta" aria-hidden="true">
+        View case study <Icon name="arrow-right" />
+      </span>
+    )}
   </div>
 </article>
 
-<style>
+<style is:global>
+  /*
+    Unscoped to fit the per-route CSS budget; every selector is namespaced by
+    the project-entry block. The row and featured layouts live in
+    projects.astro, the only route that renders them.
+  */
   .project-entry {
-    position: relative;
     display: grid;
-    gap: var(--space-4);
-    padding-block: var(--space-6);
-    border-top: 1px solid var(--border-subtle);
+    align-content: start;
+    overflow: clip;
+    isolation: isolate;
+    border-radius: var(--radius-2xl);
+    --glare: 0.18;
+    transition:
+      box-shadow var(--dur-base),
+      border-color var(--dur-base);
   }
 
-  .project-entry--featured {
-    padding-block: var(--space-8);
+  html[data-theme='dark'] .project-entry {
+    --glare: 0.07;
   }
 
-  @media (min-width: 768px) {
-    .project-entry--row:not(.project-entry--text-only) {
-      grid-template-columns: 5fr 7fr;
-      gap: var(--space-6);
-      align-items: start;
-    }
+  /* Tilt only runs alongside the reveal, so it sits on the settled state. It ties the reveal's `transform: none` and wins by loading later. */
+  html.js .project-entry.is-visible {
+    transform: perspective(1200px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+    transition:
+      transform var(--dur-slower) var(--ease-spring),
+      opacity var(--dur-slower) var(--ease-spring),
+      box-shadow var(--dur-base),
+      border-color var(--dur-base);
+  }
+
+  html.js .project-entry.is-visible[data-tilting] {
+    transition-duration: 80ms, var(--dur-slower), var(--dur-base), var(--dur-base);
+  }
+
+  .project-entry__glare {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    background: radial-gradient(
+      420px circle at var(--gx, 50%) var(--gy, 0%),
+      rgb(255 255 255 / var(--glare)),
+      transparent 60%
+    );
+    opacity: 0;
+    transition: opacity var(--dur-base);
+  }
+
+  [data-tilting] > .project-entry__glare {
+    opacity: 1;
+  }
+
+  .project-entry__stage {
+    position: relative;
+    padding: clamp(var(--space-4), 3vw, var(--space-6));
+    background:
+      radial-gradient(120% 90% at 80% 0%, var(--aurora-a), transparent 60%),
+      radial-gradient(90% 80% at 0% 100%, var(--aurora-b), transparent 60%),
+      var(--surface-sunken);
+  }
+
+  .project-entry__stage::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+    background-size: 32px 32px;
+    mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, #000 20%, transparent 80%);
+    pointer-events: none;
+  }
+
+  .project-entry__frame,
+  .project-entry__art {
+    position: relative;
+    width: 100%;
+    border-radius: var(--radius-lg);
+    overflow: clip;
+    background: var(--surface-raised);
+    box-shadow: var(--shadow-3);
+    transform: translateY(var(--lift, 0));
+    transition: transform var(--dur-slower) var(--ease-spring);
+  }
+
+  .project-entry__chrome {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 28px;
+    padding-inline: 12px;
+    border-bottom: 1px solid var(--glass-border);
+    background: var(--surface-sunken);
+  }
+
+  .project-entry__chrome > span:not(.project-entry__url) {
+    flex-shrink: 0;
+    width: 8px;
+    height: 8px;
+    border-radius: var(--radius-full);
+    background: var(--border-strong);
+  }
+
+  .project-entry__url {
+    min-width: 0;
+    margin-left: var(--space-3);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-muted);
+  }
+
+  .project-entry__art {
+    aspect-ratio: 16 / 10;
+    background: var(--surface-page);
+    box-shadow: var(--shadow-2);
   }
 
   .project-entry__body {
     display: grid;
+    align-content: start;
     gap: var(--space-3);
+    padding: var(--space-5) var(--space-5) var(--space-6);
   }
 
-  .project-entry__kicker {
-    margin: 0;
-    font-family: var(--font-mono);
-    font-size: var(--step--2);
-    letter-spacing: var(--tracking-mono);
-    text-transform: uppercase;
-    color: var(--text-muted);
+  .project-entry__top {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-3);
   }
 
   .project-entry__title {
     margin: 0;
-    font-size: var(--step-2);
-  }
-
-  .project-entry--featured .project-entry__title {
     font-size: var(--step-3);
+    font-weight: 400;
   }
 
   .project-entry__link {
     color: inherit;
     text-decoration: none;
+    text-underline-offset: 0.15em;
+    text-decoration-thickness: 1px;
   }
 
   .project-entry__link::after {
     content: '';
     position: absolute;
     inset: 0;
+    z-index: 3;
   }
 
   .project-entry__outcome {
     margin: 0;
-    color: var(--text-primary);
+    color: var(--text-secondary);
   }
 
   .project-entry__summary {
@@ -174,7 +310,7 @@ const chipMax = variant === 'compact' ? 3 : 5;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: var(--space-4);
+    gap: var(--space-3);
   }
 
   .project-entry__year {
@@ -185,19 +321,31 @@ const chipMax = variant === 'compact' ? 3 : 5;
 
   .project-entry__actions {
     position: relative;
-    z-index: 1;
+    z-index: 4;
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-3);
+    gap: var(--space-2);
     list-style: none;
-    margin: 0;
+    margin: var(--space-2) 0 0;
     padding: 0;
   }
 
-  .project-entry__actions a {
+  .project-entry__pill {
+    position: relative;
+    z-index: 4;
     display: inline-flex;
     align-items: center;
-    min-height: 44px;
+    min-height: 36px;
+    padding-inline: 14px;
+    font-size: var(--step--1);
+    color: var(--text-primary);
+    text-decoration: none;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--glass-border);
+    background: var(--glass-bg-strong);
+    transition:
+      border-color var(--dur-base),
+      color var(--dur-base);
   }
 
   .project-entry__note {
@@ -208,26 +356,62 @@ const chipMax = variant === 'compact' ? 3 : 5;
     color: var(--text-muted);
   }
 
-  .project-entry__media :global(.media) {
-    transition: transform var(--dur-base) var(--ease-out);
+  .project-entry__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: var(--space-2);
+    font-weight: 500;
+    color: var(--accent);
+  }
+
+  .project-entry__cta svg {
+    transition: transform var(--dur-base) var(--ease-spring);
+  }
+
+  @media (pointer: coarse) {
+    .project-entry__link {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+    }
+
+    .project-entry__pill {
+      min-height: 44px;
+    }
   }
 
   @media (hover: hover) and (pointer: fine) {
-    .project-entry:hover {
-      border-color: var(--border-strong);
+    .project-entry:is(:hover, :has(:focus-visible)) {
+      --lift: -6px;
+      box-shadow: var(--glass-highlight), var(--shadow-3);
+      border-color: color-mix(in srgb, var(--accent) 30%, var(--glass-border));
     }
 
-    .project-entry:hover .project-entry__link {
+    .project-entry:is(:hover, :has(:focus-visible)) .project-entry__link {
       text-decoration: underline;
-      text-underline-offset: 0.15em;
     }
 
-    .project-entry:hover .project-entry__media :global(img) {
-      transform: scale(1.02);
+    .project-entry:is(:hover, :has(:focus-visible)) .project-entry__frame img {
+      transform: scale(1.03);
+    }
+
+    .project-entry:is(:hover, :has(:focus-visible)) .project-entry__cta svg {
+      transform: translateX(4px);
+    }
+
+    .project-entry__pill:is(:hover, :focus-visible) {
+      color: var(--accent);
+      border-color: var(--border-strong);
     }
   }
 
   .project-entry:has(:focus-visible) {
-    border-color: var(--border-strong);
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 4px;
+  }
+
+  .project-entry__link:focus-visible {
+    outline: none;
   }
 </style>

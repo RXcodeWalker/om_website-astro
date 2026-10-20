@@ -24,7 +24,7 @@ if (!empty) {
 
 {
   parsed.length > 0 && (
-    <dl class="spec-sheet tabular-nums">
+    <dl class="spec-sheet surface-card tabular-nums">
       {parsed.map((item) => (
         <div class="spec-sheet__row">
           <dt class="spec-sheet__label">{item.label}</dt>
@@ -40,6 +40,8 @@ if (!empty) {
     margin: var(--space-6) 0;
     display: grid;
     gap: var(--space-3);
+    padding: var(--space-5) var(--space-6);
+    border-radius: var(--radius-xl);
   }
 
   .spec-sheet__row {
@@ -48,7 +50,12 @@ if (!empty) {
     gap: var(--space-1);
     margin: 0;
     padding-bottom: var(--space-3);
-    border-bottom: 1px solid var(--border-subtle);
+    border-bottom: 1px solid var(--glass-border);
+  }
+
+  .spec-sheet__row:last-child {
+    padding-bottom: 0;
+    border-bottom: 0;
   }
 
   @media (min-width: 480px) {

@@ -15,6 +15,11 @@
   width: min(var(--container), 100% - 2 * var(--gutter));
 }
 
+.container-wide {
+  margin-inline: auto;
+  width: min(var(--container-wide), 100% - 2 * var(--gutter));
+}
+
 .stack {
   display: flex;
   flex-direction: column;
@@ -36,12 +41,13 @@
 
 .chip {
   display: inline-block;
-  padding: 2px 8px;
+  padding: 3px 10px;
   font-family: var(--font-mono);
   font-size: var(--step--2);
   color: var(--text-secondary);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
+  background: var(--wash);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-full);
 }
 
 .chip-list {
@@ -85,5 +91,222 @@
     align-items: center;
     min-height: 44px;
     min-width: 44px;
+  }
+}
+
+/* Layered surfaces */
+.glass {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-highlight), var(--shadow-2);
+}
+
+@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+  .glass {
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+  }
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass {
+    background: var(--glass-bg-strong);
+  }
+}
+
+.surface-card {
+  position: relative;
+  background: var(--card-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--glass-highlight), var(--shadow-1);
+}
+
+.has-aurora {
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
+}
+
+/* Kickers */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--step--2);
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.eyebrow__index {
+  color: var(--accent);
+}
+
+.eyebrow__index::before {
+  content: '';
+  display: inline-block;
+  width: 28px;
+  height: 1px;
+  margin-right: var(--space-2);
+  vertical-align: middle;
+  background: currentColor;
+}
+
+.has-aurora .eyebrow {
+  color: var(--text-secondary);
+}
+
+.accent-text {
+  font-style: italic;
+  background: linear-gradient(100deg, var(--accent) 15%, var(--highlight) 85%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  padding-inline-end: 0.06em;
+}
+
+/* Project grid shared by home and about */
+.bento {
+  display: grid;
+  gap: var(--space-5);
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 768px) {
+  .bento {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .bento > :last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (min-width: 1024px) {
+  .bento {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: var(--space-6);
+  }
+
+  .bento > :nth-child(4n + 1) {
+    grid-column: span 7;
+  }
+
+  .bento > :nth-child(4n + 2) {
+    grid-column: span 5;
+  }
+
+  .bento > :nth-child(4n + 3) {
+    grid-column: span 5;
+  }
+
+  .bento > :nth-child(4n + 4) {
+    grid-column: span 7;
+  }
+
+  .bento > :only-child,
+  .bento > :last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+}
+
+.link-arrow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.link-arrow__icon {
+  display: inline-block;
+  transition: transform var(--dur-base) var(--ease-spring);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .link-arrow:hover .link-arrow__icon,
+  .link-arrow:focus-visible .link-arrow__icon {
+    transform: translateX(4px);
+  }
+
+  .link-arrow--external:hover .link-arrow__icon,
+  .link-arrow--external:focus-visible .link-arrow__icon {
+    transform: translate(3px, -3px);
+  }
+}
+
+.marquee-mask {
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+
+/* Live indicator shared by the hero, StatusBadge, NowBand, and Contact */
+.pulse-dot {
+  position: relative;
+  display: inline-block;
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  --pulse: var(--status-shipped);
+  background: var(--pulse);
+}
+
+/* A box-shadow ring, not a scaled box: shadows never add scrollable overflow. */
+.pulse-dot::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  animation: pulse-ring 2.2s var(--ease-out) infinite;
+}
+
+@keyframes pulse-ring {
+  from {
+    box-shadow: 0 0 0 0 var(--pulse);
+    opacity: 0.55;
+  }
+  to {
+    box-shadow: 0 0 0 6px var(--pulse);
+    opacity: 0;
+  }
+}
+
+/* Copy-to-clipboard, shared by the footer and the contact page */
+.copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  padding-inline: 16px;
+  font-size: var(--step--1);
+  color: var(--text-primary);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg-strong);
+  cursor: pointer;
+  transition:
+    background-color var(--dur-base),
+    border-color var(--dur-base);
+}
+
+.copy-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+html:not(.js) .copy-btn {
+  display: none;
+}
+
+.copy-btn[data-copied='true'] .copy-btn__label {
+  color: var(--status-shipped);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .copy-btn:hover {
+    background: var(--surface-raised);
+    border-color: var(--border-strong);
   }
 }

@@ -25,10 +25,10 @@ if (!empty) {
   parsed.length > 0 && (
     <dl class="metrics tabular-nums">
       {parsed.map((item) => (
-        <div class="metrics__item">
+        <div class="metrics__item surface-card">
           <dt class="metrics__label">{item.label}</dt>
           <dd class="metrics__value">
-            {item.value}
+            <span class="metrics__figure accent-text">{item.value}</span>
             {item.note && <span class="metrics__note">{item.note}</span>}
           </dd>
         </div>
@@ -47,6 +47,8 @@ if (!empty) {
 
   .metrics__item {
     margin: 0;
+    padding: var(--space-5);
+    border-radius: var(--radius-xl);
   }
 
   .metrics__label {
@@ -59,10 +61,16 @@ if (!empty) {
   }
 
   .metrics__value {
-    margin: var(--space-1) 0 0;
+    margin: var(--space-2) 0 0;
     font-family: var(--font-display);
-    font-size: var(--step-2);
     color: var(--text-primary);
+  }
+
+  .metrics__figure {
+    display: inline-block;
+    font-size: var(--step-4);
+    line-height: 1.1;
+    letter-spacing: var(--tracking-tight);
   }
 
   .metrics__note {

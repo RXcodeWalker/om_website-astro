@@ -6,8 +6,8 @@ interface Props {
 const { title } = Astro.props;
 ---
 
-<div class="empty-state">
-  <p class="empty-state__title">{title}</p>
+<div class="empty-state surface-card">
+  <p class="empty-state__title eyebrow">{title}</p>
   <div class="empty-state__body">
     <slot />
   </div>
@@ -16,18 +16,11 @@ const { title } = Astro.props;
 <style>
   .empty-state {
     display: grid;
+    justify-items: center;
     gap: var(--space-3);
-    padding-block: var(--space-6);
-    border-top: 1px solid var(--border-subtle);
-  }
-
-  .empty-state__title {
-    margin: 0;
-    font-family: var(--font-mono);
-    font-size: var(--step--2);
-    letter-spacing: var(--tracking-mono);
-    text-transform: uppercase;
-    color: var(--text-muted);
+    padding: var(--space-7);
+    text-align: center;
+    border-style: dashed;
   }
 
   .empty-state__body {

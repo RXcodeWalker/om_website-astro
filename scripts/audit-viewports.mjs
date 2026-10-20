@@ -138,16 +138,19 @@ const INLINE_EXEMPT = '.prose a';
 async function settle(page) {
   await page.waitForLoadState('networkidle');
   await page.evaluate(() => document.fonts.ready);
+  // A lazy image far below the fold is never requested, so waiting on it
+  // would hang; promote those to eager so every image still settles.
   await page.evaluate(() =>
     Promise.all(
-      Array.from(document.images).map((img) =>
-        img.complete
-          ? Promise.resolve()
-          : new Promise((res) => {
-              img.addEventListener('load', res, { once: true });
-              img.addEventListener('error', res, { once: true });
-            }),
-      ),
+      Array.from(document.images).map((img) => {
+        if (img.complete) return Promise.resolve();
+        const done = new Promise((res) => {
+          img.addEventListener('load', res, { once: true });
+          img.addEventListener('error', res, { once: true });
+        });
+        if (img.loading === 'lazy') img.loading = 'eager';
+        return done;
+      }),
     ),
   );
   await page.evaluate(
@@ -392,6 +395,16 @@ async function runTouchTargetPass(browser, base) {
       if (name === '404') continue;
       await page.goto(`${base}${path}`);
       await settle(page);
+      // Measure targets as they are tapped: a reveal not yet entered is
+      // invisible and scaled down, which would undercount its size.
+      await page.evaluate(() => {
+        document.querySelectorAll('.reveal').forEach((el) => el.classList.add('is-visible'));
+        const running = document
+          .getAnimations()
+          .filter((a) => a instanceof CSSTransition)
+          .map((a) => a.finished.catch(() => {}));
+        return Promise.all(running);
+      });
 
       const targets = await page.$$(
         'a, button, input, textarea, select, summary, [role="button"]',

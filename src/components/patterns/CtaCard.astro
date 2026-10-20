@@ -1,0 +1,87 @@
+---
+import Aurora from '../primitives/Aurora.astro';
+import Button from '../primitives/Button.astro';
+import { site } from '../../config/site';
+
+interface Props {
+  kicker: string;
+  heading: string;
+  accent?: string;
+  text: string;
+  href: string;
+  label: string;
+  id?: string;
+  external?: boolean;
+}
+
+const { kicker, heading, accent, text, href, label, id, external = false } = Astro.props;
+---
+
+<section class="cta has-aurora surface-card reveal reveal--scale" aria-labelledby={id} data-spotlight>
+  <Aurora intensity="soft" grid spotlight />
+  <div class="cta__inner">
+    <p class="eyebrow">{kicker}</p>
+    <h2 id={id} class="cta__heading">
+      {heading}
+      {
+        accent && (
+          <>
+            {' '}
+            <em class="accent-text">{accent}</em>
+          </>
+        )
+      }
+    </h2>
+    <p class="cta__text">{text}</p>
+    <div class="cta__actions">
+      <Button href={href} variant="primary" size="lg" arrow magnetic external={external}>
+        {label}
+      </Button>
+      <a class="cta__email link-ui tap-target" href={`mailto:${site.email}`}>{site.email}</a>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  .cta {
+    margin-inline: auto;
+    width: min(var(--container), 100% - 2 * var(--gutter));
+    padding: clamp(var(--space-7), 8vw, var(--space-9)) clamp(var(--space-5), 6vw, var(--space-9));
+    border-radius: var(--radius-2xl);
+  }
+
+  .cta__inner {
+    display: grid;
+    gap: var(--space-4);
+    justify-items: start;
+  }
+
+  .cta__heading {
+    margin: 0;
+    max-width: 16ch;
+    font-size: var(--step-5);
+    letter-spacing: var(--tracking-display);
+    line-height: var(--leading-tight);
+  }
+
+  .cta__text {
+    max-width: var(--measure-narrow);
+    font-size: var(--step-1);
+    line-height: var(--leading-prose);
+    color: var(--text-secondary);
+  }
+
+  .cta__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-5);
+    margin-top: var(--space-6);
+  }
+
+  .cta__email {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    overflow-wrap: anywhere;
+  }
+</style>

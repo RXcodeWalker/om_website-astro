@@ -1,0 +1,111 @@
+---
+interface Props {
+  items: { primary: string; secondary: string }[];
+}
+
+const { items } = Astro.props;
+---
+
+<div class="proof marquee-mask" role="region" aria-label="Credentials">
+  <ul class="proof__track">
+    {
+      items.map((item) => (
+        <li class="proof__item">
+          <span class="proof__primary">{item.primary}</span>
+          <span class="proof__secondary">{item.secondary}</span>
+        </li>
+      ))
+    }
+  </ul>
+  <ul class="proof__track" aria-hidden="true">
+    {
+      items.map((item) => (
+        <li class="proof__item">
+          <span class="proof__primary">{item.primary}</span>
+          <span class="proof__secondary">{item.secondary}</span>
+        </li>
+      ))
+    }
+  </ul>
+</div>
+
+<style is:global>
+  .proof {
+    display: flex;
+    overflow: clip;
+    padding-block: var(--space-5);
+    border-block: 1px solid var(--glass-border);
+  }
+
+  .proof__track {
+    display: flex;
+    flex-shrink: 0;
+    align-items: baseline;
+    gap: 0;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    animation: marquee 48s linear infinite;
+  }
+
+  .proof:hover .proof__track {
+    animation-play-state: paused;
+  }
+
+  @keyframes marquee {
+    to {
+      transform: translateX(-100%);
+    }
+  }
+
+  .proof__item {
+    display: flex;
+    align-items: baseline;
+    white-space: nowrap;
+  }
+
+  .proof__item::after {
+    content: '✦';
+    margin-inline: var(--space-6);
+    color: var(--highlight-soft);
+  }
+
+  .proof__primary {
+    font-family: var(--font-display);
+    font-size: var(--step-2);
+    font-style: italic;
+    color: var(--text-primary);
+  }
+
+  .proof__secondary {
+    margin-left: var(--space-3);
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+    color: var(--text-secondary);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .proof {
+      padding-inline: var(--gutter);
+      -webkit-mask-image: none;
+      mask-image: none;
+    }
+
+    .proof__track[aria-hidden='true'] {
+      display: none;
+    }
+
+    .proof__track {
+      flex-shrink: 1;
+      flex-wrap: wrap;
+      row-gap: var(--space-3);
+      animation: none;
+    }
+
+    .proof__item {
+      white-space: normal;
+    }
+  }
+</style>

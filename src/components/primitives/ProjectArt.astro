@@ -1,0 +1,244 @@
+---
+/* Decorative generative art for projects that have no image. */
+interface Props {
+  category: 'web' | 'ai' | 'hardware' | 'tool';
+}
+
+const { category } = Astro.props;
+const uid = Math.random().toString(36).slice(2, 8);
+const gridId = `pa-grid-${uid}`;
+
+const track = 'M -20 300 C 120 300, 170 120, 310 140 S 500 300, 660 110';
+
+const bars = Array.from({ length: 32 }, (_, i) => {
+  const height = Math.round(Math.abs(Math.sin(i * 0.55)) * 140 + 18);
+  return {
+    x: 56 + i * 17,
+    y: 170 - height / 2,
+    height,
+    opacity: 0.35 + (i % 4) * 0.15,
+    delay: `${i * 45}ms`,
+  };
+});
+
+const nodes = Array.from({ length: 28 }, (_, i) => ({
+  cx: 80 + (i % 7) * 80,
+  cy: 80 + Math.floor(i / 7) * 80,
+}));
+const node = (col: number, row: number) => nodes[row * 7 + col];
+const edges = [
+  [node(0, 0), node(1, 1)],
+  [node(1, 1), node(3, 1)],
+  [node(3, 1), node(4, 2)],
+  [node(2, 2), node(4, 2)],
+  [node(4, 2), node(6, 3)],
+  [node(5, 0), node(4, 2)],
+];
+---
+
+<svg
+  class="project-art"
+  viewBox="0 0 640 400"
+  aria-hidden="true"
+  focusable="false"
+  preserveAspectRatio="xMidYMid slice"
+>
+  <defs>
+    <pattern id={gridId} width="24" height="24" patternUnits="userSpaceOnUse">
+      <path class="art-grid-line" d="M 24 0 L 0 0 0 24" fill="none" />
+    </pattern>
+  </defs>
+  <rect width="100%" height="100%" fill={`url(#${gridId})`} />
+
+  {
+    category === 'hardware' && (
+      <g>
+        <path
+          class="art-track"
+          d={track}
+          fill="none"
+          stroke="currentColor"
+          stroke-width="14"
+          stroke-linecap="round"
+        />
+        <line class="art-dim" x1="110" y1="244" x2="138" y2="220" stroke-dasharray="4 6" />
+        <line class="art-dim" x1="335" y1="106" x2="318" y2="128" stroke-dasharray="4 6" />
+        <line class="art-dim" x1="518" y1="222" x2="490" y2="206" stroke-dasharray="4 6" />
+        <text class="art-label" x="90" y="250">IR</text>
+        <text class="art-label" x="330" y="100">ULTRASONIC</text>
+        <text class="art-label" x="520" y="230">SERVO</text>
+        <g class="art-bot">
+          <rect class="art-bot__wheel" x="-22" y="-26" width="16" height="8" rx="3" />
+          <rect class="art-bot__wheel" x="6" y="-26" width="16" height="8" rx="3" />
+          <rect class="art-bot__wheel" x="-22" y="18" width="16" height="8" rx="3" />
+          <rect class="art-bot__wheel" x="6" y="18" width="16" height="8" rx="3" />
+          <rect class="art-bot__body" x="-26" y="-18" width="52" height="36" rx="8" />
+          <circle class="art-bot__sensor" cx="22" cy="-8" r="3" />
+          <circle class="art-bot__sensor" cx="22" cy="8" r="3" />
+        </g>
+      </g>
+    )
+  }
+
+  {
+    category === 'ai' && (
+      <g>
+        {bars.map((bar) => (
+          <rect
+            class="art-bar"
+            x={bar.x}
+            y={bar.y}
+            width="8"
+            height={bar.height}
+            rx="4"
+            style={`opacity: ${bar.opacity}; animation-delay: ${bar.delay}`}
+          />
+        ))}
+        <rect class="art-wash" x="110" y="290" width="420" height="10" rx="5" />
+        <rect class="art-wash" x="140" y="316" width="360" height="10" rx="5" />
+        <rect class="art-wash" x="190" y="342" width="260" height="10" rx="5" />
+      </g>
+    )
+  }
+
+  {
+    category === 'web' && (
+      <g>
+        <rect class="art-window" x="60" y="50" width="520" height="300" rx="14" />
+        <line class="art-window" x1="60" y1="86" x2="580" y2="86" />
+        <circle class="art-dot" cx="84" cy="68" r="4" />
+        <circle class="art-dot" cx="100" cy="68" r="4" />
+        <circle class="art-dot" cx="116" cy="68" r="4" />
+        <rect class="art-accent" x="84" y="106" width="472" height="92" rx="8" />
+        <rect class="art-wash" x="84" y="214" width="148" height="112" rx="8" />
+        <rect class="art-wash" x="246" y="214" width="148" height="112" rx="8" />
+        <rect class="art-wash" x="408" y="214" width="148" height="112" rx="8" />
+      </g>
+    )
+  }
+
+  {
+    category === 'tool' && (
+      <g>
+        {edges.map(([a, b]) => (
+          <line class="art-edge" x1={a.cx} y1={a.cy} x2={b.cx} y2={b.cy} />
+        ))}
+        {nodes.map((n) => (
+          <circle class="art-node" cx={n.cx} cy={n.cy} r="5" />
+        ))}
+      </g>
+    )
+  }
+</svg>
+
+<style is:global>
+  .project-art {
+    width: 100%;
+    height: 100%;
+    color: var(--text-primary);
+  }
+
+  .art-grid-line {
+    stroke: var(--grid-line);
+  }
+
+  .art-track {
+    opacity: 0.85;
+    stroke-dasharray: 1400;
+    stroke-dashoffset: 0;
+  }
+
+  .art-dim {
+    stroke: var(--text-muted);
+    stroke-width: 1;
+  }
+
+  .art-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    fill: var(--text-muted);
+  }
+
+  .art-bot {
+    offset-path: path('M -20 300 C 120 300, 170 120, 310 140 S 500 300, 660 110');
+    offset-rotate: auto;
+    offset-distance: 46%;
+    animation: art-drive 11s linear infinite;
+  }
+
+  .art-bot__body {
+    fill: var(--accent);
+  }
+
+  .art-bot__wheel {
+    fill: var(--text-primary);
+  }
+
+  .art-bot__sensor {
+    fill: var(--highlight-soft);
+  }
+
+  @keyframes art-drive {
+    from {
+      offset-distance: 0%;
+    }
+    to {
+      offset-distance: 100%;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html.js .reveal:not(.is-visible) .art-track {
+      stroke-dashoffset: 1400;
+    }
+
+    .art-track {
+      transition: stroke-dashoffset 1.8s var(--ease-spring);
+    }
+  }
+
+  .art-bar {
+    fill: var(--accent);
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: art-pulse 1.4s var(--ease-in-out) infinite alternate;
+  }
+
+  @keyframes art-pulse {
+    from {
+      transform: scaleY(1);
+    }
+    to {
+      transform: scaleY(0.55);
+    }
+  }
+
+  .art-wash {
+    fill: var(--wash);
+  }
+
+  .art-window {
+    fill: none;
+    stroke: var(--border-strong);
+    stroke-width: 1.5;
+  }
+
+  .art-dot {
+    fill: var(--border-strong);
+  }
+
+  .art-accent {
+    fill: var(--aurora-a);
+  }
+
+  .art-edge {
+    stroke: var(--accent);
+    stroke-width: 2;
+    opacity: 0.6;
+  }
+
+  .art-node {
+    fill: var(--border-strong);
+  }
+</style>
